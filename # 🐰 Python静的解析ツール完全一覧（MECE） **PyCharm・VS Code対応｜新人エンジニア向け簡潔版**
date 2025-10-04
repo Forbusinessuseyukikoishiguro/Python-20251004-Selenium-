@@ -1,0 +1,725 @@
+# 🐰 Python静的解析ツール完全一覧（MECE）
+**PyCharm・VS Code対応｜新人エンジニア向け簡潔版**
+
+---
+
+## 📚 目次
+
+1. [ツール分類（MECE）](#1-ツール分類mece)
+2. [カテゴリ別ツール一覧](#2-カテゴリ別ツール一覧)
+3. [推奨構成パターン](#3-推奨構成パターン)
+4. [各ツールの設定（簡潔版）](#4-各ツールの設定簡潔版)
+
+---
+
+## 1. ツール分類（MECE）
+
+### 📊 5つのカテゴリ（相互排他・完全網羅）
+
+```
+静的解析ツール
+├── A. リンター（Linter）............... コードの問題検出
+├── B. フォーマッタ（Formatter）......... コード整形
+├── C. 型チェッカー（Type Checker）...... 型検証
+├── D. セキュリティチェッカー............. 脆弱性検出
+└── E. 統合ツール......................... 複数機能を統合
+```
+
+---
+
+## 2. カテゴリ別ツール一覧
+
+### A. リンター（Linter）- コードの問題検出
+
+| ツール | 速度 | 推奨度 | PyCharm | VS Code | 特徴 |
+|--------|------|--------|---------|---------|------|
+| **Ruff** | ★★★★★ | ★★★★★ | ✅ | ✅ | 最速・最新・オールインワン |
+| **Pylint** | ★☆☆☆☆ | ★★☆☆☆ | ✅ | ✅ | 詳細だが遅い（旧世代） |
+| **Flake8** | ★★★☆☆ | ★★★☆☆ | ✅ | ✅ | 軽量（旧世代） |
+| **Pyflakes** | ★★★★☆ | ★★☆☆☆ | ✅ | ✅ | シンプル・高速 |
+| **PyCodeStyle** | ★★★☆☆ | ★★☆☆☆ | ✅ | ✅ | PEP 8専用 |
+
+---
+
+### B. フォーマッタ（Formatter）- コード整形
+
+| ツール | 速度 | 推奨度 | PyCharm | VS Code | 特徴 |
+|--------|------|--------|---------|---------|------|
+| **Ruff Format** | ★★★★★ | ★★★★★ | ✅ | ✅ | Black互換・超高速 |
+| **Black** | ★★★★☆ | ★★★★★ | ✅ | ✅ | 定番・設定不要 |
+| **autopep8** | ★★★☆☆ | ★★☆☆☆ | ✅ | ✅ | PEP 8準拠 |
+| **YAPF** | ★★☆☆☆ | ★★☆☆☆ | ✅ | ✅ | Google製・柔軟 |
+
+---
+
+### C. 型チェッカー（Type Checker）- 型検証
+
+| ツール | 速度 | 推奨度 | PyCharm | VS Code | 特徴 |
+|--------|------|--------|---------|---------|------|
+| **mypy** | ★★★☆☆ | ★★★★★ | ✅ | ✅ | 業界標準 |
+| **Pyright** | ★★★★☆ | ★★★★☆ | ✅ | ✅ | Microsoft製・高速 |
+| **Pyre** | ★★★★☆ | ★★☆☆☆ | ✅ | ✅ | Facebook製 |
+| **Pytype** | ★★☆☆☆ | ★★☆☆☆ | ✅ | ✅ | Google製 |
+
+---
+
+### D. セキュリティチェッカー - 脆弱性検出
+
+| ツール | 速度 | 推奨度 | PyCharm | VS Code | 特徴 |
+|--------|------|--------|---------|---------|------|
+| **Bandit** | ★★★★☆ | ★★★★★ | ✅ | ✅ | セキュリティ専用 |
+| **Safety** | ★★★★☆ | ★★★★☆ | ✅ | ✅ | 依存関係の脆弱性 |
+| **Semgrep** | ★★★☆☆ | ★★★☆☆ | ✅ | ✅ | パターンマッチング |
+
+---
+
+### E. 統合ツール - 複数機能を統合
+
+| ツール | 速度 | 推奨度 | PyCharm | VS Code | 特徴 |
+|--------|------|--------|---------|---------|------|
+| **Ruff** | ★★★★★ | ★★★★★ | ✅ | ✅ | リンター+フォーマッタ |
+| **SonarLint** | ★★☆☆☆ | ★★★☆☆ | ✅ | ✅ | 品質+セキュリティ |
+
+---
+
+### F. その他の便利ツール
+
+| ツール | 用途 | 推奨度 | PyCharm | VS Code |
+|--------|------|--------|---------|---------|
+| **isort** | import文の整理 | ★★★★☆ | ✅ | ✅ |
+| **pydocstyle** | docstringチェック | ★★★☆☆ | ✅ | ✅ |
+| **vulture** | 未使用コード検出 | ★★★☆☆ | ✅ | ✅ |
+| **radon** | コード複雑度測定 | ★★★☆☆ | ✅ | ✅ |
+| **pre-commit** | Git hookフレームワーク | ★★★★★ | ✅ | ✅ |
+
+---
+
+## 3. 推奨構成パターン
+
+### 🎯 パターン1: ミニマル構成（初心者向け）
+
+```bash
+# インストール
+pip install ruff mypy
+
+# 実行
+ruff check . --fix    # リンター
+ruff format .         # フォーマッタ
+mypy .                # 型チェック
+```
+
+**メリット:** シンプル、速い、学習コスト低  
+**用途:** 個人開発、小規模プロジェクト
+
+---
+
+### 🎯 パターン2: スタンダード構成（推奨）
+
+```bash
+# インストール
+pip install ruff mypy bandit pre-commit
+
+# 実行
+ruff check . --fix    # リンター
+ruff format .         # フォーマッタ
+mypy .                # 型チェック
+bandit -r .           # セキュリティチェック
+```
+
+**メリット:** バランス良い、業界標準  
+**用途:** チーム開発、中規模プロジェクト
+
+---
+
+### 🎯 パターン3: 従来型構成（Black派）
+
+```bash
+# インストール
+pip install black flake8 mypy isort
+
+# 実行
+isort .               # import整理
+black .               # フォーマット
+flake8 .              # リンター
+mypy .                # 型チェック
+```
+
+**メリット:** 定番、情報が多い  
+**用途:** 既存プロジェクト、保守的なチーム
+
+---
+
+### 🎯 パターン4: フル装備構成（エンタープライズ）
+
+```bash
+# インストール
+pip install ruff mypy bandit safety semgrep pre-commit
+
+# 実行
+ruff check . --fix
+ruff format .
+mypy .
+bandit -r .
+safety check
+semgrep --config=auto .
+```
+
+**メリット:** 最高の品質保証  
+**用途:** 大規模プロジェクト、金融・医療系
+
+---
+
+## 4. 各ツールの設定（簡潔版）
+
+### A. Ruff（必須）
+
+#### インストール
+```bash
+pip install ruff
+```
+
+#### pyproject.toml
+```toml
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "I", "N", "UP", "B"]
+ignore = ["E501"]
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Ruff
+Program: ruff
+Arguments: check $FilePath$ --fix
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "ruff.enable": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  }
+}
+```
+
+---
+
+### B. Black（フォーマッタ）
+
+#### インストール
+```bash
+pip install black
+```
+
+#### pyproject.toml
+```toml
+[tool.black]
+line-length = 88
+target-version = ['py310']
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Black
+Program: black
+Arguments: $FilePath$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}
+```
+
+---
+
+### C. mypy（型チェック・必須）
+
+#### インストール
+```bash
+pip install mypy
+```
+
+#### pyproject.toml
+```toml
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+disallow_untyped_defs = true
+show_error_codes = true
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: mypy
+Program: mypy
+Arguments: $FilePath$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "python.linting.mypyEnabled": true,
+  "python.linting.enabled": true
+}
+```
+
+---
+
+### D. Pylint（詳細チェック）
+
+#### インストール
+```bash
+pip install pylint
+```
+
+#### .pylintrc
+```ini
+[MASTER]
+max-line-length=88
+
+[MESSAGES CONTROL]
+disable=C0111,R0903
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Pylint
+Program: pylint
+Arguments: $FilePath$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "python.linting.pylintEnabled": true
+}
+```
+
+---
+
+### E. Flake8（軽量リンター）
+
+#### インストール
+```bash
+pip install flake8
+```
+
+#### .flake8
+```ini
+[flake8]
+max-line-length = 88
+extend-ignore = E203, W503
+exclude = .git,__pycache__,venv
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Flake8
+Program: flake8
+Arguments: $FilePath$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "python.linting.flake8Enabled": true
+}
+```
+
+---
+
+### F. Bandit（セキュリティ）
+
+#### インストール
+```bash
+pip install bandit
+```
+
+#### .bandit
+```yaml
+tests:
+  - B201
+  - B301
+exclude_dirs:
+  - /test/
+  - /venv/
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Bandit
+Program: bandit
+Arguments: -r $ProjectFileDir$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "python.linting.banditEnabled": true
+}
+```
+
+---
+
+### G. isort（import整理）
+
+#### インストール
+```bash
+pip install isort
+```
+
+#### pyproject.toml
+```toml
+[tool.isort]
+profile = "black"
+line_length = 88
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: isort
+Program: isort
+Arguments: $FilePath$
+Working directory: $ProjectFileDir$
+```
+
+#### VS Code設定
+```json
+{
+  "isort.check": true
+}
+```
+
+---
+
+### H. pre-commit（自動化・推奨）
+
+#### インストール
+```bash
+pip install pre-commit
+```
+
+#### .pre-commit-config.yaml
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+  
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, .]
+```
+
+#### 有効化
+```bash
+pre-commit install
+```
+
+---
+
+### I. Pyright（Microsoft製型チェッカー）
+
+#### インストール
+```bash
+npm install -g pyright
+# または
+pip install pyright
+```
+
+#### pyrightconfig.json
+```json
+{
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true
+}
+```
+
+#### VS Code設定
+```json
+{
+  "python.analysis.typeCheckingMode": "basic"
+}
+```
+
+---
+
+### J. Safety（依存関係の脆弱性）
+
+#### インストール
+```bash
+pip install safety
+```
+
+#### 実行
+```bash
+# requirements.txtをチェック
+safety check
+
+# pipenv環境
+safety check --json
+
+# poetry環境
+poetry export -f requirements.txt | safety check --stdin
+```
+
+---
+
+### K. Vulture（未使用コード検出）
+
+#### インストール
+```bash
+pip install vulture
+```
+
+#### 実行
+```bash
+vulture .
+```
+
+#### PyCharm設定
+```
+Settings → Tools → External Tools → +
+
+Name: Vulture
+Program: vulture
+Arguments: $ProjectFileDir$
+Working directory: $ProjectFileDir$
+```
+
+---
+
+### L. Radon（複雑度測定）
+
+#### インストール
+```bash
+pip install radon
+```
+
+#### 実行
+```bash
+# サイクロマティック複雑度
+radon cc . -a
+
+# 保守性指数
+radon mi .
+
+# Raw metrics
+radon raw .
+```
+
+---
+
+## 5. IDE別推奨プラグイン
+
+### PyCharm
+
+| プラグイン | 用途 | インストール |
+|-----------|------|------------|
+| **SonarLint** | 品質+セキュリティ | Marketplace |
+| **Ruff** | リンター | Marketplace（または外部ツール） |
+| **File Watchers** | 自動実行 | デフォルト |
+
+---
+
+### VS Code
+
+| 拡張機能 | ID | 用途 |
+|---------|-----|------|
+| **Ruff** | `charliermarsh.ruff` | リンター+フォーマッタ |
+| **Pylance** | `ms-python.vscode-pylance` | 型チェック・IntelliSense |
+| **Black Formatter** | `ms-python.black-formatter` | フォーマッタ |
+| **Mypy** | `ms-python.mypy-type-checker` | 型チェック |
+| **Pylint** | `ms-python.pylint` | リンター |
+| **SonarLint** | `SonarSource.sonarlint-vscode` | 品質 |
+
+---
+
+## 6. 比較表（総合）
+
+### 🎯 用途別おすすめツール
+
+| 用途 | 第1選択 | 第2選択 | 第3選択 |
+|------|---------|---------|---------|
+| **リンター** | Ruff | Pylint | Flake8 |
+| **フォーマッタ** | Ruff Format | Black | autopep8 |
+| **型チェック** | mypy | Pyright | Pyre |
+| **セキュリティ** | Bandit | Safety | Semgrep |
+| **import整理** | Ruff | isort | - |
+| **自動化** | pre-commit | - | - |
+
+---
+
+### 🎯 速度比較（1000ファイル）
+
+| ツール | 処理時間 | 相対速度 |
+|--------|----------|----------|
+| Ruff | 0.5秒 | 100x |
+| Pyright | 3秒 | 16x |
+| Pyflakes | 5秒 | 10x |
+| Flake8 | 15秒 | 3.3x |
+| Black | 20秒 | 2.5x |
+| mypy | 25秒 | 2x |
+| Pylint | 60秒 | 1x（基準） |
+
+---
+
+## 7. クイックスタートガイド
+
+### 🚀 30秒で始める
+
+```bash
+# ステップ1: インストール（3つだけ）
+pip install ruff mypy bandit
+
+# ステップ2: 設定ファイル作成
+cat > pyproject.toml << EOF
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+EOF
+
+# ステップ3: 実行
+ruff check . --fix
+mypy .
+bandit -r .
+```
+
+---
+
+### 🚀 PyCharm 1分セットアップ
+
+```
+1. Settings → Tools → External Tools → +
+
+2. 3つのツールを追加:
+   - Ruff Check
+   - Ruff Format  
+   - mypy
+
+3. ショートカットキー設定（任意）
+   - Ctrl+Alt+R → Ruff
+   - Ctrl+Alt+M → mypy
+
+4. 完了！
+```
+
+---
+
+### 🚀 VS Code 1分セットアップ
+
+```
+1. 拡張機能をインストール:
+   - Ruff
+   - Pylance
+   - Mypy Type Checker
+
+2. settings.jsonに追加:
+{
+  "ruff.enable": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  }
+}
+
+3. 完了！
+```
+
+---
+
+## 8. まとめ
+
+### ✅ 結論：2024年のベストプラクティス
+
+```
+【最小構成】
+Ruff + mypy
+
+【推奨構成】
+Ruff + mypy + Bandit + pre-commit
+
+【フル装備】
+Ruff + mypy + Pyright + Bandit + Safety + pre-commit
+```
+
+---
+
+### ✅ ツール選択フローチャート
+
+```
+新規プロジェクト？
+├─ Yes → Ruff + mypy（最新ツール）
+└─ No → 既存プロジェクトの設定に従う
+         ├─ Black使用中 → Black + Flake8 + mypy
+         └─ 設定なし → Ruff + mypyを提案
+
+セキュリティ重要？
+├─ Yes → Bandit + Safety追加
+└─ No → Ruff + mypyのみ
+
+チーム開発？
+├─ Yes → pre-commit必須
+└─ No → 任意
+```
+
+---
+
+**🐰 うさうさ店長の最終アドバイス:**
+
+「ツールは**多ければいい**わけではありません！
+
+**新人エンジニアへ:**
+1. まず**Ruff + mypy**だけ使う
+2. 慣れたら**Bandit**でセキュリティ
+3. チーム開発なら**pre-commit**で自動化
+
+**重要なのは:**
+- ツールを使うこと < ツールを**継続的に**使うこと
+- 設定を完璧にすること < まず**動かす**こと
+- 全部入れること < **必要なものだけ**入れること
+
+Ruffの登場で、静的解析は**劇的に簡単**になりました。
+ぜひ今日から始めてみてください！🎉」
