@@ -1,0 +1,1620 @@
+
+# ====================================
+# 5大記法 書き換え実践
+# デバッグプリント完全版
+# 何をしているか完全に見える
+# ====================================
+# """
+
+# ====================================
+# パターン1: PEP 257 から書き換えhelp( calc_original_pep)
+# ====================================
+
+print("=" * 70)
+print("【パターン1】PEP 257 → 他の4記法へ書き換え")
+print("=" * 70)
+
+
+# ----- 元: PEP 257 -----
+def calc_original_pep(x, y):
+    """2つの数を足し算する。"""
+    # 【この関数の目的】
+    # - 2つの整数を受け取る
+    # - 足し算する
+    # - 結果を返す
+
+    print(f"  [PEP257元] 実行: {x} + {y}")  # デバッグ
+    result = x + y  # 計算
+    print(f"  [PEP257元] 結果: {result}")  # デバッグ
+    return result
+
+
+print("\n--- PEP 257 → Google への書き換え ---")
+
+
+def calc_pep_to_google(x, y):
+    """
+    2つの数を足し算する。
+
+    Args:
+        x (int): 1つ目の数
+        y (int): 2つ目の数
+
+    Returns:
+        int: x + y の結果
+    """
+    # 【書き換え内容】
+    # PEP 257: """2つの数を足し算する。"""
+    #    ↓
+    # Google: 概要 + Args + Returns
+
+    print(f"  [Google版] 実行: {x} + {y}")
+    print(f"  [Google版] 引数x={x}, y={y} を足し算")
+    result = x + y
+    print(f"  [Google版] 結果: {result}")
+    print(f"  [書き換え成功] PEP 257 → Google")
+    return result
+
+
+print("\n--- PEP 257 → NumPy への書き換え ---")
+
+
+def calc_pep_to_numpy(x, y):
+    """
+    2つの数を足し算する。
+
+    Parameters
+    ----------
+    x : int
+        1つ目の数
+    y : int
+        2つ目の数
+
+    Returns
+    -------
+    int
+        x + y の結果
+    """
+    # 【書き換え内容】
+    # PEP 257: """2つの数を足し算する。"""
+    #    ↓
+    # NumPy: 概要 + Parameters + ハイフン + Returns
+
+    print(f"  [NumPy版] 実行: {x} + {y}")
+    print(f"  [NumPy版] Parameters形式で引数を記述")
+    result = x + y
+    print(f"  [NumPy版] 結果: {result}")
+    print(f"  [書き換え成功] PEP 257 → NumPy")
+    return result
+
+
+print("\n--- PEP 257 → reST への書き換え ---")
+
+
+def calc_pep_to_rest(x, y):
+    """
+    2つの数を足し算する。!
+
+    :param x: 1つ目の数
+    :type x: int
+    :param y: 2つ目の数
+    :type y: int
+    :return: x + y の結果
+    :rtype: int
+    """
+    # 【書き換え内容】
+    # PEP 257: """2つの数を足し算する。"""
+    #    ↓
+    # reST: 概要 + :param/:type + :return/:rtype
+
+    print(f"  [reST版] 実行: {x} + {y}")
+    print(f"  [reST版] :param と :type で引数を2行ずつ記述")
+    result = x + y
+    print(f"  [reST版] 結果: {result}")
+    print(f"  [書き換え成功] PEP 257 → reST")
+    return result
+
+
+print("\n--- PEP 257 → Epytext への書き換え ---")
+
+
+def calc_pep_to_epytext(x, y):
+    """
+    2つの数を足し算する。
+
+    @param x: 1つ目の数
+    @type x: int
+    @param y: 2つ目の数
+    @type y: int
+    @return: x + y の結果
+    @rtype: int
+    """
+    # 【書き換え内容】
+    # PEP 257: """2つの数を足し算する。"""
+    #    ↓
+    # Epytext: 概要 + @param/@type + @return/@rtype
+
+    print(f"  [Epytext版] 実行: {x} + {y}")
+    print(f"  [Epytext版] @ 記法で記述（レガシー）")
+    result = x + y
+    print(f"  [Epytext版] 結果: {result}")
+    print(f"  [書き換え成功] PEP 257 → Epytext")
+    return result
+
+
+# テスト実行
+print("\n▼ パターン1のテスト実行")
+x, y = 10, 5
+print(f"入力値: x={x}, y={y}\n")
+
+print("1-0. 元のPEP 257:")
+calc_original_pep(x, y)
+
+print("\n1-1. PEP 257 → Google:")
+calc_pep_to_google(x, y)
+
+print("\n1-2. PEP 257 → NumPy:")
+calc_pep_to_numpy(x, y)
+
+print("\n1-3. PEP 257 → reST:")
+calc_pep_to_rest(x, y)
+
+print("\n1-4. PEP 257 → Epytext:")
+calc_pep_to_epytext(x, y)
+
+
+# ====================================
+# パターン2: Google から書き換え
+# ====================================
+
+print("\n\n" + "=" * 70)
+print("【パターン2】Google → 他の4記法へ書き換え")
+print("=" * 70)
+
+
+# ----- 元: Google -----
+def calc_original_google(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+
+    Args:
+        x (float): 割られる数
+        y (float): 割る数
+        z (float, optional): 加算する数。デフォルトは10
+
+    Returns:
+        float: 計算結果
+
+    Raises:
+        ValueError: yが0の場合
+    """
+    # 【この関数の目的】
+    # - xをyで割る
+    # - zを足す
+    # - yが0ならエラー
+
+    print(f"  [Google元] 実行: ({x} / {y}) + {z}")
+    if y == 0:
+        print(f"  [Google元] エラー: yが0です")
+        raise ValueError("yは0以外")
+
+    result = x / y + z
+    print(f"  [Google元] 結果: {result}")
+    return result
+
+
+print("\n--- Google → PEP 257 への書き換え ---")
+
+
+def calc_google_to_pep(x, y, z=10):
+    """(x / y) + z を計算する。"""
+    # 【書き換え内容】
+    # Google: 概要 + Args + Returns + Raises
+    #    ↓
+    # PEP 257: 概要のみ（詳細情報は削除）
+
+    print(f"  [PEP257版] 実行: ({x} / {y}) + {z}")
+    print(f"  [PEP257版] 簡略化（引数・戻り値の説明を削除）")
+
+    if y == 0:
+        print(f"  [PEP257版] エラー: yが0です")
+        raise ValueError("yは0以外")
+
+    result = x / y + z
+    print(f"  [PEP257版] 結果: {result}")
+    print(f"  [書き換え成功] Google → PEP 257")
+    return result
+
+
+print("\n--- Google → NumPy への書き換え ---")
+
+
+def calc_google_to_numpy(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+
+    Parameters
+    ----------
+    x : float
+        割られる数
+    y : float
+        割る数
+    z : float, optional
+        加算する数。デフォルトは10
+
+    Returns
+    -------
+    float
+        計算結果
+
+    Raises
+    ------
+    ValueError
+        yが0の場合
+    """
+    # 【書き換え内容】
+    # Google: Args: + Returns: + Raises:
+    #    ↓
+    # NumPy: Parameters + ハイフン + Returns + Raises
+
+    print(f"  [NumPy版] 実行: ({x} / {y}) + {z}")
+    print(f"  [NumPy版] Args→Parameters, ハイフン追加, インデント形式")
+
+    if y == 0:
+        print(f"  [NumPy版] エラー: yが0です")
+        raise ValueError("yは0以外")
+
+    result = x / y + z
+    print(f"  [NumPy版] 結果: {result}")
+    print(f"  [書き換え成功] Google → NumPy")
+    return result
+
+
+print("\n--- Google → reST への書き換え ---")
+
+
+def calc_google_to_rest(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+
+    :param x: 割られる数
+    :type x: float
+    :param y: 割る数
+    :type y: float
+    :param z: 加算する数（デフォルト: 10）
+    :type z: float
+    :return: 計算結果
+    :rtype: float
+    :raises ValueError: yが0の場合
+    """
+    # 【書き換え内容】
+    # Google: x (float): 説明
+    #    ↓
+    # reST: :param x: 説明 + :type x: float（2行に分割）
+
+    print(f"  [reST版] 実行: ({x} / {y}) + {z}")
+    print(f"  [reST版] 各引数を :param と :type の2行で記述")
+
+    if y == 0:
+        print(f"  [reST版] エラー: yが0です")
+        raise ValueError("yは0以外")
+
+    result = x / y + z
+    print(f"  [reST版] 結果: {result}")
+    print(f"  [書き換え成功] Google → reST")
+    return result
+
+
+print("\n--- Google → Epytext への書き換え ---")
+
+
+def calc_google_to_epytext(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+
+    @param x: 割られる数
+    @type x: float
+    @param y: 割る数
+    @type y: float
+    @param z: 加算する数（デフォルト: 10）
+    @type z: float
+    @return: 計算結果
+    @rtype: float
+    @raise ValueError: yが0の場合
+    """
+    # 【書き換え内容】
+    # reST: :param, :type, :return, :rtype, :raises
+    #    ↓
+    # Epytext: @param, @type, @return, @rtype, @raise
+
+    print(f"  [Epytext版] 実行: ({x} / {y}) + {z}")
+    print(f"  [Epytext版] : を @ に置き換え")
+
+    if y == 0:
+        print(f"  [Epytext版] エラー: yが0です")
+        raise ValueError("yは0以外")
+
+    result = x / y + z
+    print(f"  [Epytext版] 結果: {result}")
+    print(f"  [書き換え成功] Google → Epytext")
+    return result
+
+
+# テスト実行
+print("\n▼ パターン2のテスト実行")
+x2, y2, z2 = 20.0, 4.0, 10.0
+print(f"入力値: x={x2}, y={y2}, z={z2}\n")
+
+print("2-0. 元のGoogle:")
+calc_original_google(x2, y2, z2)
+
+print("\n2-1. Google → PEP 257:")
+calc_google_to_pep(x2, y2, z2)
+
+print("\n2-2. Google → NumPy:")
+calc_google_to_numpy(x2, y2, z2)
+
+print("\n2-3. Google → reST:")
+calc_google_to_rest(x2, y2, z2)
+
+print("\n2-4. Google → Epytext:")
+calc_google_to_epytext(x2, y2, z2)
+
+
+# ====================================
+# パターン3: NumPy から書き換え
+# ====================================
+
+print("\n\n" + "=" * 70)
+print("【パターン3】NumPy → 他の4記法へ書き換え")
+print("=" * 70)
+
+
+# ----- 元: NumPy -----
+def calc_original_numpy(values):
+    """
+    リストの統計を計算する。
+
+    Parameters
+    ----------
+    values : list of float
+        数値のリスト
+
+    Returns
+    -------
+    mean : float
+        平均値
+    total : float
+        合計値
+    """
+    # 【この関数の目的】
+    # - リストを受け取る
+    # - 平均と合計を計算
+    # - タプルで返す
+
+    print(f"  [NumPy元] 実行: values={values}")
+    total = sum(values)
+    mean = total / len(values)
+    print(f"  [NumPy元] 合計={total}, 平均={mean}")
+    return mean, total
+
+
+print("\n--- NumPy → PEP 257 への書き換え ---")
+
+
+def calc_numpy_to_pep(values):
+    """リストの統計を計算する。"""
+    # 【書き換え内容】
+    # NumPy: Parameters + ハイフン + Returns
+    #    ↓
+    # PEP 257: 概要のみ
+
+    print(f"  [PEP257版] 実行: values={values}")
+    print(f"  [PEP257版] 詳細削除（概要のみ残す）")
+
+    total = sum(values)
+    mean = total / len(values)
+    print(f"  [PEP257版] 合計={total}, 平均={mean}")
+    print(f"  [書き換え成功] NumPy → PEP 257")
+    return mean, total
+
+
+print("\n--- NumPy → Google への書き換え ---")
+
+
+def calc_numpy_to_google(values):
+    """
+    リストの統計を計算する。
+
+    Args:
+        values (list of float): 数値のリスト
+
+    Returns:
+        tuple: (mean, total) のタプル
+            mean (float): 平均値
+            total (float): 合計値
+    """
+    # 【書き換え内容】
+    # NumPy: values : list of float (次の行に説明)
+    #    ↓
+    # Google: values (list of float): 説明（1行にまとめる）
+
+    print(f"  [Google版] 実行: values={values}")
+    print(f"  [Google版] ハイフン削除, 1行形式に変換")
+
+    total = sum(values)
+    mean = total / len(values)
+    print(f"  [Google版] 合計={total}, 平均={mean}")
+    print(f"  [書き換え成功] NumPy → Google")
+    return mean, total
+
+
+print("\n--- NumPy → reST への書き換え ---")
+
+
+def calc_numpy_to_rest(values):
+    """
+    リストの統計を計算する。
+
+    :param values: 数値のリスト
+    :type values: list of float
+    :return: (mean, total) のタプル
+    :rtype: tuple
+    """
+    # 【書き換え内容】
+    # NumPy: values : list of float (ハイフン + インデント)
+    #    ↓
+    # reST: :param values: + :type values: (2行形式)
+
+    print(f"  [reST版] 実行: values={values}")
+    print(f"  [reST版] ハイフン削除, :param/:type形式")
+
+    total = sum(values)
+    mean = total / len(values)
+    print(f"  [reST版] 合計={total}, 平均={mean}")
+    print(f"  [書き換え成功] NumPy → reST")
+    return mean, total
+
+
+print("\n--- NumPy → Epytext への書き換え ---")
+
+
+def calc_numpy_to_epytext(values):
+    """
+    リストの統計を計算する。
+
+    @param values: 数値のリスト
+    @type values: list of float
+    @return: (mean, total) のタプル
+    @rtype: tuple
+    """
+    # 【書き換え内容】
+    # reST: :param, :type, :return, :rtype
+    #    ↓
+    # Epytext: @param, @type, @return, @rtype
+
+    print(f"  [Epytext版] 実行: values={values}")
+    print(f"  [Epytext版] : を @ に置き換え")
+
+    total = sum(values)
+    mean = total / len(values)
+    print(f"  [Epytext版] 合計={total}, 平均={mean}")
+    print(f"  [書き換え成功] NumPy → Epytext")
+    return mean, total
+
+
+# テスト実行
+print("\n▼ パターン3のテスト実行")
+values = [10.0, 20.0, 30.0]
+print(f"入力値: values={values}\n")
+
+print("3-0. 元のNumPy:")
+calc_original_numpy(values)
+
+print("\n3-1. NumPy → PEP 257:")
+calc_numpy_to_pep(values)
+
+print("\n3-2. NumPy → Google:")
+calc_numpy_to_google(values)
+
+print("\n3-3. NumPy → reST:")
+calc_numpy_to_rest(values)
+
+print("\n3-4. NumPy → Epytext:")
+calc_numpy_to_epytext(values)
+
+
+# ====================================
+# 最終まとめ
+# ====================================
+
+print("\n\n" + "=" * 70)
+print("【最終まとめ】全パターンの書き換え完了")
+print("=" * 70)
+print(
+    """
+✅ パターン1: PEP 257 → 他の4記法（完了）
+✅ パターン2: Google → 他の4記法（完了）
+✅ パターン3: NumPy → 他の4記法（完了）
+
+【書き換えのポイント】
+- PEP 257: 概要のみ（最小限）
+- Google: Args/Returns形式（読みやすい）
+- NumPy: ハイフン + インデント（表形式）
+- reST: :記法 + 2行ずつ（Sphinx用）
+- Epytext: @記法（レガシー）
+
+【デバッグプリントで確認できたこと】
+✓ 各関数が何をしているか
+✓ 書き換え前後の違い
+✓ 実行結果が正しいか
+✓ 書き換えが成功したか
+
+新人エンジニアの皆さん、頑張ってください！
+"""
+)
+
+
+
+
+# 🐰 Pythonのdocstring完全ガイド
+
+**ふわふわ大福店のうさうさ店長で学ぶ、実務レベルのdocstring**
+
+---
+
+## 📚 目次
+
+1. [docstringとは](#1-docstringとは)
+2. [基本の書き方](#2-基本の書き方)
+3. [3つのスタイル比較](#3-3つのスタイル比較)
+4. [実務で使える書き方](#4-実務で使える書き方)
+5. [チートシート](#5-チートシート)
+6. [チェックリスト](#6-チェックリスト)
+7. [ステップバイステップ実践](#7-ステップバイステップ実践)
+
+---
+
+## 1. docstringとは
+
+### 📖 超シンプルな定義
+
+**docstring = 関数やクラスの「説明書」**
+
+コードの最初に書く、三連引用符（`"""`）で囲まれた文字列。
+
+### 🎯 なぜ必要？
+
+```python
+# ❌ docstringなし - 何をする関数か分からない
+def calc(a, b):
+    return a * b + 10
+
+# ✅ docstringあり - 一目で分かる
+def calc(a, b):
+    """
+    価格を計算する
+    
+    個数と単価から税込価格を計算します。
+    
+    Args:
+        a (int): 個数
+        b (int): 単価
+    
+    Returns:
+        int: 税込価格
+    """
+    return a * b + 10
+```
+
+### 💡 docstringの3つのメリット
+
+| メリット | 説明 | 例 |
+|---------|------|-----|
+| **自己文書化** | コード自体が説明書になる | 関数の使い方が一目で分かる |
+| **IDE補完** | エディタがヒントを表示 | VSCodeで関数を使う時にヘルプが出る |
+| **自動ドキュメント** | Sphinxなどで自動生成 | APIドキュメントを自動作成 |
+
+### 🔍 docstringの確認方法
+
+```python
+def sell(quantity):
+    """大福を販売する"""
+    pass
+
+# 方法1: help()関数
+help(sell)
+
+# 方法2: __doc__属性
+print(sell.__doc__)
+
+# 方法3: IDEでマウスホバー
+# VSCodeなどで関数名にカーソルを合わせると表示される
+```
+
+---
+
+## 2. 基本の書き方
+
+### 📝 docstringの基本ルール
+
+#### ルール1: 三連引用符を使う
+
+```python
+def greet():
+    """挨拶をする"""  # ✅ 三連引用符
+    pass
+
+def greet2():
+    "挨拶をする"  # ❌ 単一引用符（docstringではない）
+    pass
+```
+
+#### ルール2: 関数・クラスの直後に書く
+
+```python
+# ✅ 正しい位置
+def sell(quantity):
+    """販売する"""
+    pass
+
+# ❌ 間違った位置
+def sell(quantity):
+    # コメント
+    """販売する"""  # 遅すぎる
+    pass
+```
+
+#### ルール3: 1行か複数行
+
+```python
+# シンプルな関数: 1行でOK
+def get_price():
+    """価格を取得する"""
+    return 150
+
+# 複雑な関数: 複数行で詳しく
+def calculate_total(quantity, price, tax_rate):
+    """
+    合計金額を計算する
+    
+    個数と単価から税込の合計金額を計算します。
+    
+    Args:
+        quantity (int): 個数
+        price (int): 単価
+        tax_rate (float): 税率（0.1 = 10%）
+    
+    Returns:
+        int: 税込合計金額
+    """
+    return int(quantity * price * (1 + tax_rate))
+```
+
+### 📊 1行 vs 複数行の判断
+
+```
+関数がシンプル？
+├─ YES → 1行docstring
+│   例: def get_price(): """価格を取得する"""
+│
+└─ NO → 複数行docstring
+    - 引数が2つ以上
+    - 処理が複雑
+    - 例外を投げる
+    - 詳しい説明が必要
+```
+
+---
+
+## 3. 3つのスタイル比較
+
+### 📖 主要な3つのスタイル
+
+Pythonには3つの主要なdocstringスタイルがあります：
+
+| スタイル | 特徴 | 推奨度 | 企業 |
+|---------|------|--------|------|
+| **Google** | 読みやすい、シンプル | ★★★★★ | Google, 多くの企業 |
+| **NumPy** | 詳細、科学計算向け | ★★★☆☆ | NumPy, SciPy |
+| **reStructuredText** | Sphinx標準 | ★★★☆☆ | Python公式 |
+
+### 💻 スタイル別の比較
+
+```python
+# ==========================================
+# Googleスタイル（最も推奨）
+# ==========================================
+def sell(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    指定された個数の大福を販売し、売上金額を計算します。
+    割引率を指定することもできます。
+    
+    Args:
+        quantity (int): 販売個数
+        price (int, optional): 単価。デフォルトは150円
+        discount (float, optional): 割引率（0.0-1.0）。デフォルトは0
+    
+    Returns:
+        int: 売上金額（税抜）
+    
+    Raises:
+        ValueError: quantityが0以下の場合
+    
+    Example:
+        >>> sell(5)
+        750
+        >>> sell(10, discount=0.1)
+        1350
+    """
+    if quantity <= 0:
+        raise ValueError("個数は1以上にしてください")
+    
+    total = quantity * price
+    total = int(total * (1 - discount))
+    return total
+
+
+# ==========================================
+# NumPyスタイル
+# ==========================================
+def sell_numpy(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    指定された個数の大福を販売し、売上金額を計算します。
+    
+    Parameters
+    ----------
+    quantity : int
+        販売個数
+    price : int, optional
+        単価（デフォルト: 150円）
+    discount : float, optional
+        割引率 0.0-1.0（デフォルト: 0）
+    
+    Returns
+    -------
+    int
+        売上金額（税抜）
+    
+    Raises
+    ------
+    ValueError
+        quantityが0以下の場合
+    
+    Examples
+    --------
+    >>> sell_numpy(5)
+    750
+    """
+    if quantity <= 0:
+        raise ValueError("個数は1以上にしてください")
+    
+    total = quantity * price
+    total = int(total * (1 - discount))
+    return total
+
+
+# ==========================================
+# reStructuredTextスタイル
+# ==========================================
+def sell_rst(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    指定された個数の大福を販売し、売上金額を計算します。
+    
+    :param quantity: 販売個数
+    :type quantity: int
+    :param price: 単価（デフォルト: 150円）
+    :type price: int
+    :param discount: 割引率 0.0-1.0（デフォルト: 0）
+    :type discount: float
+    :return: 売上金額（税抜）
+    :rtype: int
+    :raises ValueError: quantityが0以下の場合
+    
+    .. code-block:: python
+    
+        >>> sell_rst(5)
+        750
+    """
+    if quantity <= 0:
+        raise ValueError("個数は1以上にしてください")
+    
+    total = quantity * price
+    total = int(total * (1 - discount))
+    return total
+```
+
+### 🎯 推奨：Googleスタイル
+
+**理由：**
+- 最も読みやすい
+- シンプルで覚えやすい
+- 多くの企業で採用
+- IDEのサポートが良い
+
+以降、このガイドでは**Googleスタイル**を使います。
+
+---
+
+## 4. 実務で使える書き方
+
+### 📝 関数のdocstring（基本形）
+
+```python
+def 関数名(引数1, 引数2):
+    """
+    1行要約（動詞で始める）
+    
+    詳細説明（省略可）
+    複数行で詳しく説明できます。
+    
+    Args:
+        引数1 (型): 説明
+        引数2 (型): 説明
+    
+    Returns:
+        型: 説明
+    
+    Raises:
+        例外名: 条件
+    """
+    pass
+```
+
+### 💻 実践例1: シンプルな関数
+
+```python
+def get_price():
+    """基本価格を取得する"""
+    return 150
+```
+
+### 💻 実践例2: 引数ありの関数
+
+```python
+def calculate_total(quantity, price):
+    """
+    合計金額を計算する
+    
+    Args:
+        quantity (int): 個数
+        price (int): 単価
+    
+    Returns:
+        int: 合計金額
+    """
+    return quantity * price
+```
+
+### 💻 実践例3: デフォルト引数あり
+
+```python
+def sell(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+        price (int, optional): 単価。デフォルトは150円
+        discount (float, optional): 割引率（0.0-1.0）。デフォルトは0
+    
+    Returns:
+        int: 売上金額
+    """
+    total = quantity * price
+    return int(total * (1 - discount))
+```
+
+### 💻 実践例4: 例外を投げる関数
+
+```python
+def sell(quantity):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+    
+    Returns:
+        int: 売上金額
+    
+    Raises:
+        ValueError: quantityが0以下の場合
+    """
+    if quantity <= 0:
+        raise ValueError("個数は1以上にしてください")
+    
+    return quantity * 150
+```
+
+### 💻 実践例5: 使用例付き
+
+```python
+def calculate_tax(price, tax_rate=0.1):
+    """
+    税込価格を計算する
+    
+    Args:
+        price (int): 税抜価格
+        tax_rate (float, optional): 税率。デフォルトは0.1（10%）
+    
+    Returns:
+        int: 税込価格
+    
+    Example:
+        >>> calculate_tax(1000)
+        1100
+        >>> calculate_tax(1000, 0.08)
+        1080
+    """
+    return int(price * (1 + tax_rate))
+```
+
+### 📝 クラスのdocstring
+
+```python
+class DaifukuShop:
+    """
+    大福店クラス
+    
+    大福の在庫管理と販売を行うクラスです。
+    
+    Attributes:
+        owner_name (str): 店長の名前
+        stock (int): 在庫数
+        sold (int): 累計販売数
+    
+    Example:
+        >>> shop = DaifukuShop("うさうさ", 20)
+        >>> shop.sell(5)
+        True
+    """
+    
+    def __init__(self, owner_name, stock):
+        """
+        大福店を初期化する
+        
+        Args:
+            owner_name (str): 店長の名前
+            stock (int): 初期在庫数
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.sold = 0
+    
+    def sell(self, quantity):
+        """
+        大福を販売する
+        
+        在庫から指定個数を販売します。
+        在庫が足りない場合は販売できません。
+        
+        Args:
+            quantity (int): 販売個数
+        
+        Returns:
+            bool: 販売成功ならTrue、失敗ならFalse
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 10)
+            >>> shop.sell(3)
+            True
+            >>> shop.stock
+            7
+        """
+        if quantity > self.stock:
+            return False
+        
+        self.stock -= quantity
+        self.sold += quantity
+        return True
+```
+
+---
+
+## 5. チートシート
+
+### 📋 Googleスタイル チートシート
+
+```python
+"""
+【関数の基本テンプレート】
+
+def function_name(arg1, arg2, arg3=None):
+    '''
+    1行要約（動詞で始める、ピリオドなし）
+    
+    詳細な説明（省略可）
+    - 何をするか
+    - どう使うか
+    - 注意点など
+    
+    Args:
+        arg1 (型): 説明
+        arg2 (型): 説明
+        arg3 (型, optional): 説明。デフォルトはNone
+    
+    Returns:
+        型: 説明
+        
+        返り値が複数行の説明が必要な場合は
+        インデントして書く
+    
+    Raises:
+        例外名: いつ発生するか
+        別の例外: いつ発生するか
+    
+    Yields:  # ジェネレーター関数の場合
+        型: 説明
+    
+    Example:
+        >>> function_name(1, 2)
+        3
+        >>> function_name(1, 2, 3)
+        6
+    
+    Note:
+        追加の注意事項があれば書く
+    
+    Warning:
+        警告があれば書く
+    
+    See Also:
+        関連する関数やクラスがあれば書く
+    '''
+    pass
+```
+
+### 📋 クラスのテンプレート
+
+```python
+"""
+【クラスの基本テンプレート】
+
+class ClassName:
+    '''
+    クラスの1行要約
+    
+    詳細な説明
+    - このクラスの目的
+    - 主な機能
+    
+    Attributes:
+        attr1 (型): 説明
+        attr2 (型): 説明
+    
+    Example:
+        >>> obj = ClassName(arg1, arg2)
+        >>> obj.method()
+        結果
+    '''
+    
+    def __init__(self, arg1, arg2):
+        '''
+        コンストラクタの説明
+        
+        Args:
+            arg1 (型): 説明
+            arg2 (型): 説明
+        '''
+        self.attr1 = arg1
+        self.attr2 = arg2
+    
+    def method(self):
+        '''メソッドの説明'''
+        pass
+```
+
+### 📋 型ヒントの書き方
+
+```python
+from typing import List, Dict, Optional, Union, Tuple
+
+def function(
+    items: List[str],
+    config: Dict[str, int],
+    optional_arg: Optional[str] = None,
+    union_arg: Union[int, float] = 0
+) -> Tuple[bool, str]:
+    """
+    型ヒント付きの関数
+    
+    Args:
+        items (List[str]): 文字列のリスト
+        config (Dict[str, int]): 設定辞書
+        optional_arg (Optional[str], optional): 
+            オプション引数。デフォルトはNone
+        union_arg (Union[int, float], optional): 
+            intまたはfloat。デフォルトは0
+    
+    Returns:
+        Tuple[bool, str]: (成功フラグ, メッセージ)のタプル
+    """
+    return True, "成功"
+```
+
+---
+
+## 6. チェックリスト
+
+### ✅ docstring品質チェックリスト
+
+#### レベル1: 最低限（必須）
+
+```
+□ docstringが存在する
+□ 三連引用符を使っている
+□ 関数/クラスの直後に書いている
+□ 1行目に要約がある
+□ 要約は動詞で始まっている
+```
+
+#### レベル2: 基本（推奨）
+
+```
+□ すべての引数を説明している
+□ 返り値を説明している
+□ 型情報を記載している
+□ optionalパラメータにデフォルト値を明記
+□ 説明が分かりやすい日本語
+```
+
+#### レベル3: 実務レベル（理想）
+
+```
+□ 例外を説明している（Raises）
+□ 使用例がある（Example）
+□ エッジケースを説明
+□ 制限事項を明記
+□ 関連する関数へのリンク
+```
+
+### 🔍 セルフレビュー項目
+
+```python
+def my_function(arg1, arg2):
+    """
+    チェック項目:
+    
+    ✅ 1行目は命令形で始まる？
+       ○ "計算する"
+       × "計算します" "計算された"
+    
+    ✅ すべての引数を説明した？
+       □ arg1の説明がある
+       □ arg2の説明がある
+    
+    ✅ 返り値の説明がある？
+       □ 何を返すか
+       □ どんな型か
+    
+    ✅ 例外の説明がある？
+       □ どんな時にエラーになるか
+    
+    ✅ 使用例がある？
+       □ 実際の使い方を示している
+    """
+    pass
+```
+
+---
+
+## 7. ステップバイステップ実践
+
+### 📝 ステップ1: 空の関数を作る
+
+```python
+def sell(quantity, price, discount):
+    pass
+```
+
+### 📝 ステップ2: 1行要約を書く
+
+```python
+def sell(quantity, price, discount):
+    """大福を販売する"""
+    pass
+```
+
+### 📝 ステップ3: 引数を説明する
+
+```python
+def sell(quantity, price, discount):
+    """
+    大福を販売する
+    
+    Args:
+        quantity: 販売個数
+        price: 単価
+        discount: 割引率
+    """
+    pass
+```
+
+### 📝 ステップ4: 型を追加する
+
+```python
+def sell(quantity, price, discount):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+        price (int): 単価
+        discount (float): 割引率
+    """
+    pass
+```
+
+### 📝 ステップ5: 返り値を説明する
+
+```python
+def sell(quantity, price, discount):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+        price (int): 単価
+        discount (float): 割引率
+    
+    Returns:
+        int: 売上金額
+    """
+    pass
+```
+
+### 📝 ステップ6: デフォルト値を明記
+
+```python
+def sell(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+        price (int, optional): 単価。デフォルトは150円
+        discount (float, optional): 割引率。デフォルトは0
+    
+    Returns:
+        int: 売上金額
+    """
+    pass
+```
+
+### 📝 ステップ7: 例外を追加
+
+```python
+def sell(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    Args:
+        quantity (int): 販売個数
+        price (int, optional): 単価。デフォルトは150円
+        discount (float, optional): 割引率。デフォルトは0
+    
+    Returns:
+        int: 売上金額
+    
+    Raises:
+        ValueError: quantityが0以下の場合
+    """
+    pass
+```
+
+### 📝 ステップ8: 使用例を追加（完成）
+
+```python
+def sell(quantity, price=150, discount=0):
+    """
+    大福を販売する
+    
+    指定された個数と単価から売上金額を計算します。
+    割引率を指定することもできます。
+    
+    Args:
+        quantity (int): 販売個数
+        price (int, optional): 単価。デフォルトは150円
+        discount (float, optional): 割引率（0.0-1.0）。デフォルトは0
+    
+    Returns:
+        int: 売上金額（割引後）
+    
+    Raises:
+        ValueError: quantityが0以下の場合
+    
+    Example:
+        >>> sell(10)
+        1500
+        >>> sell(10, discount=0.1)
+        1350
+    """
+    if quantity <= 0:
+        raise ValueError("個数は1以上にしてください")
+    
+    total = quantity * price
+    return int(total * (1 - discount))
+```
+
+---
+
+## 🎓 実践演習
+
+### 演習1: この関数にdocstringを書いてください
+
+```python
+def calculate_discount(price, rate):
+    return int(price * (1 - rate))
+```
+
+<details>
+<summary>解答例</summary>
+
+```python
+def calculate_discount(price, rate):
+    """
+    割引後の価格を計算する
+    
+    Args:
+        price (int): 元の価格
+        rate (float): 割引率（0.0-1.0）
+    
+    Returns:
+        int: 割引後の価格
+    
+    Example:
+        >>> calculate_discount(1000, 0.1)
+        900
+    """
+    return int(price * (1 - rate))
+```
+
+</details>
+
+### 演習2: このクラスにdocstringを書いてください
+
+```python
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+    
+    def get_tax_included_price(self, tax_rate=0.1):
+        return int(self.price * (1 + tax_rate))
+```
+
+<details>
+<summary>解答例</summary>
+
+```python
+class Product:
+    """
+    商品クラス
+    
+    商品名と価格を管理します。
+    
+    Attributes:
+        name (str): 商品名
+        price (int): 価格
+    """
+    
+    def __init__(self, name, price):
+        """
+        商品を初期化する
+        
+        Args:
+            name (str): 商品名
+            price (int): 価格
+        """
+        self.name = name
+        self.price = price
+    
+    def get_tax_included_price(self, tax_rate=0.1):
+        """
+        税込価格を取得する
+        
+        Args:
+            tax_rate (float, optional): 税率。デフォルトは0.1（10%）
+        
+        Returns:
+            int: 税込価格
+        
+        Example:
+            >>> product = Product("大福", 150)
+            >>> product.get_tax_included_price()
+            165
+        """
+        return int(self.price * (1 + tax_rate))
+```
+
+</details>
+
+---
+
+## 📝 完全実践例
+
+### 🐰 ふわふわ大福店の完全実装
+
+```python
+"""
+ふわふわ大福店管理システム
+
+このモジュールは大福店の在庫管理と販売機能を提供します。
+
+Example:
+    >>> from daifuku_shop import DaifukuShop
+    >>> shop = DaifukuShop("うさうさ", 20)
+    >>> shop.sell(5)
+    750
+"""
+
+class DaifukuShop:
+    """
+    大福店クラス
+    
+    大福の在庫管理、販売、統計機能を提供します。
+    
+    Attributes:
+        owner_name (str): 店長の名前
+        stock (int): 現在の在庫数
+        sold (int): 累計販売数
+        revenue (int): 累計売上金額
+        base_price (int): 基本価格（1個あたり）
+    
+    Example:
+        >>> shop = DaifukuShop("うさうさ", 20)
+        >>> shop.sell(5)
+        750
+        >>> shop.stock
+        15
+    """
+    
+    def __init__(self, owner_name, stock, base_price=150):
+        """
+        大福店を初期化する
+        
+        Args:
+            owner_name (str): 店長の名前
+            stock (int): 初期在庫数
+            base_price (int, optional): 基本価格。デフォルトは150円
+        
+        Raises:
+            ValueError: stockが負の数の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.owner_name
+            'うさうさ'
+        """
+        if stock < 0:
+            raise ValueError("在庫数は0以上にしてください")
+        
+        self.owner_name = owner_name
+        self.stock = stock
+        self.sold = 0
+        self.revenue = 0
+        self.base_price = base_price
+    
+    def sell(self, quantity, discount=0):
+        """
+        大福を販売する
+        
+        指定された個数の大福を販売し、在庫を減らします。
+        割引率を指定することもできます。
+        
+        Args:
+            quantity (int): 販売個数
+            discount (float, optional): 割引率（0.0-1.0）。デフォルトは0
+        
+        Returns:
+            int: 売上金額（割引後）
+            None: 在庫不足の場合
+        
+        Raises:
+            ValueError: quantityが0以下の場合
+            ValueError: discountが0.0-1.0の範囲外の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.sell(5)
+            750
+            >>> shop.sell(3, discount=0.1)
+            405
+            >>> shop.stock
+            12
+        
+        Note:
+            在庫不足の場合はNoneを返し、在庫は変更されません。
+        """
+        if quantity <= 0:
+            raise ValueError("個数は1以上にしてください")
+        
+        if not 0 <= discount <= 1:
+            raise ValueError("割引率は0.0-1.0の範囲で指定してください")
+        
+        if quantity > self.stock:
+            print(f"在庫不足: 在庫{self.stock}個")
+            return None
+        
+        # 売上計算
+        price = int(self.base_price * (1 - discount))
+        total = quantity * price
+        
+        # 在庫更新
+        self.stock -= quantity
+        self.sold += quantity
+        self.revenue += total
+        
+        return total
+    
+    def restock(self, quantity):
+        """
+        在庫を補充する
+        
+        Args:
+            quantity (int): 補充個数
+        
+        Raises:
+            ValueError: quantityが0以下の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 10)
+            >>> shop.restock(20)
+            >>> shop.stock
+            30
+        """
+        if quantity <= 0:
+            raise ValueError("補充個数は1以上にしてください")
+        
+        self.stock += quantity
+    
+    def get_stats(self):
+        """
+        統計情報を取得する
+        
+        Returns:
+            dict: 以下のキーを持つ辞書
+                - owner (str): 店長名
+                - stock (int): 在庫数
+                - sold (int): 累計販売数
+                - revenue (int): 累計売上
+                - avg_price (float): 平均単価
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.sell(10)
+            1500
+            >>> stats = shop.get_stats()
+            >>> stats['sold']
+            10
+        """
+        avg_price = self.revenue / self.sold if self.sold > 0 else 0
+        
+        return {
+            'owner': self.owner_name,
+            'stock': self.stock,
+            'sold': self.sold,
+            'revenue': self.revenue,
+            'avg_price': avg_price
+        }
+    
+    def __str__(self):
+        """
+        文字列表現を返す
+        
+        Returns:
+            str: 店舗情報の文字列
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> print(shop)
+            うさうさ店長の店（在庫: 20個）
+        """
+        return f"{self.owner_
