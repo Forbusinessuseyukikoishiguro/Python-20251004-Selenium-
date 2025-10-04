@@ -1,0 +1,451 @@
+# 🔧 PyCharm静的解析ツール設定ガイド（簡潔版）
+
+**3つの設定方法を段階的に解説**
+
+---
+
+## 📚 目次
+
+1. [方法1: External Tools（基本）](#方法1-external-tools基本)
+2. [方法2: File Watchers（自動実行）](#方法2-file-watchers自動実行)
+3. [方法3: 組み込み機能（推奨）](#方法3-組み込み機能推奨)
+4. [実践：3ステップセットアップ](#実践3ステップセットアップ)
+
+---
+
+## 方法1: External Tools（基本）
+
+### 手動でツールを実行する設定
+
+#### ステップ1: 設定画面を開く
+
+```
+Windows/Linux: File → Settings → Tools → External Tools
+Mac: PyCharm → Preferences → Tools → External Tools
+```
+
+#### ステップ2: ツールを追加（+ボタン）
+
+**Ruff Check の設定**
+```
+Name: Ruff Check
+Description: Ruffでコードチェック
+Program: ruff
+Arguments: check $FilePath$ --fix
+Working directory: $ProjectFileDir$
+
+☑ Synchronize files after execution
+☑ Open console for tool output
+```
+
+**Ruff Format の設定**
+```
+Name: Ruff Format
+Description: Ruffでフォーマット
+Program: ruff
+Arguments: format $FilePath$
+Working directory: $ProjectFileDir$
+
+☑ Synchronize files after execution
+```
+
+**mypy の設定**
+```
+Name: mypy
+Description: 型チェック
+Program: mypy
+Arguments: $FilePath$ --show-error-codes --pretty
+Working directory: $ProjectFileDir$
+
+☑ Open console for tool output
+```
+
+**Bandit の設定**
+```
+Name: Bandit
+Description: セキュリティチェック
+Program: bandit
+Arguments: -r $FilePath$
+Working directory: $ProjectFileDir$
+
+☑ Open console for tool output
+```
+
+#### ステップ3: 使い方
+
+```
+方法A: ファイル上で右クリック
+→ External Tools → Ruff Check
+
+方法B: メニューから実行
+Tools → External Tools → Ruff Check
+
+方法C: ショートカットキー設定（任意）
+Settings → Keymap → External Tools
+→ Ruff Check を検索 → 右クリック → Add Keyboard Shortcut
+例: Ctrl+Alt+R
+```
+
+---
+
+## 方法2: File Watchers（自動実行）
+
+### ファイル保存時に自動実行する設定
+
+#### ステップ1: File Watchersを開く
+
+```
+Settings → Tools → File Watchers → +
+```
+
+#### ステップ2: Watcherを追加
+
+**Ruff Format Watcher**
+```
+Name: Ruff Format
+File type: Python
+Scope: Project Files
+Program: ruff
+Arguments: format $FilePath$
+Output paths to refresh: $FilePath$
+Working directory: $ProjectFileDir$
+
+☑ Auto-save edited files to trigger the watcher
+☑ Trigger the watcher on external changes
+```
+
+**設定のポイント:**
+- `Auto-save edited files` → 保存時に自動実行
+- `Output paths to refresh` → フォーマット後にファイルを再読み込み
+
+#### 注意事項
+
+```
+Programのパスが通っていない場合:
+
+1. ターミナルでパスを確認
+   which ruff          # Mac/Linux
+   where ruff          # Windows
+
+2. フルパスを記入
+   例: /Users/username/.venv/bin/ruff
+```
+
+---
+
+## 方法3: 組み込み機能（推奨）
+
+### PyCharm標準機能を活用
+
+#### A. コードインスペクション
+
+```
+Settings → Editor → Inspections → Python
+
+☑ PEP 8 coding style violation
+☑ Type checker
+☑ Unresolved references
+☑ Incorrect function signature
+```
+
+#### B. 保存時の自動アクション
+
+```
+Settings → Tools → Actions on Save
+
+☑ Reformat code
+☑ Optimize imports
+☑ Run code cleanup
+```
+
+#### C. 型ヒントの設定
+
+```
+Settings → Editor → Inlay Hints → Python
+
+☑ Type hints
+☑ Parameter names
+```
+
+#### D. Pythonインタプリタの設定
+
+```
+Settings → Project → Python Interpreter
+
+1. 仮想環境を選択（.venv）
+2. パッケージ一覧で以下を確認:
+   - ruff
+   - mypy
+   - bandit
+```
+
+---
+
+## 実践：3ステップセットアップ
+
+### ステップ1: ツールをインストール（Terminal）
+
+```bash
+# PyCharm下部のTerminalタブで実行
+
+# 仮想環境をアクティベート（自動的にされている場合が多い）
+# Windows: .venv\Scripts\activate
+# Mac/Linux: source .venv/bin/activate
+
+# ツールをインストール
+pip install ruff mypy bandit
+
+# 確認
+ruff --version
+mypy --version
+bandit --version
+```
+
+---
+
+### ステップ2: 設定ファイルを作成
+
+プロジェクトルートに `pyproject.toml` を作成
+
+```toml
+# pyproject.toml
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+disallow_untyped_defs = true
+show_error_codes = true
+pretty = true
+```
+
+---
+
+### ステップ3: PyCharmに統合（3つの方法から選択）
+
+#### 👍 初心者推奨: External Tools のみ
+
+```
+1. Settings → Tools → External Tools
+2. Ruff Check を追加
+3. mypy を追加
+4. 必要な時に右クリック → External Tools で実行
+```
+
+#### 👍👍 中級者推奨: External Tools + File Watchers
+
+```
+1. External Tools で Ruff, mypy を設定
+2. File Watchers で Ruff Format を追加
+3. 保存時に自動フォーマット、手動でチェック
+```
+
+#### 👍👍👍 上級者推奨: すべて統合
+
+```
+1. External Tools: すべてのツール
+2. File Watchers: Ruff Format（保存時自動実行）
+3. Actions on Save: Reformat code, Optimize imports
+4. Inspections: すべて有効化
+```
+
+---
+
+## 便利な Tips
+
+### Tip 1: マクロで一括実行
+
+```
+1. Edit → Macros → Start Macro Recording
+2. Tools → External Tools → Ruff Check
+3. Tools → External Tools → mypy
+4. Edit → Macros → Stop Macro Recording
+5. マクロ名: "All Checks"
+6. Settings → Keymap でショートカット設定
+   例: Ctrl+Alt+A
+```
+
+---
+
+### Tip 2: ショートカットキー推奨設定
+
+```
+Settings → Keymap
+
+Ruff Check:    Ctrl+Alt+R
+Ruff Format:   Ctrl+Alt+F
+mypy:          Ctrl+Alt+M
+All Checks:    Ctrl+Alt+A
+```
+
+---
+
+### Tip 3: プロジェクトテンプレート化
+
+```
+1. 完璧な設定を作る
+2. File → Export → Export Settings
+3. 次回プロジェクト作成時にインポート
+```
+
+---
+
+### Tip 4: チーム共有設定
+
+```
+.idea/ フォルダの一部をGitに含める:
+
+# .gitignore
+.idea/*
+!.idea/externalTools.xml    # External Tools設定
+!.idea/watcherTasks.xml     # File Watchers設定
+```
+
+---
+
+## トラブルシューティング
+
+### 問題1: 「ruff: command not found」
+
+```
+原因: Pythonのパスが通っていない
+
+解決方法:
+1. Terminalで確認
+   which ruff  # Mac/Linux
+   where ruff  # Windows
+
+2. フルパスを使用
+   Program: /path/to/.venv/bin/ruff
+
+3. または仮想環境を確認
+   Settings → Project → Python Interpreter
+   .venv が選択されているか確認
+```
+
+---
+
+### 問題2: File Watcherが動かない
+
+```
+チェック項目:
+☑ Auto-save edited files にチェック
+☑ Program のパスが正しい
+☑ Working directory が $ProjectFileDir$
+☑ Output paths to refresh が $FilePath$
+
+デバッグ方法:
+1. Terminalで手動実行して確認
+   ruff format your_file.py
+2. エラーメッセージを確認
+```
+
+---
+
+### 問題3: 保存時に2回実行される
+
+```
+原因: 複数の設定が競合
+
+解決方法:
+Actions on Save と File Watchers で
+同じ処理をしていないか確認
+
+推奨:
+- File Watchers: Ruff Format のみ
+- Actions on Save: Optimize imports のみ
+```
+
+---
+
+## クイックリファレンス
+
+### 最小構成（5分）
+
+```
+1. pip install ruff mypy
+2. Settings → Tools → External Tools
+   - Ruff Check 追加
+   - mypy 追加
+3. 完了
+```
+
+---
+
+### 推奨構成（10分）
+
+```
+1. pip install ruff mypy bandit
+2. pyproject.toml 作成
+3. External Tools 設定（3つ）
+4. File Watchers 設定（Ruff Format）
+5. Actions on Save 有効化
+6. 完了
+```
+
+---
+
+### フル構成（20分）
+
+```
+1. すべてのツールインストール
+2. 設定ファイル作成
+3. External Tools 設定
+4. File Watchers 設定
+5. Inspections 設定
+6. Actions on Save 設定
+7. ショートカットキー設定
+8. マクロ作成
+9. 完了
+```
+
+---
+
+## まとめ
+
+### 新人エンジニアへの推奨
+
+```
+【第1週】
+External Tools で Ruff + mypy
+→ 手動実行に慣れる
+
+【第2週】
+File Watchers で Ruff Format 追加
+→ 保存時自動フォーマット
+
+【第3週】
+Actions on Save 有効化
+→ 完全自動化
+
+【第4週】
+ショートカットキー設定
+→ 効率化
+```
+
+---
+
+**重要なポイント:**
+
+1. **一度に全部やらない** → 段階的に導入
+2. **Programのパス** → 仮想環境のパスを確認
+3. **File Watchers** → 保存時自動実行が便利
+4. **チーム共有** → `.idea/` の一部をGit管理
+
+PyCharmの設定は最初だけ手間ですが、一度設定すればずっと使えます。まずは Ruff + mypy の External Tools から始めてください。
