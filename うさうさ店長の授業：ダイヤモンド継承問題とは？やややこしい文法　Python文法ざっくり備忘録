@@ -1,0 +1,1451 @@
+キーワードやクリエイターで検索
+
+
+701
+メニュー
+ 投稿
+
+あなただけに表示されています
+見出し画像を設定してみませんか?
+見出し画像があると、もっと作品のイメージが伝わります！
+かんたんにオリジナル画像を作ったり、他のクリエイターが提供した画像から選んだりすることもできます。
+ぜひ活用してみましょう！
+
+
+🐇 うさうさ店長の授業：ダイヤモンド継承問題とは？やややこしい文法　Python文法ざっくり備忘録
+
+YUKIKO@BI＆AIを極めたい（転職活動中スカウト歓迎）
+YUKIKO@BI＆AIを極めたい（転職活動中スカウト歓迎）
+2025年10月4日 11:55
+
+MRO（Method Resolution Order：メソッド探索順序） を理解する
+
+
+多くの人は super() を __init__ の初期化 でしか使わないのですが、実は 他のメソッドでもよく使われます。
+特に 多重継承 や 処理を拡張したいとき に便利です。
+
+🐇 うさうさ店長の授業：super() は init 以外でも使える！
+🔹 そもそも
+super() は 「MROの次のクラスのメソッドを呼ぶ」 仕組み
+
+なので、どのメソッドでも使える
+
+__init__ 以外の場面でも「親クラスの処理を残しつつ追加したい」ときに役立つ
+
+🔹 実例：大福店の業務報告
+class Staff:
+    def report(self):
+        print("🍡 基本業務報告")
+
+class Cashier(Staff):
+    def report(self):
+        super().report()   # 親のreportも呼ぶ
+        print("💰 レジの売上報告")
+
+class Baker(Staff):
+    def report(self):
+        super().report()
+        print("🥮 大福製造数の報告")
+
+class SuperStaff(Cashier, Baker):
+    def report(self):
+        super().report()
+        print("🌟 店全体の最終報告")
+
+copy
+🔹 実行例
+ss = SuperStaff()
+ss.report()
+
+copy
+🔹 出力結果
+🍡 基本業務報告
+🥮 大福製造数の報告
+💰 レジの売上報告
+🌟 店全体の最終報告
+
+copy
+🔹 ポイント
+super().report() が MRO の順番で次のクラスを呼んでいる
+
+SuperStaff → Cashier → Baker → Staff → object
+
+全員がリレー形式で報告するように処理がつながっていく
+
+super() を書かないと、そのクラスの処理で止まってしまう
+
+🔹 よくある使いどころ
+__str__() や __repr__() のカスタマイズ
+
+save() や delete() など（Djangoなどフレームワークで頻出）
+
+ロギングや共通処理を追加する時
+
+🐰 うさうさ店長の格言
+super() は 「親の処理を潰さずに自分の処理を足す魔法」
+
+__init__ に限らず、どのメソッドでも使える
+
+多重継承でリレー形式にすることで、全クラスの機能を積み重ねられる
+
+🐇 うさうさ店長の授業：ダイヤモンド継承問題とは？
+
+
+
+目次
+🐇 うさうさ店長の授業：super() は init 以外でも使える！
+🔹 そもそも
+🔹 実例：大福店の業務報告
+🔹 実行例
+🔹 出力結果
+🔹 ポイント
+🔹 よくある使いどころ
+🐰 うさうさ店長の格言
+🐇 うさうさ店長の授業：ダイヤモンド継承問題とは？
+🔹 問題のイメージ
+
+すべて表示
+🔹 問題のイメージ
+大福店でこんな「家系図」を考えてみましょう：
+
+        Staff（スタッフ基底クラス）
+        /                      \
+   Cashier（レジ担当）      Baker（製造担当）
+        \                      /
+            SuperStaff（両方担当）
+
+copy
+この形が「ダイヤモンド継承」と呼ばれる構造です。
+SuperStaff は Cashier と Baker の両方を継承しているけど、
+どちらも 同じ親（Staff） を持っているため「親がダブる」問題が出てきます。
+
+🔹 実際のコード
+class Staff:
+    def report(self):
+        print("🍡 基本業務報告")
+
+class Cashier(Staff):
+    def report(self):
+        print("💰 レジの売上報告")
+        super().report()
+
+class Baker(Staff):
+    def report(self):
+        print("🥮 大福製造数の報告")
+        super().report()
+
+class SuperStaff(Cashier, Baker):
+    def report(self):
+        print("🌟 店全体の最終報告")
+        super().report()
+
+copy
+🔹 実行
+ss = SuperStaff()
+ss.report()
+
+copy
+🔹 結果
+🌟 店全体の最終報告
+💰 レジの売上報告
+🥮 大福製造数の報告
+🍡 基本業務報告
+
+copy
+🔹 なぜこうなる？ → MRO のおかげ
+Python は「同じ親を二重に呼ばない」ために MRO を使います。
+順序を確認してみましょう：
+
+print(SuperStaff.__mro__)
+
+copy
+結果：
+
+(<class '__main__.SuperStaff'>, 
+ <class '__main__.Cashier'>, 
+ <class '__main__.Baker'>, 
+ <class '__main__.Staff'>, 
+ <class 'object'>)
+
+copy
+🔹 ポイント
+左から順に探索する (Cashier → Baker → Staff)
+
+同じ親クラス（Staff）が重複しても、1回しか呼ばれない
+
+super() を正しく書くと、リレー形式で順番に処理が流れる
+
+🐰 うさうさ店長の格言
+ダイヤモンド継承は「親クラスの処理が二重で呼ばれちゃうのでは？」という心配から名前がついた
+
+でも Python の MRO（C3アルゴリズム）が賢く解決してくれる
+
+super() を忘れずに書くと、みんながきれいにバトンを渡せる
+
+おまけ
+「ふわふわ大福店」の うさうさ店長 が、新人エンジニアさん向けに ⑥ 継承とオーバーライド を MECE（モレなくダブりなく） に整理して授業します
+
+🐰 うさうさ店長の授業：継承とオーバーライド（親子関係）
+🔹 継承とは？
+定義：「親クラス（基礎の設計図）」を 子クラス（応用の設計図） が引き継ぐ仕組み。
+
+イメージ：
+
+親 → 「大福の基本レシピ」
+
+子 → 「そのレシピを元にした新しい味の大福」
+
+🔹 オーバーライドとは？
+定義：親クラスから引き継いだメソッドを、子クラスで 上書きして作り直すこと。
+
+イメージ：
+
+親 → 「あんこ大福は甘さひかえめ」
+
+子 → 「いちご大福はクリームを追加！」
+
+🔹 MECEで整理
+継承のメリット
+
+共通処理をまとめられる（DRYの実現）
+
+再利用性アップ
+
+コードの整理がしやすい
+
+継承の書き方
+
+class 子クラス(親クラス): pass
+
+オーバーライドの特徴
+
+親と同じ名前のメソッドを子で再定義すると上書きされる
+
+子クラス特有のふるまいを追加できる
+
+親メソッドも使いたい場合
+
+super().メソッド名() で親の処理を呼び出せる
+
+🔹 実例：ふわふわ大福店
+# 親クラス：大福の基本レシピ
+class Daifuku:
+    def __init__(self, name):
+        self.name = name
+    
+    def introduce(self):  # 自己紹介
+        print(f"私は {self.name} 大福です！")
+
+# 子クラス：いちご大福（親を継承）
+class IchigoDaifuku(Daifuku):
+    def introduce(self):  # オーバーライド（上書き）
+        print(f"私は特製 {self.name} 大福！中にいちごが入ってます🍓")
+
+# 子クラス：クリーム大福（親を継承＋親呼び出し）
+class CreamDaifuku(Daifuku):
+    def introduce(self):
+        super().introduce()  # 親の処理も呼ぶ
+        print("さらにクリームが入ってます🍦")
+
+copy
+🔹 実行例
+anko = Daifuku("あんこ")
+ichigo = IchigoDaifuku("いちご")
+cream = CreamDaifuku("クリーム")
+
+anko.introduce()
+ichigo.introduce()
+cream.introduce()
+
+copy
+🔹 実行結果
+私は あんこ 大福です！
+私は特製 いちご 大福！中にいちごが入ってます🍓
+私は クリーム 大福です！
+さらにクリームが入ってます🍦
+
+copy
+🐇 まとめ（うさうさ店長の格言）
+継承 = レシピを引き継ぐ（共通部分をまとめる）
+
+オーバーライド = レシピをアレンジ（子クラスで上書き）
+
+super() = 親のレシピを呼びつつ、新しい工夫を足す
+
+了解しました！😊
+それでは、ふわふわ大福店の うさうさ店長 が、新人エンジニアさん向けに ⑪ 抽象クラスとダックタイピング を MECEで整理して解説しますね。
+
+🐰 うさうさ店長の授業：抽象クラスとダックタイピング
+🔹 まずキーワードを整理
+抽象クラス (Abstract Class)
+→ 「ルールブックだけ渡して、実際の中身は子クラスに任せる」仕組み
+→ Pythonでは abc モジュールを使う
+
+ダックタイピング (Duck Typing)
+→ 「アヒルみたいに歩いて鳴けばアヒルとみなす」方式
+→ 型よりも「必要なメソッドを持っているか」で判断する柔軟な考え方
+
+🔹 MECEで整理
+抽象クラスの役割
+
+共通の「ルール」を強制する
+
+具体的な処理は子クラスで書かせる
+
+→ 「必ず introduce() メソッドを書いてね」という約束事ができる
+
+抽象クラスの書き方
+
+ABC を継承
+
+@abstractmethod をつけたメソッドを定義
+
+ダックタイピングの役割
+
+抽象クラスのように「型」を縛らなくても、柔軟に動ける
+
+「このクラスは introduce() を持っているから使える！」という発想
+
+メリット
+
+抽象クラス → 厳格なルール（安心）
+
+ダックタイピング → 柔軟な設計（自由）
+
+🔹 実例：ふわふわ大福店の抽象クラス
+from abc import ABC, abstractmethod
+
+# 抽象クラス：大福ルールブック
+class Daifuku(ABC):
+    def __init__(self, name):
+        self.name = name
+
+    @abstractmethod
+    def introduce(self):  # 子クラスで必ず作らないとエラー
+        pass
+
+# 子クラス：あんこ大福
+class AnkoDaifuku(Daifuku):
+    def introduce(self):
+        print(f"私は {self.name} 大福です！甘さひかえめです😊")
+
+# 子クラス：いちご大福
+class IchigoDaifuku(Daifuku):
+    def introduce(self):
+        print(f"私は {self.name} 大福です！いちご入り🍓")
+
+copy
+🔹 実行例（抽象クラス）
+anko = AnkoDaifuku("あんこ")
+ichigo = IchigoDaifuku("いちご")
+
+anko.introduce()
+ichigo.introduce()
+
+# daifuku = Daifuku("基本")  # ← エラー！ 抽象クラスは直接インスタンス化できない
+
+copy
+🔹 実行結果
+私は あんこ 大福です！甘さひかえめです😊
+私は いちご 大福です！いちご入り🍓
+
+copy
+🔹 ダックタイピングの例
+# 抽象クラスを使わずに「introduceを持ってるならOK」と考える
+
+class Mochi:
+    def introduce(self):
+        print("私はお餅です！もちもち～")
+
+def introduce_any(obj):
+    # introduceメソッドを持っているなら呼び出せる
+    obj.introduce()
+
+anko = AnkoDaifuku("あんこ")
+mochi = Mochi()
+
+introduce_any(anko)   # Daifuku子クラス
+introduce_any(mochi)  # 全然関係ないクラスでもOK
+
+copy
+🔹 実行結果（ダックタイピング）
+私は あんこ 大福です！甘さひかえめです😊
+私はお餅です！もちもち～
+
+copy
+🐇 まとめ（うさうさ店長の格言）
+抽象クラス = 「ふわふわ大福店のルールブック」
+→ 「必ず introduce() を書きなさい！」と強制できる
+
+ダックタイピング = 「見た目で判断」
+→ introduce() を持っていれば大福じゃなくても仲間扱いできる
+
+実務では「厳格にルールを守りたいとき」は抽象クラス、
+「柔軟にいろんなオブジェクトを扱いたいとき」はダックタイピングを選ぶと良い。
+
+了解しました！😊
+それでは、ふわふわ大福店の うさうさ店長 が、新人エンジニアさん向けに ⑪ 抽象クラスとダックタイピング を MECEで整理して解説しますね。
+
+🐰 うさうさ店長の授業：抽象クラスとダックタイピング
+🔹 まずキーワードを整理
+抽象クラス (Abstract Class)
+→ 「ルールブックだけ渡して、実際の中身は子クラスに任せる」仕組み
+→ Pythonでは abc モジュールを使う
+
+ダックタイピング (Duck Typing)
+→ 「アヒルみたいに歩いて鳴けばアヒルとみなす」方式
+→ 型よりも「必要なメソッドを持っているか」で判断する柔軟な考え方
+
+🔹 MECEで整理
+抽象クラスの役割
+
+共通の「ルール」を強制する
+
+具体的な処理は子クラスで書かせる
+
+→ 「必ず introduce() メソッドを書いてね」という約束事ができる
+
+抽象クラスの書き方
+
+ABC を継承
+
+@abstractmethod をつけたメソッドを定義
+
+ダックタイピングの役割
+
+抽象クラスのように「型」を縛らなくても、柔軟に動ける
+
+「このクラスは introduce() を持っているから使える！」という発想
+
+メリット
+
+抽象クラス → 厳格なルール（安心）
+
+ダックタイピング → 柔軟な設計（自由）
+
+🔹 実例：ふわふわ大福店の抽象クラス
+from abc import ABC, abstractmethod
+
+# 抽象クラス：大福ルールブック
+class Daifuku(ABC):
+    def __init__(self, name):
+        self.name = name
+
+    @abstractmethod
+    def introduce(self):  # 子クラスで必ず作らないとエラー
+        pass
+
+# 子クラス：あんこ大福
+class AnkoDaifuku(Daifuku):
+    def introduce(self):
+        print(f"私は {self.name} 大福です！甘さひかえめです😊")
+
+# 子クラス：いちご大福
+class IchigoDaifuku(Daifuku):
+    def introduce(self):
+        print(f"私は {self.name} 大福です！いちご入り🍓")
+
+copy
+🔹 実行例（抽象クラス）
+anko = AnkoDaifuku("あんこ")
+ichigo = IchigoDaifuku("いちご")
+
+anko.introduce()
+ichigo.introduce()
+
+# daifuku = Daifuku("基本")  # ← エラー！ 抽象クラスは直接インスタンス化できない
+
+copy
+🔹 実行結果
+私は あんこ 大福です！甘さひかえめです😊
+私は いちご 大福です！いちご入り🍓
+
+copy
+🔹 ダックタイピングの例
+# 抽象クラスを使わずに「introduceを持ってるならOK」と考える
+
+class Mochi:
+    def introduce(self):
+        print("私はお餅です！もちもち～")
+
+def introduce_any(obj):
+    # introduceメソッドを持っているなら呼び出せる
+    obj.introduce()
+
+anko = AnkoDaifuku("あんこ")
+mochi = Mochi()
+
+introduce_any(anko)   # Daifuku子クラス
+introduce_any(mochi)  # 全然関係ないクラスでもOK
+
+copy
+🔹 実行結果（ダックタイピング）
+私は あんこ 大福です！甘さひかえめです😊
+私はお餅です！もちもち～
+
+copy
+🐇 まとめ（うさうさ店長の格言）
+抽象クラス = 「ふわふわ大福店のルールブック」
+→ 「必ず introduce() を書きなさい！」と強制できる
+
+ダックタイピング = 「見た目で判断」
+→ introduce() を持っていれば大福じゃなくても仲間扱いできる
+
+実務では「厳格にルールを守りたいとき」は抽象クラス、
+「柔軟にいろんなオブジェクトを扱いたいとき」はダックタイピングを選ぶと良い。
+
+いいところに気づきましたね！😊
+では「ダックタイピング」の例を、めちゃくちゃかみ砕いて説明します。
+
+🔹 1. まず普通の考え方（JavaやC++）
+Java や C++ では、こういうことが多いです：
+
+「この関数に渡せるのは あるインターフェースを実装したクラスだけ」
+
+型がきっちり決まってないとエラーになる
+
+👉 つまり「肩書き が正しい人しか通れない」イメージです。
+
+🔹 2. Python の考え方（ダックタイピング）
+Python では、もっと柔軟です。
+
+「アヒルのように歩いて、アヒルのように鳴くなら、それはアヒルだ」
+
+つまり「その型が何か」よりも「そのメソッドや属性を持っているかどうか」が大事。
+
+👉 「肩書き」より「できること」で判断する。
+
+🔹 3. 例のコードの意味
+class Mochi:
+    def introduce(self):
+        print("私はお餅です！もちもち～")
+
+copy
+def introduce_any(obj):
+    obj.introduce()   # introduceメソッドがあるなら呼べる
+
+copy
+ここでは 「obj が Mochi か Daifuku かどうかは気にしてない」 んです。
+ただ「introduce メソッドを持ってるなら呼び出せるよね？」という考え方。
+
+🔹 4. 実行の流れ
+anko = AnkoDaifuku("あんこ")
+mochi = Mochi()
+
+introduce_any(anko)   # → AnkoDaifuku の introduce が呼ばれる
+introduce_any(mochi)  # → Mochi の introduce が呼ばれる
+
+copy
+実行結果：
+
+私は あんこ 大福です！甘さひかえめです😊
+私はお餅です！もちもち～
+
+copy
+👉 introduce_any() は「どんなクラスか」ではなく「introduce メソッドを持っているか」だけを見ているので、
+全く関係ないクラスでも introduce を持っていれば OK になるわけです。
+
+🔹 5. 直感的なまとめ
+普通の言語：
+「クラスが同じ血筋か（継承してるか）」「インターフェースを持ってるか」を見る
+
+Python のダックタイピング：
+「やりたい動作（introduce）ができるならそれでいい！」
+→ 実際に呼んでみて動けばOK
+
+おっ！✨ もう一歩深く 多重継承 に行きたいのですね！
+新人エンジニアさん向けに、ふわふわ大福店の うさうさ店長 が「多重継承の実務ポイントと応用」をさらに掘り下げて教えますね。
+
+🐰 うさうさ店長の授業：多重継承をもう少し詳しく！
+🔹 1. 多重継承の本質
+1つの子クラスが複数の親クラスを持つ仕組み
+
+「大福の基本」＋「チョコ」＋「クリーム」＝「チョコクリーム大福」みたいな感じ
+
+PythonはC++と同じく多重継承OK（JavaはNG、C#も制限あり）
+
+🔹 2. 実務でよくある使い方
+✅ 機能の組み合わせ（Mixinパターン）
+多重継承は「機能を小さく分けて合体させる」ためによく使う
+
+小さい部品（Mixinクラス）を作って、必要なときにだけ継承する
+
+🔹 3. 実例：Mixinを使った大福店
+# 親クラス：基本の大福
+class Daifuku:
+    def introduce(self):
+        print("私は大福です！")
+
+# Mixin1：チョコ味機能
+class ChocoMixin:
+    def taste_choco(self):
+        print("チョコ風味です🍫")
+
+# Mixin2：クリーム味機能
+class CreamMixin:
+    def taste_cream(self):
+        print("クリーム入りです🍦")
+
+# 子クラス：チョコクリーム大福
+class ChocoCreamDaifuku(Daifuku, ChocoMixin, CreamMixin):
+    pass
+
+copy
+🔹 実行例
+d = ChocoCreamDaifuku()
+d.introduce()     # Daifukuから継承
+d.taste_choco()   # ChocoMixinから継承
+d.taste_cream()   # CreamMixinから継承
+
+print(ChocoCreamDaifuku.mro())  # 継承の順序確認
+
+copy
+🔹 実行結果
+私は大福です！
+チョコ風味です🍫
+クリーム入りです🍦
+[<class '__main__.ChocoCreamDaifuku'>, <class '__main__.Daifuku'>, <class '__main__.ChocoMixin'>, <class '__main__.CreamMixin'>, <class 'object'>]
+
+copy
+👉 これで「大福の基本」＋「チョコ」＋「クリーム」を合体できた！
+
+🔹 4. MRO（Method Resolution Order）
+Pythonではメソッド解決順序（MRO）がきっちり決まっている
+
+左から順番に親クラスを探す
+
+例：class C(A, B) なら C → A → B → object
+
+class A:
+    def show(self): print("A")
+
+class B:
+    def show(self): print("B")
+
+class C(A, B):  # Aが先
+    pass
+
+c = C()
+c.show()  # "A" が出る
+print(C.mro())
+
+copy
+🔹 5. 実務での注意点
+多重継承を使いすぎると複雑になりがち
+
+読む人が「どの親から来てるの？」と迷子になる
+
+Mixinを使って小さく分けるのがベストプラクティス
+
+「チョコ機能」「クリーム機能」みたいに細かい役割で分ける
+
+MROを意識する
+
+ClassName.mro() を確認すれば「どの順番で親を見るか」が一目でわかる
+
+🐇 まとめ（うさうさ店長の格言）
+多重継承 = 「複数のレシピを合体させて新しい大福を作る」
+
+MRO = 「どのレシピを先に読むかの順番表」
+
+実務では 小さいMixinを組み合わせる のが安全でおすすめ
+
+いいですね！🐰✨
+多重継承の流れで super() をしっかり理解すると、クラス設計のモヤモヤが一気にスッキリしますよ。
+今回は、ふわふわ大福店の「店員教育」ストーリーで整理してみます。
+
+🐇 うさうさ店長の授業：super() ってなあに？
+🔹 そもそも super() とは？
+親クラスのメソッドを呼び出す仕組み
+
+super().method() と書くと、 次に呼ぶべきクラス のメソッドが実行される
+
+特に 多重継承 のとき、呼び出しの順番を自動で管理してくれる
+
+🔹 MECE整理
+役割
+
+親クラスのメソッド呼び出し
+
+初期化処理の共有（__init__）でよく使う
+
+なぜ必要？
+
+ParentClass.method(self) と直接書くと、
+
+呼び出しが1回しかできない
+
+多重継承で複雑になると 重複呼び出し の危険がある
+
+仕組み
+
+MRO（Method Resolution Order） という「呼び出し順リスト」に従って次のクラスを探す
+
+メリット
+
+重複実行を避けられる
+
+新しい親クラスを追加しても修正が少ない
+
+🔹 実例：ふわふわ大福店の研修
+class Staff:
+    def __init__(self):
+        print("🍡 大福店スタッフ基礎研修")
+
+class Cashier(Staff):
+    def __init__(self):
+        super().__init__()  # Staffを呼ぶ
+        print("💰 レジ研修")
+
+class Baker(Staff):
+    def __init__(self):
+        super().__init__()  # Staffを呼ぶ
+        print("🥮 製造研修")
+
+# 多重継承
+class SuperStaff(Cashier, Baker):
+    def __init__(self):
+        super().__init__()  # MROに従って呼ぶ
+        print("🌟 スーパー店員研修")
+
+copy
+🔹 実行例
+SuperStaff()
+
+copy
+🔹 実行結果
+🍡 大福店スタッフ基礎研修
+🥮 製造研修
+💰 レジ研修
+🌟 スーパー店員研修
+
+copy
+🔹 ポイント
+super() は 次のクラス を MRO に従って呼び出す
+
+SuperStaff の MRO（順番）はこうなる：
+
+SuperStaff → Cashier → Baker → Staff → object
+
+copy
+つまり super() は「親クラスひとつ」じゃなくて、MROの次のクラスを呼んでいる
+
+🐰 うさうさ店長の格言
+super() = 「次の講師にバトンタッチする仕組み」
+
+直接「親クラス名」を呼ぶより 安全で拡張しやすい
+
+多重継承を扱うなら必須のツール
+
+👉 ここからさらに進めるなら：
+
+super() が絡む MROの確認方法 (Class.__mro__)
+
+実務での init 以外のメソッドで super() を使う場面
+
+
+
+いい質問です！🐰✨
+さっきの super() の理解をさらに深めるカギが、まさに MRO（Method Resolution Order） です。
+ここを理解すると「なんでこの順番で処理が走るの？」という謎が一気に解けます。
+
+🐇 うさうさ店長の授業：MROとは？
+🔹 MROの意味
+MRO (Method Resolution Order) = 「メソッド解決順序」
+
+多重継承 のときに、
+「どのクラスのメソッドを最初に探すか？」を決めるルール
+
+Python は C3線形化アルゴリズム を使って、
+複雑な親子関係でも 矛盾がないように順序を決めている
+
+🔹 MECE整理
+なぜ必要？
+
+多重継承では「同じメソッドを持つ親」が複数出てくることがある
+
+MROがないと「どっちを優先すべきか」わからなくなる
+
+何をしている？
+
+「継承ツリーを辿る順番」を一列に並べる
+
+super() がこの順番に従って次を呼ぶ
+
+確認方法
+
+クラス.__mro__
+
+クラス.mro()
+
+ルール
+
+左側の親を優先
+
+同じクラスは一度しか登場しない（重複排除）
+
+一番下（最後）は必ず object
+
+🔹 実例：大福店のスーパー店員
+class Staff:
+    def work(self):
+        print("🍡 大福店スタッフ基礎業務")
+
+class Cashier(Staff):
+    def work(self):
+        print("💰 レジ打ち")
+
+class Baker(Staff):
+    def work(self):
+        print("🥮 大福を作る")
+
+class SuperStaff(Cashier, Baker):
+    pass
+
+# MROの確認
+print(SuperStaff.__mro__)
+
+copy
+🔹 実行結果
+(<class '__main__.SuperStaff'>,
+ <class '__main__.Cashier'>,
+ <class '__main__.Baker'>,
+ <class '__main__.Staff'>,
+ <class 'object'>)
+
+copy
+🔹 解説
+SuperStaff の MRO 順序はこう決まる：
+
+SuperStaff（自分自身）
+
+Cashier（左から）
+
+Baker（次に右）
+
+Staff（共通の親は最後にまとめる）
+
+object（全ての大元）
+
+🔹 実行例：メソッド呼び出し
+ss = SuperStaff()
+ss.work()
+
+copy
+出力：
+
+💰 レジ打ち
+
+copy
+SuperStaff には work() が無い
+
+→ MROの順番で Cashier → Baker → Staff を探す
+
+一番最初の Cashier.work() が選ばれる
+
+🐰 うさうさ店長の格言
+MRO = 「どの順番で講師が授業するかのシラバス」
+
+super() は「次の講師をMRO表に従って呼ぶ」だけ
+
+MROを理解すると 「なぜこの処理が実行されたのか」 が説明できる
+
+いいところに気づきましたね！🐰✨
+多くの人は super() を __init__ の初期化 でしか使わないのですが、実は 他のメソッドでもよく使われます。
+特に 多重継承 や 処理を拡張したいとき に便利です。
+
+🐇 うさうさ店長の授業：super() は init 以外でも使える！
+🔹 そもそも
+super() は 「MROの次のクラスのメソッドを呼ぶ」 仕組み
+
+なので、どのメソッドでも使える
+
+__init__ 以外の場面でも「親クラスの処理を残しつつ追加したい」ときに役立つ
+
+🔹 実例：大福店の業務報告
+class Staff:
+    def report(self):
+        print("🍡 基本業務報告")
+
+class Cashier(Staff):
+    def report(self):
+        super().report()   # 親のreportも呼ぶ
+        print("💰 レジの売上報告")
+
+class Baker(Staff):
+    def report(self):
+        super().report()
+        print("🥮 大福製造数の報告")
+
+class SuperStaff(Cashier, Baker):
+    def report(self):
+        super().report()
+        print("🌟 店全体の最終報告")
+
+copy
+🔹 実行例
+ss = SuperStaff()
+ss.report()
+
+copy
+🔹 出力結果
+🍡 基本業務報告
+🥮 大福製造数の報告
+💰 レジの売上報告
+🌟 店全体の最終報告
+
+copy
+🔹 ポイント
+super().report() が MRO の順番で次のクラスを呼んでいる
+
+SuperStaff → Cashier → Baker → Staff → object
+
+全員がリレー形式で報告するように処理がつながっていく
+
+super() を書かないと、そのクラスの処理で止まってしまう
+
+🔹 よくある使いどころ
+__str__() や __repr__() のカスタマイズ
+
+save() や delete() など（Djangoなどフレームワークで頻出）
+
+ロギングや共通処理を追加する時
+
+🐰 うさうさ店長の格言
+super() は 「親の処理を潰さずに自分の処理を足す魔法」
+
+__init__ に限らず、どのメソッドでも使える
+
+多重継承でリレー形式にすることで、全クラスの機能を積み重ねられる
+
+おっ！いい質問です😊
+ここで出てきた @property / @xxx.setter の文法 が「なんだこれ？！」ってなりやすいポイントなんですよね。
+順番にかみ砕いていきますね。
+
+🐍 Python先生の授業：@property と @setter の文法を理解しよう
+🔹 まず、普通のクラスの場合
+もし @property を使わなかったら、こんな書き方になります。
+
+class Daifuku:
+    def __init__(self, name, price):
+        self.name = name
+        self._price = price  # 内部用の変数
+
+    def get_price(self):  # 値段を読み取る
+        return self._price
+
+    def set_price(self, value):  # 値段を設定する
+        if value < 0:
+            raise ValueError("値段はマイナスにできません！")
+        self._price = value
+
+copy
+使うときはこう：
+
+anko = Daifuku("あんこ", 120)
+print(anko.get_price())  # getter
+anko.set_price(150)      # setter
+print(anko.get_price())
+
+copy
+👉 Java や C# だとこの書き方が多いです。
+
+🔹 Python の流儀：@property
+Python では「もっとスマートに書きたいよね」ということで
+getter/setterを関数っぽく呼ぶのではなく、変数アクセスのように書ける仕組みが用意されています。
+
+class Daifuku:
+    def __init__(self, name, price):
+        self.name = name
+        self._price = price  # 内部用（_付きで直アクセスは避ける）
+
+    # getter（読み取り）
+    @property
+    def price(self):  # ← ここは「関数」だけど、呼ぶときは anko.price でOK
+        return self._price
+
+    # setter（書き込み）
+    @price.setter
+    def price(self, value):  # ← ここも「関数」だけど、呼ぶときは anko.price = xxx でOK
+        if value < 0:
+            raise ValueError("値段はマイナスにできません！")
+        self._price = value
+
+copy
+🔹 どう動く？
+anko = Daifuku("あんこ", 120)
+
+print(anko.price)    # 本当は anko.price() じゃなくて anko.price
+anko.price = 150     # 本当は anko.set_price(150) を呼んでる
+anko.price = -50     # setterでチェックしてエラーになる
+
+copy
+👉 実際には getter/setter を呼んでるけど、文法を変数アクセス風に隠している んです。
+
+🔹 実行結果（確認）
+120
+150
+Traceback (most recent call last):
+  ...
+ValueError: 値段はマイナスにできません！
+
+copy
+🔹 まとめ（ふわふわ大福店のたとえ）
+_price … 店の裏にしまってある「原価表」📒（直接触らない約束）
+
+@property price … 「メニュー表に載せた表向きの価格」💴（安全に取り出せる）
+
+@price.setter … 値段を改訂するときの「店長チェック」✅（マイナスは禁止！）
+
+🐰 うさうさ店長の格言
+@property は「関数を変数っぽく呼べる魔法」
+
+getter/setter を 呼び出しやすく、読みやすく するための仕組み
+
+「内部の _price を守りつつ、外からはスマートにアクセスできる」
+
+いい質問です！💡
+ここで混乱しやすいのは 「@property や @price.setter で定義したものは関数なのに、呼び出すときは () を書かないで変数のように扱える」 という点ですね。
+
+🔹 ステップごとの理解
+1. 普通の関数ならこうなる
+class Test:
+    def get_value(self):
+        return 100
+
+copy
+t = Test()
+print(t.get_value())  # ← () が必要（関数呼び出しだから）
+
+copy
+👉 普通は「関数」なら () を付けますよね。
+
+2. @property を付けると「変数っぽく」使える
+class Test:
+    @property
+    def value(self):
+        return 100
+
+copy
+t = Test()
+print(t.value)   # ← () なしで呼べる！
+
+copy
+👉 実際には 関数が呼ばれている のですが、Python が「プロパティ（属性）としてアクセスできるように見せかけてくれる」仕組みです。
+つまり t.value と書いた瞬間に、内部では value(self) 関数が呼ばれています。
+
+3. setter も同じ
+class Test:
+    def __init__(self):
+        self._x = 0
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+
+copy
+t = Test()
+t.x = 10   # ← 関数 x(self, value) が呼ばれる
+print(t.x) # ← 関数 x(self) が呼ばれる
+
+copy
+👉 t.x = 10 と書いたとき、実は x.setter が呼び出されてるんです。
+でも 見た目は「変数に代入しているだけ」 に見えるように Python がしてくれている。
+
+🔹 まとめ（直感的なイメージ）
+@property → 関数を「変数のように読める属性」に変える
+
+@xxx.setter → 関数を「変数に代入するときに動く属性」に変える
+
+実際には関数だが、見た目は変数アクセスに見える
+
+✅ だから anko.price は 「関数を呼んでいるけど、変数っぽく書ける」 特殊な仕組みなんです。
+
+
+
+
+
+友季子さん、ここまでで「関数なのに変数っぽく見える」ってイメージつきましたか？
+それとも「@property が裏でどう動いてるか」まで掘り下げて説明したほうがいいですか？
+
+いいところに気づきましたね！😊
+では「ダックタイピング」の例を、めちゃくちゃかみ砕いて説明します。
+
+🔹 1. まず普通の考え方（JavaやC++）
+Java や C++ では、こういうことが多いです：
+
+「この関数に渡せるのは あるインターフェースを実装したクラスだけ」
+
+型がきっちり決まってないとエラーになる
+
+👉 つまり「肩書き が正しい人しか通れない」イメージです。
+
+🔹 2. Python の考え方（ダックタイピング）
+Python では、もっと柔軟です。
+
+「アヒルのように歩いて、アヒルのように鳴くなら、それはアヒルだ」
+
+つまり「その型が何か」よりも「そのメソッドや属性を持っているかどうか」が大事。
+
+👉 「肩書き」より「できること」で判断する。
+
+🔹 3. 例のコードの意味
+class Mochi:
+    def introduce(self):
+        print("私はお餅です！もちもち～")
+
+copy
+def introduce_any(obj):
+    obj.introduce()   # introduceメソッドがあるなら呼べる
+
+copy
+ここでは 「obj が Mochi か Daifuku かどうかは気にしてない」 んです。
+ただ「introduce メソッドを持ってるなら呼び出せるよね？」という考え方。
+
+🔹 4. 実行の流れ
+anko = AnkoDaifuku("あんこ")
+mochi = Mochi()
+
+introduce_any(anko)   # → AnkoDaifuku の introduce が呼ばれる
+introduce_any(mochi)  # → Mochi の introduce が呼ばれる
+
+copy
+実行結果：
+
+私は あんこ 大福です！甘さひかえめです😊
+私はお餅です！もちもち～
+
+copy
+👉 introduce_any() は「どんなクラスか」ではなく「introduce メソッドを持っているか」だけを見ているので、
+全く関係ないクラスでも introduce を持っていれば OK になるわけです。
+
+🔹 5. 直感的なまとめ
+普通の言語：
+「クラスが同じ血筋か（継承してるか）」「インターフェースを持ってるか」を見る
+
+Python のダックタイピング：
+「やりたい動作（introduce）ができるならそれでいい！」
+→ 実際に呼んでみて動けばOK
+
+いいですね！✨ 「デコレーター」は Python でよく使うけど、最初はちょっと分かりにくい仕組みなんです。
+分かりやすく「ステップごと」に説明しますね。
+
+🔹 デコレーターとは？
+関数やメソッドに「追加の機能」をくっつける仕組み
+
+「@マーク」を使って関数の上に書くだけで適用できる
+
+👉 料理で例えるなら、
+「ケーキに生クリームをデコレーションする」イメージです。
+ケーキ本体は変わらないけど、見た目や味をちょっと変えられる。
+
+🔹 最小の例
+def simple_decorator(func):
+    def wrapper():
+        print("🍀 関数が呼ばれる前の処理")
+        func()
+        print("🍀 関数が呼ばれた後の処理")
+    return wrapper
+
+@simple_decorator
+def hello():
+    print("こんにちは！")
+
+hello()
+
+copy
+実行結果
+🍀 関数が呼ばれる前の処理
+こんにちは！
+🍀 関数が呼ばれた後の処理
+
+copy
+🔹 解説
+simple_decorator は 関数を受け取って新しい関数を返す関数
+
+@simple_decorator と書くと、自動的に hello = simple_decorator(hello) が実行される
+
+だから hello() を呼ぶと、wrapper() が動き、その中で元の hello() も呼ばれる
+
+🔹 デコレーターのよくある用途
+1. ログを取る
+def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"[LOG] {func.__name__} が呼ばれました")
+        return func(*args, **kwargs)
+    return wrapper
+
+@log
+def add(a, b):
+    return a + b
+
+print(add(3, 5))
+
+copy
+実行結果：
+
+[LOG] add が呼ばれました
+8
+
+copy
+2. 実行時間を測る
+import time
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"{func.__name__} の実行時間: {end - start:.4f} 秒")
+        return result
+    return wrapper
+
+@timer
+def heavy_task():
+    time.sleep(1)
+
+heavy_task()
+
+copy
+🔹 まとめ
+デコレーター = 関数をラップして機能を追加する仕組み
+
+@decorator_name で関数に適用できる
+
+ログ・バリデーション・キャッシュ・実行時間測定などによく使う
+
+なるほど！👍
+友季子さんは「デコレーターの文法の裏側」をきちんと理解したいんですね。
+では、 wrapper が返る仕組み、*args, **kwargs、さらに __init__ などの特殊メソッドとの関係まで、順を追って説明します！
+
+🔹 1. デコレーターの基本の流れ
+デコレーターは 「関数を受け取り → 新しい関数を返す」 だけの仕組みです。
+
+def decorator(func):   # 関数を受け取る
+    def wrapper():
+        print("前処理")
+        func()
+        print("後処理")
+    return wrapper     # ← 関数を返す！
+
+copy
+@decorator
+def hello():
+    print("こんにちは！")
+
+copy
+これは内部的には次と同じ：
+
+hello = decorator(hello)
+
+copy
+👉 つまり hello 関数は上書きされて、wrapper に置き換わる。
+呼ぶと wrapper が動き、その中で元の hello も呼ばれる。
+
+🔹 2. *args, **kwargs の意味
+デコレーターは どんな関数にも使える ようにするため、引数を柔軟に受け取れるようにします。
+
+def decorator(func):
+    def wrapper(*args, **kwargs):   # 可変長引数
+        print("前処理")
+        result = func(*args, **kwargs)  # 元の関数を呼ぶ
+        print("後処理")
+        return result
+    return wrapper
+
+copy
+*args → 位置引数をタプルとして受け取る
+
+**kwargs → キーワード引数を辞書として受け取る
+
+例：
+
+@decorator
+def add(a, b):
+    return a + b
+
+print(add(2, 3))
+
+copy
+👉 wrapper(2, 3) が呼ばれ、内部で func(2, 3) = add(2, 3) が実行される。
+
+🔹 3. __init__ と特殊メソッドの関係
+特殊メソッド（__init__, __str__, __call__ など）は Python の組み込みルールに従って呼ばれる特別な名前の関数です。
+
+例えば __init__ は コンストラクタ。
+
+class Daifuku:
+    def __init__(self, name):
+        self.name = name
+
+anko = Daifuku("あんこ")
+
+copy
+ここで Daifuku("あんこ") を書くと、内部では
+
+Daifuku.__init__(anko, "あんこ")
+
+copy
+が呼ばれています。
+
+🔹 4. デコレーターとクラスの特殊メソッド
+実はデコレーターも「関数を置き換える仕組み」なので、クラスのメソッドにも使えます。
+
+def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"[LOG] {func.__name__} が呼ばれました")
+        return func(*args, **kwargs)
+    return wrapper
+
+class Daifuku:
+    def __init__(self, name):
+        self.name = name
+
+    @log
+    def introduce(self):
+        print(f"私は {self.name} 大福です！")
+
+copy
+anko = Daifuku("あんこ")
+anko.introduce()
+
+copy
+実行結果：
+
+[LOG] introduce が呼ばれました
+私は あんこ 大福です！
+
+copy
+👉 introduce メソッドが log() でラップされた wrapper に差し替わっている。
+
+🔹 まとめ（直感イメージ）
+デコレーターは 「関数 → 関数」変換装置
+
+@decorator は func = decorator(func) の糖衣構文
+
+wrapper(*args, **kwargs) にすることで、どんな関数でもラップできる
+
+__init__ など特殊メソッドも、普通のメソッドなのでデコレーターでラップ可能
+
+はい！😊 ここをしっかり押さえると デコレーターの文法も一気に理解しやすくなります。
+*args と **kwargs は Python の「引数の受け取りルール」です。
+
+🔹 *args（位置引数）
+関数に渡された 位置引数（カンマ区切りで並んだ引数）をタプルとしてまとめて受け取る。
+
+「個数が決まっていない引数」を扱うときに便利。
+
+def sample(*args):
+    print(args)
+
+sample(1, 2, 3)
+
+copy
+出力：
+
+(1, 2, 3)
+
+copy
+👉 args は タプル。だから args[0] で最初の値にアクセスできる。
+
+🔹 **kwargs（キーワード引数）
+関数に渡された キーワード引数（key=value の形）を辞書としてまとめて受け取る。
+
+def sample(**kwargs):
+    print(kwargs)
+
+sample(name="anko", price=120)
+
+copy
+出力：
+
+{'name': 'anko', 'price': 120}
+
+copy
+👉 kwargs は 辞書。だから kwargs["name"] で値を取り出せる。
+
+🔹 両方を使う
+実際には 位置引数もキーワード引数も混ざることがあるので、両方セットで書くのが定番です。
+
+def sample(*args, **kwargs):
+    print("位置引数:", args)
+    print("キーワード引数:", kwargs)
+
+sample(1, 2, 3, name="anko", price=120)
+
+copy
+出力：
+
+位置引数: (1, 2, 3)
+キーワード引数: {'name': 'anko', 'price': 120}
+
+copy
+🔹 なぜデコレーターでよく出るの？
+デコレーターは どんな関数でもラップできるようにしたいからです。
+
+例えば：
+
+def decorator(func):
+    def wrapper(*args, **kwargs):
+        print("前処理")
+        result = func(*args, **kwargs)  # どんな引数でも渡せる
+        print("後処理")
+        return result
+    return wrapper
+
+copy
+👉 wrapper が *args, **kwargs を受け取ってくれるから
+
+func(1, 2) でも
+
+func(a=1, b=2) でも
+
+func(1, b=2, c=3) でも
+全部OK！
+
+🐇 ふわふわ大福店たとえ
+*args → 大福を「個数指定」で買うとき（買う(3個, 5個) → (3, 5) のタプル）
+
+**kwargs → 大福を「名前付き」で買うとき（買う(味="あんこ", 値段=120) → {"味": "あんこ", "値段": 120} の辞書）
+
+両方 → 数量と条件を同時に指定できる。
+
+
+
+
+
+
+
+
+YUKIKO@BI＆AIを極めたい（転職活動中スカウト歓迎）
+YUKIKO@BI＆AIを極めたい（転職活動中スカウト歓迎）
+生成AIパスポート試験合格に向けて学習中！
+Python3エンジニア認定試験合格
+2025年7月：BIの学習中です！
+
+【技術】
+Python/Django/スクレイピング/業務自動化
+
+
+
+
+
+
+
+noteプレミアム
+note pro
+よくある質問・noteの使い方
+プライバシー
+クリエイターへのお問い合わせ
+フィードバック
+ご利用規約
+通常ポイント利用特約
+加盟店規約
+資⾦決済法に基づく表⽰
+特商法表記
+投資情報の免責事項
+🐇 うさうさ店長の授業：ダイヤモンド継承問題とは？やややこしい文法　Python文法ざっくり備忘録｜YUKIKO@BI＆AIを極めたい（転職活動中スカウト歓迎）
