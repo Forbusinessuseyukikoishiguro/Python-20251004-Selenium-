@@ -1,0 +1,803 @@
+# 🐰 Python先生の実践コード解説
+**新人エンジニア向け！コメント・docstringの書き方を一行ずつ丁寧に**
+
+---
+
+## 📚 この記事で学べること
+
+1. **コメントとdocstringの違い**
+2. **一行ずつのコメントの書き方**
+3. **実践的なコツ**
+4. **よくある間違いと正しい例**
+
+---
+
+## 1. コメントとdocstringの違い
+
+### 📖 基本ルール
+
+```python
+# これは「コメント」 → コードの「なぜ」を説明
+def calculate_price():
+    """これは「docstring」 → 関数の「何をするか」を説明"""
+    pass
+```
+
+| 種類 | 記号 | 目的 | 誰が読む？ |
+|------|------|------|-----------|
+| **コメント** | `#` | コードの意図・理由を説明 | コードを読む人 |
+| **docstring** | `"""` | 関数・クラスの使い方を説明 | APIを使う人 |
+
+---
+
+## 2. 実践！一行ずつコメントを書いてみよう
+
+### 🐰 例題：ふわふわ大福店のレジシステム
+
+#### ❌ 悪い例（コメントなし）
+
+```python
+from typing import Optional
+
+class DaifukuShop:
+    def __init__(self, owner_name: str, stock: int) -> None:
+        if stock < 0:
+            raise ValueError("在庫数は0以上にしてください")
+        self.owner_name = owner_name
+        self.stock = stock
+        self.sold = 0
+        self.revenue = 0
+    
+    def sell(self, quantity: int, price: int = 150, discount: float = 0) -> Optional[int]:
+        if quantity <= 0:
+            raise ValueError("個数は1以上にしてください")
+        if quantity > self.stock:
+            return None
+        total = int(quantity * price * (1 - discount))
+        self.stock -= quantity
+        self.sold += quantity
+        self.revenue += total
+        return total
+```
+
+**問題点：**
+- 何をしているかわからない
+- なぜその処理をしているか不明
+- 数値の意味が不明
+
+---
+
+#### ✅ 良い例（適切なコメント + docstring）
+
+```python
+from typing import Optional
+
+class DaifukuShop:
+    """
+    大福店の在庫・販売管理クラス
+    
+    Args:
+        owner_name: 店長の名前
+        stock: 初期在庫数
+    
+    Attributes:
+        owner_name: 店長の名前
+        stock: 現在の在庫数
+        sold: 累計販売数
+        revenue: 累計売上金額
+    """
+    
+    def __init__(self, owner_name: str, stock: int) -> None:
+        """
+        大福店を初期化する
+        
+        Args:
+            owner_name: 店長の名前
+            stock: 初期在庫数（0以上）
+        
+        Raises:
+            ValueError: stockが負の数の場合
+        """
+        # バリデーション: 在庫数は負にできない
+        if stock < 0:
+            raise ValueError("在庫数は0以上にしてください")
+        
+        # インスタンス変数の初期化
+        self.owner_name = owner_name  # 店長名を保存
+        self.stock = stock            # 現在の在庫数
+        self.sold = 0                 # 累計販売数（初期値0）
+        self.revenue = 0              # 累計売上（初期値0円）
+    
+    def sell(
+        self,
+        quantity: int,
+        price: int = 150,      # デフォルト単価: 150円
+        discount: float = 0    # デフォルト割引率: 0%
+    ) -> Optional[int]:
+        """
+        大福を販売して売上を計算する
+        
+        Args:
+            quantity: 販売個数
+            price: 単価（円）。デフォルトは150円
+            discount: 割引率（0.0-1.0）。デフォルトは0
+        
+        Returns:
+            売上金額（円）。在庫不足の場合はNone
+        
+        Raises:
+            ValueError: quantityが0以下の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.sell(5)
+            750
+            >>> shop.sell(3, discount=0.1)  # 10%割引
+            405
+        """
+        # バリデーション: 販売個数は1以上必須
+        if quantity <= 0:
+            raise ValueError("個数は1以上にしてください")
+        
+        # 在庫チェック: 足りない場合は販売不可
+        if quantity > self.stock:
+            return None  # Noneを返して在庫不足を通知
+        
+        # 売上計算: 単価 × 個数 × (1 - 割引率)
+        # int()で小数点以下切り捨て
+        total = int(quantity * price * (1 - discount))
+        
+        # 在庫と販売数を更新
+        self.stock -= quantity    # 在庫を減らす
+        self.sold += quantity     # 累計販売数を増やす
+        self.revenue += total     # 累計売上に加算
+        
+        # 売上金額を返す
+        return total
+```
+
+---
+
+## 3. コメントを書く5つのコツ
+
+### 💡 コツ1: 「何を」ではなく「なぜ」を書く
+
+#### ❌ 悪い例
+
+```python
+# iに1を足す
+i = i + 1
+
+# stockが10より大きいかチェック
+if stock > 10:
+    # discountを0.1にする
+    discount = 0.1
+```
+
+**問題:** コードを見ればわかることを書いている
+
+#### ✅ 良い例
+
+```python
+# カウンターをインクリメント（ループの次の要素へ）
+i = i + 1
+
+# 大量購入割引: 11個以上で10%オフ
+if stock > 10:
+    discount = 0.1  # 10%割引を適用
+```
+
+**ポイント:** なぜその処理が必要か、ビジネスロジックを説明
+
+---
+
+### 💡 コツ2: マジックナンバーには必ずコメント
+
+#### ❌ 悪い例
+
+```python
+if age >= 20:
+    can_buy = True
+
+total = price * 1.1
+
+if score > 80:
+    grade = "A"
+```
+
+**問題:** 数値の意味が不明
+
+#### ✅ 良い例
+
+```python
+LEGAL_AGE = 20  # 成人年齢（日本）
+if age >= LEGAL_AGE:
+    can_buy = True
+
+TAX_RATE = 1.1  # 消費税10%
+total = price * TAX_RATE
+
+A_GRADE_THRESHOLD = 80  # A評価のボーダーライン
+if score > A_GRADE_THRESHOLD:
+    grade = "A"
+```
+
+**ポイント:** 定数化 + コメントで意味を明確に
+
+---
+
+### 💡 コツ3: 複雑なロジックは段階的にコメント
+
+#### ❌ 悪い例
+
+```python
+def calculate_shipping_fee(items, weight, distance):
+    if len(items) > 10 and weight < 5000:
+        base = 500
+    elif distance > 100:
+        base = 1000 + (distance - 100) * 10
+    else:
+        base = 800
+    
+    if weight > 3000:
+        base += (weight - 3000) // 1000 * 200
+    
+    return base
+```
+
+**問題:** ロジックが複雑で追いづらい
+
+#### ✅ 良い例
+
+```python
+def calculate_shipping_fee(items: list, weight: int, distance: int) -> int:
+    """
+    配送料を計算する
+    
+    Args:
+        items: 商品リスト
+        weight: 総重量（グラム）
+        distance: 配送距離（km）
+    
+    Returns:
+        配送料（円）
+    """
+    # ステップ1: 基本料金を決定
+    if len(items) > 10 and weight < 5000:
+        # 大量注文 & 軽量 → 割引適用
+        base = 500
+    elif distance > 100:
+        # 遠距離配送 → 距離に応じた追加料金
+        base = 1000 + (distance - 100) * 10  # 100km超過分は1kmあたり10円
+    else:
+        # 通常配送
+        base = 800
+    
+    # ステップ2: 重量による追加料金
+    HEAVY_THRESHOLD = 3000  # 3kg以上は追加料金
+    if weight > HEAVY_THRESHOLD:
+        # 3kgを超える1kgごとに200円追加
+        extra_weight = weight - HEAVY_THRESHOLD
+        base += (extra_weight // 1000) * 200
+    
+    return base
+```
+
+**ポイント:** 
+- ステップごとにコメント
+- 定数を使って計算式を説明
+- 条件の意味を明記
+
+---
+
+### 💡 コツ4: TODOとFIXMEを使い分ける
+
+```python
+class DaifukuShop:
+    def sell(self, quantity: int) -> Optional[int]:
+        """大福を販売する"""
+        
+        # TODO: ポイント還元機能を追加予定（2025年4月リリース）
+        # 購入金額の1%をポイントとして付与
+        
+        # FIXME: 在庫が0の時のエラーメッセージが不親切
+        # 「在庫なし」だけでなく、次回入荷日も表示したい
+        if quantity > self.stock:
+            return None
+        
+        # HACK: 暫定対応。本来はDBから取得すべき
+        # チケット #1234 で対応予定
+        price = 150
+        
+        # NOTE: この計算式は経理部門と合意済み（2024/12/01）
+        total = quantity * price
+        
+        return total
+```
+
+**コメントタグの使い分け:**
+
+| タグ | 意味 | 使う場面 |
+|------|------|---------|
+| `TODO` | やるべきこと | 将来実装する機能 |
+| `FIXME` | 修正が必要 | 既知のバグや改善点 |
+| `HACK` | 暫定対応 | 本来の実装ではない |
+| `NOTE` | 重要な注意 | 特別な理由や背景 |
+| `XXX` | 危険・注意 | 特に注意が必要な箇所 |
+
+---
+
+### 💡 コツ5: 関数・クラスには必ずdocstring
+
+#### ✅ 完璧な例
+
+```python
+from typing import Optional, List, Dict
+
+class DaifukuShop:
+    """
+    大福専門店の在庫・販売管理システム
+    
+    このクラスは大福の在庫管理、販売処理、売上集計を行います。
+    
+    Attributes:
+        owner_name: 店長の名前
+        stock: 現在の在庫数
+        sold: 累計販売数
+        revenue: 累計売上金額（円）
+    
+    Example:
+        >>> shop = DaifukuShop("うさうさ", 20)
+        >>> shop.sell(5)
+        750
+        >>> shop.get_stats()
+        {'owner': 'うさうさ', 'stock': 15, 'sold': 5, 'revenue': 750}
+    """
+    
+    # クラス定数: 全店舗共通の設定
+    DEFAULT_PRICE = 150      # デフォルト単価（円）
+    TAX_RATE = 1.1          # 消費税率
+    BULK_DISCOUNT = 0.1     # 大量購入割引率（10%）
+    
+    def __init__(self, owner_name: str, stock: int) -> None:
+        """
+        大福店を初期化する
+        
+        Args:
+            owner_name: 店長の名前
+            stock: 初期在庫数（0以上の整数）
+        
+        Raises:
+            ValueError: stockが負の数の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+        """
+        # バリデーション
+        if stock < 0:
+            raise ValueError("在庫数は0以上にしてください")
+        
+        # 初期化
+        self.owner_name = owner_name
+        self.stock = stock
+        self.sold = 0
+        self.revenue = 0
+    
+    def sell(
+        self,
+        quantity: int,
+        price: int = DEFAULT_PRICE,
+        discount: float = 0
+    ) -> Optional[int]:
+        """
+        大福を販売して売上を計算する
+        
+        在庫から指定個数を減らし、売上を計算します。
+        在庫不足の場合は販売せずNoneを返します。
+        
+        Args:
+            quantity: 販売個数（1以上）
+            price: 単価（円）。省略時はDEFAULT_PRICE
+            discount: 割引率（0.0-1.0）。0で割引なし
+        
+        Returns:
+            売上金額（円）。在庫不足の場合はNone
+        
+        Raises:
+            ValueError: quantityが0以下の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.sell(5)
+            750
+            >>> shop.sell(10, discount=0.1)  # 10%割引
+            1350
+            >>> shop.sell(100)  # 在庫不足
+            None
+        
+        Note:
+            - 在庫不足の場合、在庫数は変更されません
+            - 割引後の金額は小数点以下切り捨て
+        """
+        # ステップ1: バリデーション
+        if quantity <= 0:
+            raise ValueError("個数は1以上にしてください")
+        
+        # ステップ2: 在庫チェック
+        if quantity > self.stock:
+            # 在庫不足: 何も変更せずNoneを返す
+            return None
+        
+        # ステップ3: 売上計算
+        # 計算式: 個数 × 単価 × (1 - 割引率)
+        total = int(quantity * price * (1 - discount))
+        
+        # ステップ4: 在庫と売上を更新
+        self.stock -= quantity     # 在庫を減らす
+        self.sold += quantity      # 累計販売数を増やす
+        self.revenue += total      # 累計売上に加算
+        
+        # ステップ5: 売上金額を返す
+        return total
+    
+    def restock(self, quantity: int) -> None:
+        """
+        在庫を補充する
+        
+        Args:
+            quantity: 補充個数（1以上）
+        
+        Raises:
+            ValueError: quantityが0以下の場合
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 10)
+            >>> shop.restock(20)
+            >>> shop.stock
+            30
+        """
+        if quantity <= 0:
+            raise ValueError("補充個数は1以上にしてください")
+        
+        # 在庫に加算
+        self.stock += quantity
+    
+    def get_stats(self) -> Dict[str, any]:
+        """
+        店舗の統計情報を取得する
+        
+        Returns:
+            以下のキーを持つ辞書:
+                - owner: 店長名
+                - stock: 現在の在庫数
+                - sold: 累計販売数
+                - revenue: 累計売上（円）
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.sell(5)
+            750
+            >>> shop.get_stats()
+            {'owner': 'うさうさ', 'stock': 15, 'sold': 5, 'revenue': 750}
+        """
+        return {
+            'owner': self.owner_name,
+            'stock': self.stock,
+            'sold': self.sold,
+            'revenue': self.revenue
+        }
+    
+    def apply_bulk_discount(self, quantity: int) -> float:
+        """
+        大量購入割引を適用すべきか判定する
+        
+        10個以上の購入で10%割引を適用します。
+        
+        Args:
+            quantity: 購入個数
+        
+        Returns:
+            適用する割引率（0.0-1.0）
+        
+        Example:
+            >>> shop = DaifukuShop("うさうさ", 20)
+            >>> shop.apply_bulk_discount(5)
+            0.0
+            >>> shop.apply_bulk_discount(15)
+            0.1
+        """
+        # 大量購入の閾値
+        BULK_THRESHOLD = 10
+        
+        # 10個以上で割引適用
+        if quantity >= BULK_THRESHOLD:
+            return self.BULK_DISCOUNT
+        else:
+            return 0.0
+```
+
+---
+
+## 4. よくある間違いと正しい書き方
+
+### ❌ 間違い1: コメントアウトしたコードを残す
+
+```python
+def calculate_total(quantity: int, price: int) -> int:
+    # 古い計算方法（削除予定）
+    # total = quantity * price
+    # tax = total * 0.08
+    # return total + tax
+    
+    # 新しい計算方法
+    return int(quantity * price * 1.1)
+```
+
+**問題:** コードが読みにくくなる
+
+#### ✅ 正しい書き方
+
+```python
+def calculate_total(quantity: int, price: int) -> int:
+    """
+    合計金額を計算する（消費税10%込み）
+    
+    Note:
+        2024年10月から消費税率を8%→10%に変更
+    """
+    TAX_RATE = 1.1  # 消費税10%
+    return int(quantity * price * TAX_RATE)
+```
+
+**ポイント:** 
+- 古いコードは削除
+- 変更理由はdocstringに記載
+- Git履歴で過去のコードは確認可能
+
+---
+
+### ❌ 間違い2: 冗長なコメント
+
+```python
+# DaifukuShopクラスを定義
+class DaifukuShop:
+    # __init__メソッドを定義
+    def __init__(self, owner_name, stock):
+        # owner_nameをself.owner_nameに代入
+        self.owner_name = owner_name
+        # stockをself.stockに代入
+        self.stock = stock
+```
+
+**問題:** コードを見ればわかることを書いている
+
+#### ✅ 正しい書き方
+
+```python
+class DaifukuShop:
+    """大福店の在庫・販売管理クラス"""
+    
+    def __init__(self, owner_name: str, stock: int) -> None:
+        """
+        店舗を初期化する
+        
+        Args:
+            owner_name: 店長の名前
+            stock: 初期在庫数
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+```
+
+**ポイント:** コメントではなくdocstringで「何をするか」を説明
+
+---
+
+### ❌ 間違い3: コメントが古くなっている
+
+```python
+def sell(self, quantity: int) -> Optional[int]:
+    # 在庫から引く（2023年版）
+    # 割引は適用しない
+    self.stock -= quantity
+    
+    # 2024年追加: 割引機能
+    discount = 0.1
+    total = int(quantity * 150 * (1 - discount))
+    
+    return total
+```
+
+**問題:** コメントとコードが一致していない
+
+#### ✅ 正しい書き方
+
+```python
+def sell(self, quantity: int, discount: float = 0.1) -> Optional[int]:
+    """
+    大福を販売する（割引適用版）
+    
+    Args:
+        quantity: 販売個数
+        discount: 割引率。デフォルトは0.1（10%オフ）
+    
+    Returns:
+        売上金額（割引後）
+    
+    Note:
+        2024年4月より全商品10%割引キャンペーン実施中
+    """
+    # 在庫を減らす
+    self.stock -= quantity
+    
+    # 割引後の売上を計算
+    DEFAULT_PRICE = 150
+    total = int(quantity * DEFAULT_PRICE * (1 - discount))
+    
+    return total
+```
+
+**ポイント:** コードを変更したらコメントも必ず更新
+
+---
+
+## 5. 実践チェックリスト
+
+### ✅ コメントを書く前にチェック
+
+```
+【必須】
+□ docstringは書いたか？
+□ マジックナンバーに定数名をつけたか？
+□ 複雑なロジックに段階的コメントをつけたか？
+□ TODOやFIXMEで課題を記録したか？
+
+【禁止】
+□ コードと同じことを書いていないか？
+□ 古いコメントアウトを残していないか？
+□ コメントとコードが矛盾していないか？
+
+【推奨】
+□ 「なぜ」を書いているか？（「何を」ではなく）
+□ ビジネスロジックを説明しているか？
+□ 将来の自分が読んでわかるか？
+```
+
+---
+
+## 6. 練習問題
+
+### 問題1: このコードにコメントとdocstringを追加してください
+
+```python
+def calculate_point(price, is_member):
+    if is_member:
+        if price >= 10000:
+            return int(price * 0.05)
+        else:
+            return int(price * 0.03)
+    else:
+        return int(price * 0.01)
+```
+
+<details>
+<summary>解答例を見る</summary>
+
+```python
+def calculate_point(price: int, is_member: bool) -> int:
+    """
+    購入金額に応じたポイントを計算する
+    
+    会員ステータスと購入金額に応じて、以下のポイント還元率を適用:
+    - 会員 & 10,000円以上: 5%
+    - 会員 & 10,000円未満: 3%
+    - 非会員: 1%
+    
+    Args:
+        price: 購入金額（円）
+        is_member: 会員かどうか
+    
+    Returns:
+        付与ポイント数（小数点以下切り捨て）
+    
+    Example:
+        >>> calculate_point(15000, True)   # 会員・高額
+        750
+        >>> calculate_point(5000, True)    # 会員・通常
+        150
+        >>> calculate_point(5000, False)   # 非会員
+        50
+    """
+    # ポイント還元率の定数定義
+    PREMIUM_RATE = 0.05      # 会員・高額購入: 5%
+    MEMBER_RATE = 0.03       # 会員・通常購入: 3%
+    GUEST_RATE = 0.01        # 非会員: 1%
+    HIGH_PRICE_THRESHOLD = 10000  # 高額購入の基準額
+    
+    if is_member:
+        # 会員の場合: 購入金額で還元率を変える
+        if price >= HIGH_PRICE_THRESHOLD:
+            # 高額購入 → 5%還元
+            return int(price * PREMIUM_RATE)
+        else:
+            # 通常購入 → 3%還元
+            return int(price * MEMBER_RATE)
+    else:
+        # 非会員 → 1%還元
+        return int(price * GUEST_RATE)
+```
+
+</details>
+
+---
+
+## 7. まとめ
+
+### 🎯 新人エンジニアが覚えるべき5つのポイント
+
+1. **docstringは必ず書く**
+   - 関数・クラスの「何をするか」を説明
+   - Googleスタイル + 型ヒントが推奨
+
+2. **コメントは「なぜ」を書く**
+   - 「何を」はコードを見ればわかる
+   - ビジネスロジックや意図を説明
+
+3. **マジックナンバーは定数化**
+   - 数値の意味を名前で表現
+   - コメントで補足説明
+
+4. **TODO・FIXMEを活用**
+   - 課題を明確に記録
+   - チーム全体で共有
+
+5. **コメントも保守する**
+   - コード変更時はコメントも更新
+   - 古いコメントは削除
+
+### 📝 今日から実践！
+
+```python
+# ✅ 今日から使えるテンプレート
+def your_function(arg1: type, arg2: type = default) -> return_type:
+    """
+    1行で関数の目的を説明
+    
+    詳しい説明（必要に応じて）
+    
+    Args:
+        arg1: 引数の説明
+        arg2: 引数の説明。デフォルトは〇〇
+    
+    Returns:
+        返り値の説明
+    
+    Raises:
+        ExceptionType: 例外が発生する条件
+    
+    Example:
+        >>> your_function(1, 2)
+        3
+    """
+    # ステップ1: バリデーション
+    # ...
+    
+    # ステップ2: メイン処理
+    # ...
+    
+    # ステップ3: 結果を返す
+    return result
+```
+
+**🐰 うさうさ店長より:**
+
+「コメントは将来の自分へのラブレターです！
+
+3ヶ月後に自分のコードを見て
+『これ何してるんだっけ？』
+とならないように、今のうちに丁寧に書きましょう！
+
+最初は時間がかかりますが、
+慣れれば自然に書けるようになります。
+
+頑張ってください！」
