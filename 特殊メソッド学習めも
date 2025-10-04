@@ -1,0 +1,605 @@
+# Python特殊メソッド完全ガイド - ゼロから学ぶ
+
+新人エンジニア向けに、特殊メソッドを**実際に動くコード**で段階的に学んでいきます。
+
+---
+
+## レベル1: 基本中の基本
+
+### `__init__` - オブジェクトを作る時に実行される
+
+```python
+# 特殊メソッドなし（比較用）
+class DogWithoutInit:
+    pass
+
+dog1 = DogWithoutInit()
+# 名前を後から設定する必要がある
+dog1.name = "ポチ"
+dog1.age = 3
+
+
+# 特殊メソッドあり
+class Dog:
+    def __init__(self, name, age):
+        """オブジェクト作成時に自動で実行される"""
+        self.name = name
+        self.age = age
+        print(f"{name}が生まれました")
+
+# 使用
+dog2 = Dog("ポチ", 3)  # __init__が自動実行される
+print(f"名前: {dog2.name}")
+print(f"年齢: {dog2.age}歳")
+```
+
+**実行結果:**
+```
+ポチが生まれました
+名前: ポチ
+年齢: 3歳
+```
+
+---
+
+### `__str__` - print()で表示される内容を決める
+
+```python
+# __str__なし
+class PersonBad:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+person1 = PersonBad("太郎", 25)
+print(person1)  # <__main__.PersonBad object at 0x...> 読みにくい
+
+
+# __str__あり
+class PersonGood:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def __str__(self):
+        """print()で呼ばれる"""
+        return f"{self.name}さん（{self.age}歳）"
+
+person2 = PersonGood("太郎", 25)
+print(person2)  # 太郎さん（25歳） わかりやすい
+```
+
+**実行結果:**
+```
+<__main__.PersonBad object at 0x7f8b3c4d5e10>
+太郎さん（25歳）
+```
+
+---
+
+## レベル2: 計算できるようにする
+
+### `__add__` - プラス（+）で足し算できるようにする
+
+```python
+# 普通のクラス（計算できない）
+class NumberBad:
+    def __init__(self, value):
+        self.value = value
+
+n1 = NumberBad(10)
+n2 = NumberBad(5)
+# print(n1 + n2)  # エラー！
+
+
+# __add__を実装
+class Number:
+    def __init__(self, value):
+        self.value = value
+    
+    def __add__(self, other):
+        """+ 演算子が使われた時に実行される"""
+        return Number(self.value + other.value)
+    
+    def __str__(self):
+        return str(self.value)
+
+# 使用
+n3 = Number(10)
+n4 = Number(5)
+result = n3 + n4  # __add__が呼ばれる
+print(result)  # 15
+```
+
+**実行結果:**
+```
+15
+```
+
+### 実践例: お金クラス
+
+```python
+class Money:
+    def __init__(self, yen):
+        self.yen = yen
+    
+    def __add__(self, other):
+        """お金同士を足せる"""
+        return Money(self.yen + other.yen)
+    
+    def __sub__(self, other):
+        """お金同士を引ける"""
+        return Money(self.yen - other.yen)
+    
+    def __str__(self):
+        return f"{self.yen}円"
+
+# 使用
+wallet1 = Money(1000)
+wallet2 = Money(500)
+
+total = wallet1 + wallet2
+print(f"合計: {total}")  # 合計: 1500円
+
+change = wallet1 - wallet2
+print(f"差額: {change}")  # 差額: 500円
+```
+
+**実行結果:**
+```
+合計: 1500円
+差額: 500円
+```
+
+---
+
+## レベル3: 比較できるようにする
+
+### `__eq__` - 等しいか判定（==）
+
+```python
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+    
+    def __eq__(self, other):
+        """== で比較される時に実行"""
+        return self.price == other.price
+    
+    def __lt__(self, other):
+        """< で比較される時に実行"""
+        return self.price < other.price
+    
+    def __str__(self):
+        return f"{self.name}({self.price}円)"
+
+# 使用
+apple = Product("りんご", 100)
+banana = Product("バナナ", 100)
+orange = Product("オレンジ", 150)
+
+print(apple == banana)  # True（価格が同じ）
+print(apple == orange)  # False
+
+print(apple < orange)   # True（100 < 150）
+print(orange < apple)   # False
+```
+
+**実行結果:**
+```
+True
+False
+True
+False
+```
+
+---
+
+## レベル4: リストのように使える
+
+### `__len__`, `__getitem__` - len()と[]を使えるようにする
+
+```python
+class ShoppingCart:
+    def __init__(self):
+        self.items = []
+    
+    def add(self, item):
+        """商品を追加"""
+        self.items.append(item)
+    
+    def __len__(self):
+        """len()で長さを取得できる"""
+        return len(self.items)
+    
+    def __getitem__(self, index):
+        """cart[0]のように要素を取得できる"""
+        return self.items[index]
+    
+    def __str__(self):
+        return f"カート内: {', '.join(self.items)}"
+
+# 使用
+cart = ShoppingCart()
+cart.add("りんご")
+cart.add("バナナ")
+cart.add("みかん")
+
+print(f"商品数: {len(cart)}")  # __len__が呼ばれる
+print(f"1番目: {cart[0]}")      # __getitem__が呼ばれる
+print(f"2番目: {cart[1]}")
+print(cart)
+```
+
+**実行結果:**
+```
+商品数: 3
+1番目: りんご
+2番目: バナナ
+カート内: りんご, バナナ, みかん
+```
+
+---
+
+## レベル5: forループで使える
+
+### `__iter__` - for文で繰り返せるようにする
+
+```python
+class TodoList:
+    def __init__(self):
+        self.tasks = []
+    
+    def add(self, task):
+        self.tasks.append(task)
+    
+    def __iter__(self):
+        """for文で使えるようにする"""
+        return iter(self.tasks)
+    
+    def __len__(self):
+        return len(self.tasks)
+
+# 使用
+todos = TodoList()
+todos.add("買い物")
+todos.add("掃除")
+todos.add("勉強")
+
+print(f"タスク数: {len(todos)}")
+print("タスク一覧:")
+for task in todos:  # __iter__が呼ばれる
+    print(f"  - {task}")
+```
+
+**実行結果:**
+```
+タスク数: 3
+タスク一覧:
+  - 買い物
+  - 掃除
+  - 勉強
+```
+
+---
+
+## レベル6: in演算子を使える
+
+### `__contains__` - `in`で含まれているか確認
+
+```python
+class Inventory:
+    def __init__(self):
+        self.items = []
+    
+    def add(self, item):
+        self.items.append(item)
+    
+    def __contains__(self, item):
+        """'item in inventory'で使える"""
+        return item in self.items
+    
+    def __len__(self):
+        return len(self.items)
+
+# 使用
+inventory = Inventory()
+inventory.add("剣")
+inventory.add("盾")
+inventory.add("薬草")
+
+print("剣" in inventory)      # True (__contains__が呼ばれる)
+print("魔法書" in inventory)  # False
+print(f"アイテム数: {len(inventory)}")
+```
+
+**実行結果:**
+```
+True
+False
+アイテム数: 3
+```
+
+---
+
+## レベル7: 関数のように呼べる
+
+### `__call__` - オブジェクトを関数のように使う
+
+```python
+class Greeting:
+    def __init__(self, greeting_word):
+        self.greeting_word = greeting_word
+    
+    def __call__(self, name):
+        """greeting(name)のように呼べる"""
+        return f"{self.greeting_word}、{name}さん！"
+
+# 使用
+say_hello = Greeting("こんにちは")
+say_goodbye = Greeting("さようなら")
+
+# オブジェクトを関数のように呼ぶ
+print(say_hello("太郎"))    # __call__が呼ばれる
+print(say_goodbye("花子"))
+```
+
+**実行結果:**
+```
+こんにちは、太郎さん！
+さようなら、花子さん！
+```
+
+### 実践例: 計算機クラス
+
+```python
+class Calculator:
+    def __init__(self, tax_rate):
+        self.tax_rate = tax_rate
+    
+    def __call__(self, price):
+        """calc(price)で税込み価格を計算"""
+        return int(price * (1 + self.tax_rate))
+
+# 使用
+calc_10 = Calculator(0.10)  # 10%の消費税
+calc_8 = Calculator(0.08)   # 8%の消費税
+
+print(f"1000円（10%）: {calc_10(1000)}円")
+print(f"1000円（8%）: {calc_8(1000)}円")
+```
+
+**実行結果:**
+```
+1000円（10%）: 1100円
+1000円（8%）: 1080円
+```
+
+---
+
+## レベル8: with文で使える
+
+### `__enter__` と `__exit__` - リソース管理
+
+```python
+class FileManager:
+    def __init__(self, filename):
+        self.filename = filename
+    
+    def __enter__(self):
+        """with文の開始時に実行"""
+        print(f"{self.filename}を開きます")
+        self.file = open(self.filename, 'w', encoding='utf-8')
+        return self.file
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """with文の終了時に実行（エラーでも実行される）"""
+        print(f"{self.filename}を閉じます")
+        if self.file:
+            self.file.close()
+        return False
+
+# 使用
+with FileManager("test.txt") as f:
+    f.write("Hello, World!")
+    print("ファイル書き込み中...")
+
+print("終了")
+```
+
+**実行結果:**
+```
+test.txtを開きます
+ファイル書き込み中...
+test.txtを閉じます
+終了
+```
+
+---
+
+## レベル9: 真偽値判定
+
+### `__bool__` - if文で使える
+
+```python
+class BankAccount:
+    def __init__(self, balance):
+        self.balance = balance
+    
+    def __bool__(self):
+        """if文で使われる時、残高があればTrue"""
+        return self.balance > 0
+    
+    def __str__(self):
+        return f"残高: {self.balance}円"
+
+# 使用
+account1 = BankAccount(1000)
+account2 = BankAccount(0)
+
+if account1:  # __bool__が呼ばれる
+    print(f"{account1} - 残高あり")
+else:
+    print("残高なし")
+
+if account2:
+    print("残高あり")
+else:
+    print(f"{account2} - 残高なし")
+```
+
+**実行結果:**
+```
+残高: 1000円 - 残高あり
+残高: 0円 - 残高なし
+```
+
+---
+
+## レベル10: 完全な実践例
+
+### ショッピングカートシステム
+
+```python
+class Item:
+    """商品クラス"""
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+    
+    def __str__(self):
+        return f"{self.name}({self.price}円)"
+    
+    def __eq__(self, other):
+        return self.name == other.name
+    
+    def __lt__(self, other):
+        return self.price < other.price
+
+
+class Cart:
+    """カートクラス"""
+    def __init__(self):
+        self.items = []
+    
+    def __iadd__(self, item):
+        """cart += item で追加"""
+        self.items.append(item)
+        return self
+    
+    def __len__(self):
+        """len(cart)で商品数"""
+        return len(self.items)
+    
+    def __getitem__(self, index):
+        """cart[0]で商品取得"""
+        return self.items[index]
+    
+    def __iter__(self):
+        """for item in cart"""
+        return iter(self.items)
+    
+    def __contains__(self, item):
+        """item in cart"""
+        return item in self.items
+    
+    def __bool__(self):
+        """if cart: で空かチェック"""
+        return len(self.items) > 0
+    
+    def total(self):
+        """合計金額"""
+        return sum(item.price for item in self.items)
+    
+    def __str__(self):
+        if not self:
+            return "カートは空です"
+        items_str = ', '.join(str(item) for item in self.items)
+        return f"カート[{len(self)}点]: {items_str}\n合計: {self.total()}円"
+
+
+# 実際に使ってみる
+print("=== ショッピング開始 ===")
+
+# カート作成
+cart = Cart()
+
+# 商品追加
+cart += Item("りんご", 100)
+cart += Item("バナナ", 150)
+cart += Item("みかん", 80)
+
+# カートの状態確認
+print(cart)
+
+# 1番目の商品
+print(f"\n1番目の商品: {cart[0]}")
+
+# 商品数
+print(f"商品数: {len(cart)}点")
+
+# 商品検索
+apple = Item("りんご", 100)
+if apple in cart:
+    print(f"\n{apple}はカートに入っています")
+
+# 全商品を表示
+print("\n全商品:")
+for item in cart:
+    print(f"  - {item}")
+
+# カートが空かチェック
+if cart:
+    print(f"\nカートに{len(cart)}点の商品があります")
+```
+
+**実行結果:**
+```
+=== ショッピング開始 ===
+カート[3点]: りんご(100円), バナナ(150円), みかん(80円)
+合計: 330円
+
+1番目の商品: りんご(100円)
+商品数: 3点
+
+りんご(100円)はカートに入っています
+
+全商品:
+  - りんご(100円)
+  - バナナ(150円)
+  - みかん(80円)
+
+カートに3点の商品があります
+```
+
+---
+
+## まとめ: 特殊メソッド対応表
+
+| やりたいこと | 特殊メソッド | 例 |
+|------------|------------|-----|
+| オブジェクト作成 | `__init__` | `obj = Class()` |
+| 表示 | `__str__` | `print(obj)` |
+| 足し算 | `__add__` | `obj1 + obj2` |
+| 引き算 | `__sub__` | `obj1 - obj2` |
+| 等しいか | `__eq__` | `obj1 == obj2` |
+| 小なり | `__lt__` | `obj1 < obj2` |
+| 長さ | `__len__` | `len(obj)` |
+| 要素取得 | `__getitem__` | `obj[0]` |
+| forループ | `__iter__` | `for x in obj` |
+| 含有チェック | `__contains__` | `x in obj` |
+| 関数呼び出し | `__call__` | `obj()` |
+| with文 | `__enter__`/`__exit__` | `with obj:` |
+| 真偽値 | `__bool__` | `if obj:` |
+
+---
+
+## 学習のポイント
+
+1. 必須は `__init__` と `__str__` だけ
+2. 必要になったら追加していく
+3. 実際に動かして確認する
+4. 既存のクラス（list、dictなど）の動作を真似る
+
+これで特殊メソッドの基本は完璧です。実際にコードを書いて試してみてください。
