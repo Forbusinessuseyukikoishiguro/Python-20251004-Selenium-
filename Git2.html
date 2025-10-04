@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git チーム開発 応用操作 完全版</title>
+    <style>
+        body {
+            font-family: "Yu Gothic", "Meiryo", sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .sheet-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+        }
+        th {
+            background: #e74c3c;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #c0392b;
+        }
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #ffe8e8;
+        }
+        .category {
+            background: #ecf0f1;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .important {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .danger {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        .safe {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #c7254e;
+            font-size: 13px;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+        .reference {
+            background: #f5f5f5;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .reference h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .reference ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .reference li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .reference li:before {
+            content: "📚";
+            position: absolute;
+            left: 0;
+        }
+        .reference a {
+            color: #2196f3;
+            text-decoration: none;
+        }
+        .reference a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instruction">
+    <strong>📋 使い方:</strong> 下の表を選択して <code>Ctrl+C</code> でコピー → Excelに <code>Ctrl+V</code> で貼り付け！<br>
+    <strong>⚠️ 注意:</strong> この資料は信頼できる公式ドキュメントと技術記事を参照して作成しています。参照元は最後に記載。
+</div>
+
+<!-- シート1: Git-flow / GitHub Flow ブランチ戦略 -->
+<div class="sheet-container">
+    <h2>🌳 1. ブランチ戦略（Git-flow / GitHub Flow）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ブランチ名</th>
+                <th>用途</th>
+                <th>作成元</th>
+                <th>マージ先</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="important">
+                <td><code>main</code> / <code>master</code></td>
+                <td>本番環境</td>
+                <td>-</td>
+                <td>-</td>
+                <td>常にリリース可能な状態。直接コミット禁止</td>
+            </tr>
+            <tr class="important">
+                <td><code>develop</code></td>
+                <td>開発用メイン</td>
+                <td>main</td>
+                <td>main</td>
+                <td>開発の主軸。Git-flowで使用</td>
+            </tr>
+            <tr>
+                <td><code>feature/機能名</code></td>
+                <td>機能開発</td>
+                <td>develop</td>
+                <td>develop</td>
+                <td>新機能開発用。完了後は削除</td>
+            </tr>
+            <tr>
+                <td><code>release/vX.X.X</code></td>
+                <td>リリース準備</td>
+                <td>develop</td>
+                <td>main / develop</td>
+                <td>リリース前の最終調整</td>
+            </tr>
+            <tr class="danger">
+                <td><code>hotfix/バグ名</code></td>
+                <td>緊急バグ修正</td>
+                <td>main</td>
+                <td>main / develop</td>
+                <td>本番の緊急修正用</td>
+            </tr>
+            <tr>
+                <td><code>bugfix/バグ名</code></td>
+                <td>バグ修正</td>
+                <td>develop</td>
+                <td>develop</td>
+                <td>開発中のバグ修正</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート2: タグ操作とリリース管理 -->
+<div class="sheet-container">
+    <h2>🏷️ 2. タグ操作とリリース管理</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用場面</th>
+                <th>注意点</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="safe">
+                <td><code>git tag -a v1.0.0 -m "バージョン1.0.0"</code></td>
+                <td>注釈付きタグを作成</td>
+                <td>リリース時のバージョン管理</td>
+                <td>注釈付きタグを推奨（作成者・日時記録）</td>
+            </tr>
+            <tr>
+                <td><code>git tag v1.0.0</code></td>
+                <td>軽量タグを作成</td>
+                <td>一時的なマーキング</td>
+                <td>情報が少ないため一時用途のみ</td>
+            </tr>
+            <tr>
+                <td><code>git tag</code></td>
+                <td>タグ一覧を表示</td>
+                <td>既存タグの確認</td>
+                <td>アルファベット順で表示</td>
+            </tr>
+            <tr>
+                <td><code>git tag -l "v1.*"</code></td>
+                <td>パターンでタグ検索</td>
+                <td>特定バージョンのタグ確認</td>
+                <td>ワイルドカード使用可能</td>
+            </tr>
+            <tr class="important">
+                <td><code>git push origin v1.0.0</code></td>
+                <td>特定タグをリモートに送信</td>
+                <td>タグ作成後の共有</td>
+                <td>通常のpushではタグは送信されない</td>
+            </tr>
+            <tr class="important">
+                <td><code>git push origin --tags</code></td>
+                <td>全タグをリモートに送信</td>
+                <td>複数タグを一括送信</td>
+                <td>全てのタグが送信される</td>
+            </tr>
+            <tr>
+                <td><code>git tag -d v1.0.0</code></td>
+                <td>ローカルのタグを削除</td>
+                <td>タグの削除</td>
+                <td>リモートのタグは別途削除必要</td>
+            </tr>
+            <tr>
+                <td><code>git push origin :v1.0.0</code></td>
+                <td>リモートのタグを削除</td>
+                <td>リモートタグの削除</td>
+                <td>慎重に実行</td>
+            </tr>
+            <tr>
+                <td><code>git show v1.0.0</code></td>
+                <td>タグの詳細を表示</td>
+                <td>タグ情報の確認</td>
+                <td>コミット内容も表示される</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート3: コミットメッセージ規約 Conventional Commits -->
+<div class="sheet-container">
+    <h2>📝 3. コミットメッセージ規約（Conventional Commits）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>接頭辞（type）</th>
+                <th>意味</th>
+                <th>使用例</th>
+                <th>バージョン影響</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="important">
+                <td><code>feat:</code></td>
+                <td>新機能追加</td>
+                <td>feat: ユーザー登録機能を追加</td>
+                <td>マイナーバージョンUP (1.0.0 → 1.1.0)</td>
+            </tr>
+            <tr class="important">
+                <td><code>fix:</code></td>
+                <td>バグ修正</td>
+                <td>fix: ログイン時のエラーを修正</td>
+                <td>パッチバージョンUP (1.0.0 → 1.0.1)</td>
+            </tr>
+            <tr>
+                <td><code>docs:</code></td>
+                <td>ドキュメント変更</td>
+                <td>docs: READMEに使用方法を追記</td>
+                <td>影響なし</td>
+            </tr>
+            <tr>
+                <td><code>style:</code></td>
+                <td>コード整形（機能変更なし）</td>
+                <td>style: インデントを修正</td>
+                <td>影響なし</td>
+            </tr>
+            <tr>
+                <td><code>refactor:</code></td>
+                <td>リファクタリング</td>
+                <td>refactor: 認証ロジックを整理</td>
+                <td>影響なし</td>
+            </tr>
+            <tr>
+                <td><code>perf:</code></td>
+                <td>パフォーマンス改善</td>
+                <td>perf: データベースクエリを最適化</td>
+                <td>パッチバージョンUP</td>
+            </tr>
+            <tr>
+                <td><code>test:</code></td>
+                <td>テスト追加・修正</td>
+                <td>test: ユーザー登録のテストを追加</td>
+                <td>影響なし</td>
+            </tr>
+            <tr>
+                <td><code>chore:</code></td>
+                <td>ビルド・設定変更</td>
+                <td>chore: package.jsonを更新</td>
+                <td>影響なし</td>
+            </tr>
+            <tr class="danger">
+                <td><code>BREAKING CHANGE:</code></td>
+                <td>破壊的変更</td>
+                <td>feat!: APIエンドポイントを変更</td>
+                <td>メジャーバージョンUP (1.0.0 → 2.0.0)</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 style="margin-top: 20px;">✅ コミットメッセージのフォーマット</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>フォーマット</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>&lt;type&gt;[optional scope]: &lt;subject&gt;</code></td>
+                <td>基本形式（1行目：50文字以内推奨）</td>
+            </tr>
+            <tr>
+                <td>空行</td>
+                <td>2行目は必ず空行</td>
+            </tr>
+            <tr>
+                <td>詳細説明（body）</td>
+                <td>3行目以降：変更理由や詳細を記述</td>
+            </tr>
+            <tr>
+                <td>脚注（footer）</td>
+                <td>Issue番号やBREAKING CHANGE記載</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート4: プルリクエスト（PR）運用 -->
+<div class="sheet-container">
+    <h2>🔄 4. プルリクエスト（PR）運用</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>項目</th>
+                <th>内容</th>
+                <th>ベストプラクティス</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PRタイトル</td>
+                <td>変更内容の要約</td>
+                <td>Conventional Commitsの形式を推奨<br>例: feat: ユーザー検索機能追加</td>
+            </tr>
+            <tr>
+                <td>PR説明文</td>
+                <td>変更の目的と内容</td>
+                <td>・変更の目的<br>・変更点<br>・確認方法<br>・スクリーンショット（UI変更時）</td>
+            </tr>
+            <tr>
+                <td>レビュアー指定</td>
+                <td>コードレビュー担当者</td>
+                <td>2名以上推奨。1名はコード理解者</td>
+            </tr>
+            <tr>
+                <td>ラベル</td>
+                <td>PRの分類</td>
+                <td>feature / bugfix / hotfix / docs など</td>
+            </tr>
+            <tr>
+                <td>マイルストーン</td>
+                <td>リリースバージョン管理</td>
+                <td>v1.0.0 / v2.0.0 など紐付け</td>
+            </tr>
+            <tr class="important">
+                <td>Draft PR</td>
+                <td>作業中のPR</td>
+                <td>早期フィードバック用。完成前に共有</td>
+            </tr>
+            <tr>
+                <td>コンフリクト解決</td>
+                <td>競合の解消</td>
+                <td>VSCodeの差分ツールで解決推奨</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート5: リモート操作の詳細 -->
+<div class="sheet-container">
+    <h2>🌐 5. リモート操作の詳細</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>git remote -v</code></td>
+                <td>リモートリポジトリ一覧表示</td>
+                <td>設定確認</td>
+            </tr>
+            <tr>
+                <td><code>git remote add origin &lt;URL&gt;</code></td>
+                <td>リモートリポジトリを追加</td>
+                <td>初回設定</td>
+            </tr>
+            <tr>
+                <td><code>git remote rename origin upstream</code></td>
+                <td>リモート名を変更</td>
+                <td>名前変更</td>
+            </tr>
+            <tr>
+                <td><code>git remote remove origin</code></td>
+                <td>リモートリポジトリを削除</td>
+                <td>不要なリモート削除</td>
+            </tr>
+            <tr class="important">
+                <td><code>git fetch origin</code></td>
+                <td>リモートの変更を取得（マージしない）</td>
+                <td>安全に最新情報を確認</td>
+            </tr>
+            <tr>
+                <td><code>git pull origin main</code></td>
+                <td>fetch + merge を同時実行</td>
+                <td>最新を取得してマージ</td>
+            </tr>
+            <tr class="important">
+                <td><code>git push -u origin feature_x</code></td>
+                <td>初回プッシュ（上流ブランチ設定）</td>
+                <td>新ブランチの初回送信</td>
+            </tr>
+            <tr class="danger">
+                <td><code>git push --force</code></td>
+                <td>強制プッシュ</td>
+                <td>⚠️ 他人の履歴を壊す可能性あり。使用厳禁</td>
+            </tr>
+            <tr class="safe">
+                <td><code>git push --force-with-lease</code></td>
+                <td>安全な強制プッシュ</td>
+                <td>リモートに新しいコミットがない場合のみ実行</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート6: .gitignoreの活用 -->
+<div class="sheet-container">
+    <h2>🚫 6. .gitignore の活用</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>対象ファイル</th>
+                <th>.gitignore記述例</th>
+                <th>理由</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>環境変数ファイル</td>
+                <td><code>.env</code><br><code>.env.local</code></td>
+                <td>機密情報の保護</td>
+            </tr>
+            <tr>
+                <td>依存関係</td>
+                <td><code>node_modules/</code><br><code>vendor/</code></td>
+                <td>容量削減・再生成可能</td>
+            </tr>
+            <tr>
+                <td>ビルド成果物</td>
+                <td><code>dist/</code><br><code>build/</code></td>
+                <td>自動生成ファイル</td>
+            </tr>
+            <tr>
+                <td>エディタ設定</td>
+                <td><code>.vscode/</code><br><code>.idea/</code></td>
+                <td>個人設定の除外</td>
+            </tr>
+            <tr>
+                <td>ログファイル</td>
+                <td><code>*.log</code><br><code>logs/</code></td>
+                <td>実行時生成ファイル</td>
+            </tr>
+            <tr>
+                <td>一時ファイル</td>
+                <td><code>*.tmp</code><br><code>*.swp</code></td>
+                <td>作業用一時ファイル</td>
+            </tr>
+            <tr>
+                <td>OS固有ファイル</td>
+                <td><code>.DS_Store</code><br><code>Thumbs.db</code></td>
+                <td>OS生成ファイル</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート7: 高度な履歴操作 -->
+<div class="sheet-container">
+    <h2>⚙️ 7. 高度な履歴操作（上級者向け）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用場面</th>
+                <th>危険度</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="important">
+                <td><code>git rebase -i HEAD~3</code></td>
+                <td>過去3コミットを対話的に編集</td>
+                <td>コミット整理・統合</td>
+                <td>中</td>
+            </tr>
+            <tr class="safe">
+                <td><code>git cherry-pick &lt;commitID&gt;</code></td>
+                <td>特定コミットのみを取り込み</td>
+                <td>必要な変更のみ適用</td>
+                <td>低</td>
+            </tr>
+            <tr class="important">
+                <td><code>git reflog</code></td>
+                <td>全ての操作履歴を表示</td>
+                <td>消えたコミットの復旧</td>
+                <td>低</td>
+            </tr>
+            <tr class="danger">
+                <td><code>git reset --hard &lt;commitID&gt;</code></td>
+                <td>指定コミットまで完全に戻す</td>
+                <td>履歴の巻き戻し（ローカルのみ）</td>
+                <td>高</td>
+            </tr>
+            <tr class="safe">
+                <td><code>git revert &lt;commitID&gt;</code></td>
+                <td>コミットを打ち消す新コミット作成</td>
+                <td>安全な取り消し（push後推奨）</td>
+                <td>低</td>
+            </tr>
+            <tr>
+                <td><code>git bisect</code></td>
+                <td>バグ混入コミットを二分探索</td>
+                <td>バグの原因特定</td>
+                <td>低</td>
+            </tr>
+            <tr>
+                <td><code>git blame &lt;file&gt;</code></td>
+                <td>各行の最終編集者を表示</td>
+                <td>変更履歴の調査</td>
+                <td>低</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シート8: エイリアス設定 -->
+<div class="sheet-container">
+    <h2>⚡ 8. エイリアス設定（効率化）</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>設定コマンド</th>
+                <th>短縮形</th>
+                <th>元のコマンド</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>git config --global alias.st status</code></td>
+                <td><code>git st</code></td>
+                <td>git status</td>
+            </tr>
+            <tr>
+                <td><code>git config --global alias.co checkout</code></td>
+                <td><code>git co</code></td>
+                <td>git checkout</td>
+            </tr>
+            <tr>
+                <td><code>git config --global alias.br branch</code></td>
+                <td><code>git br</code></td>
+                <td>git branch</td>
+            </tr>
+            <tr>
+                <td><code>git config --global alias.cm "commit -m"</code></td>
+                <td><code>git cm "メッセージ"</code></td>
+                <td>git commit -m</td>
+            </tr>
+            <tr>
+                <td><code>git config --global alias.sw switch</code></td>
+                <td><code>git sw</code></td>
+                <td>git switch</td>
+            </tr>
+            <tr>
+                <td><code>git config --global alias.lg "log --oneline --graph --all"</code></td>
+                <td><code>git lg</code></td>
+                <td>ログをグラフ表示</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 参照元 -->
+<div class="reference">
+    <h3>📚 参考資料・出典</h3>
+    <ul>
+        <li><a href="https://git-scm.com/book/ja/v2" target="_blank">Git 公式ドキュメント（Pro Git Book 日本語版）</a></li>
+        <li><a href="https://www.conventionalcommits.org/ja/" target="_blank">Conventional Commits 公式サイト（日本語）</a></li>
+        <li><a href="https://docs.github.com/ja" target="_blank">GitHub Docs（公式ドキュメント）</a></li>
+        <li><a href="https://backlog.com/ja/git-tutorial/" target="_blank">サル先生のGit入門 - Backlog</a></li>
+        <li><a href="https://codezine.jp/article/detail/16910" target="_blank">Gitによるチーム開発のいろは - CodeZine</a></li>
+        <li><a href="https://techracho.bpsinc.jp/morimorihoge/2020_09_09/16856" target="_blank">チーム開発においてGit初心者が踏みがちな地雷まとめ - TechRacho</a></li>
+        <li><a href="https://supersoftware.jp/tech/20221021/17928/" target="_blank">Git-flow と GitHub Flow - スーパーソフトウエア東京</a></li>
+        <li><a href="https://envader.plus/article/367" target="_blank">git tagの使い方 - エンベーダー</a></li>
+        <li><a href="https://www.kagoya.jp/howto/rentalserver/webtrend/gittag/" target="_blank">git tagコマンドの使い方 - カゴヤのサーバー研究室</a></li>
+        <li><a href="https://gist.github.com/minop1205/5fc4f6ef0ec89fb1738833ba25ae00a0" target="_blank">コミットメッセージ規約 - GitHub Gist</a></li>
+        <li><a href="https://qiita.com/itosho/items/9565c6ad2ffc24c09364" target="_blank">Gitのコミットメッセージの書き方 - Qiita</a></li>
+        <li><a href="https://dev-scope.com/git-version-team-rules/" target="_blank">Gitを使ったバージョン管理の基本とチームでの効率的な運用ルール - DEVSCOPE</a></li>
+    </ul>
+    
+    <p style="margin-top: 20px; color: #666; font-size: 14px;">
+        ※ 本資料は2025年10月時点の情報に基づいています。<br>
+        ※ 各コマンドの詳細は公式ドキュメントをご確認ください。<br>
+        ※ チーム開発では、プロジェクト固有のルールに従ってください。
+    </p>
+</div>
+
+</body>
+</html>
