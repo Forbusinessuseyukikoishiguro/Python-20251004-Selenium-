@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git チーム開発 シーン別完全ガイド</title>
+    <style>
+        body {
+            font-family: "Yu Gothic", "Meiryo", sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .sheet-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h3 {
+            color: #34495e;
+            border-left: 4px solid #27ae60;
+            padding-left: 10px;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+        }
+        th {
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #229954;
+        }
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #e8f8f5;
+        }
+        .step-number {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .env-dev { background: #d5f4e6; border-left: 4px solid #27ae60; }
+        .env-stg { background: #fef5e7; border-left: 4px solid #f39c12; }
+        .env-pro { background: #fadbd8; border-left: 4px solid #e74c3c; }
+        code {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #c7254e;
+            font-size: 13px;
+        }
+        .command-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: "Consolas", monospace;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+        .flow-diagram {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instruction">
+    <strong>📋 使い方:</strong> 下の表を選択して <code>Ctrl+C</code> でコピー → Excelに <code>Ctrl+V</code> で貼り付け！<br>
+    <strong>🎯 対象:</strong> チーム開発における実際のシーン別Git操作完全ガイド
+</div>
+
+<!-- シーン1: 環境別ブランチ運用 -->
+<div class="sheet-container">
+    <h2>🌍 1. 環境別ブランチ運用（DEV/STG/PRO）</h2>
+    
+    <div class="flow-diagram">
+feature/xxx → develop → staging → main(production)
+    ↓          ↓         ↓          ↓
+  開発中     DEV環境   STG環境   本番環境
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ブランチ名</th>
+                <th>対応環境</th>
+                <th>用途</th>
+                <th>デプロイタイミング</th>
+                <th>誰がマージするか</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="env-dev">
+                <td><code>develop</code></td>
+                <td>DEV（開発環境）</td>
+                <td>開発中の機能を統合</td>
+                <td>feature マージ後、自動デプロイ</td>
+                <td>開発者（PR承認後）</td>
+            </tr>
+            <tr class="env-stg">
+                <td><code>staging</code></td>
+                <td>STG（ステージング環境）</td>
+                <td>本番前の最終確認</td>
+                <td>develop マージ後、自動デプロイ</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr class="env-pro">
+                <td><code>main</code> / <code>master</code></td>
+                <td>PRO（本番環境）</td>
+                <td>本番リリース済みコード</td>
+                <td>staging マージ後、タグ付けして手動デプロイ</td>
+                <td>リリース担当者のみ</td>
+            </tr>
+            <tr>
+                <td><code>feature/機能名</code></td>
+                <td>ローカル</td>
+                <td>個別機能開発</td>
+                <td>デプロイなし</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><code>hotfix/バグ名</code></td>
+                <td>本番緊急修正</td>
+                <td>本番の緊急バグ修正</td>
+                <td>main から分岐、即座に main にマージ</td>
+                <td>リリース担当者</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン2: ローカル環境開発の開始 -->
+<div class="sheet-container">
+    <h2>💻 2. ローカル環境開発の開始</h2>
+    
+    <h3>シーン: 新しい機能開発を始める</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>確認方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git switch develop</code></td>
+                <td>developブランチに移動</td>
+                <td><code>git branch</code> で現在ブランチ確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git pull origin develop</code></td>
+                <td>最新のdevelopを取得</td>
+                <td><code>git log -1</code> で最新コミット確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git switch -c feature/user-login</code></td>
+                <td>新しい機能ブランチを作成</td>
+                <td><code>git branch</code> で作成確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>コーディング作業</td>
+                <td>実際の開発作業</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git status</code></td>
+                <td>変更ファイルを確認</td>
+                <td>赤字で変更ファイル表示</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 ヒント:</strong> ブランチ名の命名規則は統一しましょう<br>
+        - <code>feature/機能名</code>: 新機能<br>
+        - <code>bugfix/バグ名</code>: バグ修正<br>
+        - <code>refactor/対象</code>: リファクタリング
+    </div>
+</div>
+
+<!-- シーン3: コミットとプッシュ -->
+<div class="sheet-container">
+    <h2>📤 3. 開発完了後のコミット＆プッシュ</h2>
+    
+    <h3>シーン: 開発が一区切りついたのでコミットする</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>注意点</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git status</code></td>
+                <td>変更内容を確認</td>
+                <td>不要なファイルが含まれていないか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git diff</code></td>
+                <td>変更の差分を確認</td>
+                <td>意図しない変更がないか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git add .</code></td>
+                <td>全ファイルをステージング</td>
+                <td>または <code>git add &lt;ファイル名&gt;</code> で個別追加</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git status</code></td>
+                <td>ステージング状態を確認</td>
+                <td>緑字でステージング済みファイル表示</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git commit -m "feat: ユーザーログイン機能を追加"</code></td>
+                <td>コミットを作成</td>
+                <td>Conventional Commits形式推奨</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git push -u origin feature/user-login</code></td>
+                <td>リモートに初回プッシュ</td>
+                <td>2回目以降は <code>git push</code> のみでOK</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 注意:</strong> コミット前に必ず <code>git diff</code> で差分確認！意図しない変更を防ぐ
+    </div>
+</div>
+
+<!-- シーン4: プルリクエスト作成 -->
+<div class="sheet-container">
+    <h2>🔄 4. プルリクエスト（PR）作成からマージまで</h2>
+    
+    <h3>シーン: 開発完了、developにマージしたい</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>操作</th>
+                <th>詳細</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td>GitHubでPR作成</td>
+                <td>
+                    <strong>Base:</strong> <code>develop</code><br>
+                    <strong>Compare:</strong> <code>feature/user-login</code>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>PRタイトル入力</td>
+                <td>
+                    例: <code>feat: ユーザーログイン機能を追加</code>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td>PR説明文記入</td>
+                <td>
+                    <strong>含めるべき内容:</strong><br>
+                    ・変更の目的<br>
+                    ・変更内容の概要<br>
+                    ・テスト方法<br>
+                    ・スクリーンショット（UI変更時）<br>
+                    ・関連Issue番号
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>レビュアー指定</td>
+                <td>2名以上のレビュアーを指定</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td>ラベル・マイルストーン設定</td>
+                <td>
+                    <strong>ラベル:</strong> feature / bugfix など<br>
+                    <strong>マイルストーン:</strong> v1.2.0 など
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>レビュー待ち</td>
+                <td>レビュアーからのフィードバックを待つ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td>承認後マージ</td>
+                <td>
+                    Approve されたら「Merge pull request」をクリック<br>
+                    マージ方法: Squash and merge 推奨
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td>ブランチ削除</td>
+                <td>マージ後、GitHub上で「Delete branch」をクリック</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン5: レビュー指摘の修正 -->
+<div class="sheet-container">
+    <h2>✏️ 5. レビュー指摘の修正</h2>
+    
+    <h3>シーン: PRにレビューコメントがついた</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド/操作</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git switch feature/user-login</code></td>
+                <td>該当ブランチに移動（既にいる場合は不要）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>コード修正</td>
+                <td>レビューコメントに従って修正</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git add .</code></td>
+                <td>修正をステージング</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git commit -m "fix: レビュー指摘に対応"</code></td>
+                <td>修正コミット作成</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git push</code></td>
+                <td>リモートに追加プッシュ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>GitHub上で返信</td>
+                <td>「修正しました」とコメント</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 ヒント:</strong> PRに追加プッシュすると、自動的にPRが更新されます。新しいPRを作る必要はありません！
+    </div>
+</div>
+
+<!-- シーン6: ブランチ切り替え中の作業 -->
+<div class="sheet-container">
+    <h2>🔀 6. ブランチ切り替え（途中作業の保存）</h2>
+    
+    <h3>シーン: 作業中に緊急でバグ修正が必要になった</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git status</code></td>
+                <td>現在の変更状態を確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git stash</code></td>
+                <td>現在の作業を一時退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git stash list</code></td>
+                <td>退避内容を確認（stash@{0}で保存）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git switch develop</code></td>
+                <td>developブランチに移動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git switch -c hotfix/urgent-bug</code></td>
+                <td>緊急修正用ブランチ作成</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>バグ修正作業</td>
+                <td>緊急バグを修正</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td><code>git add . && git commit -m "hotfix: 緊急バグ修正"</code></td>
+                <td>修正をコミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td><code>git push -u origin hotfix/urgent-bug</code></td>
+                <td>プッシュしてPR作成</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">9</span></td>
+                <td><code>git switch feature/user-login</code></td>
+                <td>元の作業ブランチに戻る</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">10</span></td>
+                <td><code>git stash pop</code></td>
+                <td>退避した作業を復元</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 注意:</strong> <code>git stash</code> は必ず <code>git stash pop</code> で戻すのを忘れずに！
+    </div>
+</div>
+
+<!-- シーン7: 状態確認と差分確認 -->
+<div class="sheet-container">
+    <h2>🔍 7. 状態確認と差分確認（よくあるシーン）</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>シーン</th>
+                <th>コマンド</th>
+                <th>確認できること</th>
+                <th>使用例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>今の変更状態を知りたい</td>
+                <td><code>git status</code></td>
+                <td>変更/追加/削除されたファイル一覧</td>
+                <td>コミット前の確認</td>
+            </tr>
+            <tr>
+                <td>何を変更したか見たい</td>
+                <td><code>git diff</code></td>
+                <td>ワーキングツリーの差分</td>
+                <td>コミット前の内容確認</td>
+            </tr>
+            <tr>
+                <td>ステージングした内容を見たい</td>
+                <td><code>git diff --cached</code></td>
+                <td>ステージング済みの差分</td>
+                <td>コミット直前の最終確認</td>
+            </tr>
+            <tr>
+                <td>特定ファイルの差分だけ見たい</td>
+                <td><code>git diff &lt;ファイル名&gt;</code></td>
+                <td>指定ファイルの差分のみ</td>
+                <td>大量変更時の個別確認</td>
+            </tr>
+            <tr>
+                <td>コミット履歴を見たい</td>
+                <td><code>git log</code></td>
+                <td>コミット履歴（詳細）</td>
+                <td>過去の変更確認</td>
+            </tr>
+            <tr>
+                <td>コミット履歴を簡潔に見たい</td>
+                <td><code>git log --oneline</code></td>
+                <td>コミット履歴（1行表示）</td>
+                <td>大量コミットの概要確認</td>
+            </tr>
+            <tr>
+                <td>ブランチ構造を見たい</td>
+                <td><code>git log --oneline --graph --all</code></td>
+                <td>全ブランチのグラフ表示</td>
+                <td>ブランチの分岐確認</td>
+            </tr>
+            <tr>
+                <td>誰がいつ変更したか知りたい</td>
+                <td><code>git blame &lt;ファイル名&gt;</code></td>
+                <td>各行の最終編集者と日時</td>
+                <td>バグの原因調査</td>
+            </tr>
+            <tr>
+                <td>リモートブランチ一覧を見たい</td>
+                <td><code>git branch -a</code></td>
+                <td>ローカル＋リモート全ブランチ</td>
+                <td>他メンバーのブランチ確認</td>
+            </tr>
+            <tr>
+                <td>現在のブランチを確認したい</td>
+                <td><code>git branch</code></td>
+                <td>現在いるブランチ（*印）</td>
+                <td>ブランチ切替時の確認</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン8: developの最新を取り込む -->
+<div class="sheet-container">
+    <h2>🔄 8. 開発中にdevelopの最新を取り込む</h2>
+    
+    <h3>シーン: 作業中にdevelopが更新された</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git add . && git commit -m "作業中: 一時保存"</code></td>
+                <td>現在の作業をコミット（または stash）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git switch develop</code></td>
+                <td>developブランチに移動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin develop</code></td>
+                <td>最新のdevelopを取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git switch feature/user-login</code></td>
+                <td>作業ブランチに戻る</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git merge develop</code></td>
+                <td>developの変更を取り込む</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>競合があれば解決</td>
+                <td>VSCodeで差分を解決</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td><code>git add . && git commit</code></td>
+                <td>マージコミット作成</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 別の方法: rebase を使う</strong><br>
+        <code>git rebase develop</code> でマージコミットなしで履歴を整理できます（上級者向け）
+    </div>
+</div>
+
+<!-- シーン9: トラブルシューティング -->
+<div class="sheet-container">
+    <h2>🚨 9. よくあるトラブルと解決方法</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>トラブル</th>
+                <th>原因</th>
+                <th>解決コマンド</th>
+                <th>予防策</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>間違ったブランチでコミットした</td>
+                <td>ブランチ確認不足</td>
+                <td>
+                    <code>git reset --soft HEAD~1</code><br>
+                    → 正しいブランチに移動してコミット
+                </td>
+                <td><code>git branch</code> で常に確認</td>
+            </tr>
+            <tr>
+                <td>コミットメッセージを間違えた</td>
+                <td>タイポ</td>
+                <td><code>git commit --amend -m "正しいメッセージ"</code></td>
+                <td>落ち着いて入力</td>
+            </tr>
+            <tr>
+                <td>不要なファイルをコミットした</td>
+                <td>.gitignore設定不足</td>
+                <td>
+                    <code>git reset HEAD &lt;ファイル&gt;</code><br>
+                    → .gitignore に追加
+                </td>
+                <td>コミット前に <code>git status</code> 確認</td>
+            </tr>
+            <tr>
+                <td>git pull で競合が発生</td>
+                <td>同じ箇所を複数人が編集</td>
+                <td>
+                    VSCodeで差分解決<br>
+                    → <code>git add . && git commit</code>
+                </td>
+                <td>こまめに pull する</td>
+            </tr>
+            <tr>
+                <td>push が rejected される</td>
+                <td>リモートが更新されている</td>
+                <td>
+                    <code>git pull</code><br>
+                    → 競合解決後 <code>git push</code>
+                </td>
+                <td>push前に pull する習慣</td>
+            </tr>
+            <tr>
+                <td>誤って main に直接 push した</td>
+                <td>ブランチ間違い</td>
+                <td>
+                    <code>git revert &lt;commitID&gt;</code><br>
+                    → 正しいブランチで再作業
+                </td>
+                <td>main は保護設定を有効化</td>
+            </tr>
+            <tr>
+                <td>コミットが消えた</td>
+                <td>reset --hard の誤用</td>
+                <td>
+                    <code>git reflog</code><br>
+                    → <code>git reset --hard &lt;commitID&gt;</code>
+                </td>
+                <td>reset --hard は慎重に使う</td>
+            </tr>
+            <tr>
+                <td>ブランチ切替ができない</td>
+                <td>未コミットの変更がある</td>
+                <td>
+                    <code>git stash</code><br>
+                    → ブランチ切替<br>
+                    → <code>git stash pop</code>
+                </td>
+                <td>切替前にコミットまたは stash</td>
+            </tr>
+            <tr>
+                <td>大量の競合で解決できない</td>
+                <td>長期間マージしていない</td>
+                <td>
+                    <code>git merge --abort</code><br>
+                    → 小さい単位で段階的にマージ
+                </td>
+                <td>こまめに develop を取り込む</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="danger">
+        <strong>🚨 危険操作:</strong><br>
+        - <code>git push --force</code>: チームメンバーの履歴を壊す可能性<br>
+        - <code>git reset --hard</code>: コミットが完全に消える<br>
+        これらは単独作業時以外使用禁止！
+    </div>
+</div>
+
+<!-- シーン10: STG環境へのデプロイ準備 -->
+<div class="sheet-container">
+    <h2>🚀 10. STG環境へのデプロイ（develop → staging）</h2>
+    
+    <h3>シーン: DEV環境での確認が終わり、STG環境でテストしたい</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>操作/コマンド</th>
+                <th>説明</th>
+                <th>担当者</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td>全PR がマージ済みか確認</td>
+                <td>develop に含める機能が全て揃っているか</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git switch staging</code></td>
+                <td>staging ブランチに移動</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin staging</code></td>
+                <td>最新の staging を取得</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git merge develop</code></td>
+                <td>develop を staging にマージ</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td>競合があれば解決</td>
+                <td>差分を確認して解決</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git push origin staging</code></td>
+                <td>staging にプッシュ</td>
+                <td>リードエンジニア</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td>CI/CD 自動デプロイ</td>
+                <td>STG環境に自動デプロイ実行</td>
+                <td>自動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td>STG環境でテスト</td>
+                <td>QAチームが総合テスト実施</td>
+                <td>QA/テスター</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 ベストプラクティス:</strong> STG へのマージは PR 経由で行うことを推奨<br>
+        develop → staging の PR を作成してレビューしてからマージ
+    </div>
+</div>
+
+<!-- シーン11: 本番環境へのリリース -->
+<div class="sheet-container">
+    <h2>🎯 11. 本番環境へのリリース（staging → main）</h2>
+    
+    <h3>シーン: STG環境でのテストが完了、本番リリースする</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>操作/コマンド</th>
+                <th>説明</th>
+                <th>担当者</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td>リリース判定会議</td>
+                <td>STGテスト結果を確認しリリース可否判断</td>
+                <td>全メンバー</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git switch main</code></td>
+                <td>main ブランチに移動</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin main</code></td>
+                <td>最新の main を取得</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git merge staging</code></td>
+                <td>staging を main にマージ</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git tag -a v1.2.0 -m "バージョン1.2.0リリース"</code></td>
+                <td>リリースタグを作成</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git push origin main</code></td>
+                <td>main にプッシュ</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td><code>git push origin v1.2.0</code></td>
+                <td>タグをプッシュ</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td>GitHub Release 作成</td>
+                <td>リリースノートを記載</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">9</span></td>
+                <td>本番デプロイ実行</td>
+                <td>CI/CD または手動でデプロイ</td>
+                <td>リリース担当者</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">10</span></td>
+                <td>本番動作確認</td>
+                <td>スモークテスト実施</td>
+                <td>全メンバー</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">11</span></td>
+                <td><code>git switch develop</code><br><code>git merge main</code></td>
+                <td>main の変更を develop に反映</td>
+                <td>リリース担当者</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 重要:</strong> 本番リリース後は必ず develop にも main をマージし戻すこと！<br>
+        これを忘れると develop と main が乖離してしまいます。
+    </div>
+</div>
+
+<!-- シーン12: 緊急バグ修正（Hotfix） -->
+<div class="sheet-container">
+    <h2>🔥 12. 本番の緊急バグ修正（Hotfix）</h2>
+    
+    <h3>シーン: 本番で重大なバグが発見された</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git switch main</code></td>
+                <td>main ブランチに移動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git pull origin main</code></td>
+                <td>最新の main を取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git switch -c hotfix/critical-bug</code></td>
+                <td>hotfix ブランチ作成</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>バグ修正</td>
+                <td>最小限の修正で対応</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git add . && git commit -m "hotfix: 重大なバグを修正"</code></td>
+                <td>修正をコミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git push -u origin hotfix/critical-bug</code></td>
+                <td>プッシュ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td>緊急PR作成（main へ）</td>
+                <td>最低限のレビュー後すぐマージ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td><code>git switch main</code><br><code>git pull</code></td>
+                <td>マージ後の main を取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">9</span></td>
+                <td><code>git tag -a v1.2.1 -m "緊急バグ修正"</code></td>
+                <td>パッチバージョンアップ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">10</span></td>
+                <td><code>git push origin main --tags</code></td>
+                <td>タグ付きでプッシュ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">11</span></td>
+                <td>本番に緊急デプロイ</td>
+                <td>即座にデプロイ実行</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">12</span></td>
+                <td><code>git switch develop</code><br><code>git merge main</code></td>
+                <td>develop にも hotfix を反映</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">13</span></td>
+                <td><code>git push origin develop</code></td>
+                <td>develop に反映完了</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="danger">
+        <strong>🚨 Hotfix の鉄則:</strong><br>
+        1. main から直接分岐<br>
+        2. 最小限の修正のみ<br>
+        3. main と develop の両方にマージ必須<br>
+        4. 必ずタグを付ける
+    </div>
+</div>
+
+<!-- シーン13: 複数人での同時開発 -->
+<div class="sheet-container">
+    <h2>👥 13. 複数人での同時開発（競合を防ぐ）</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ベストプラクティス</th>
+                <th>やること</th>
+                <th>効果</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>こまめに pull する</td>
+                <td>
+                    毎朝必ず:<br>
+                    <code>git switch develop</code><br>
+                    <code>git pull origin develop</code>
+                </td>
+                <td>競合を小さく保つ</td>
+            </tr>
+            <tr>
+                <td>小さい単位でコミット</td>
+                <td>
+                    機能の一部が完成したらすぐコミット<br>
+                    <code>git add . && git commit</code>
+                </td>
+                <td>ロールバックしやすい</td>
+            </tr>
+            <tr>
+                <td>早めに PR を出す</td>
+                <td>
+                    Draft PR で早期共有<br>
+                    完成前でも「WIP: 」付きでPR
+                </td>
+                <td>重複作業を防ぐ</td>
+            </tr>
+            <tr>
+                <td>作業前に最新を取り込む</td>
+                <td>
+                    <code>git switch develop && git pull</code><br>
+                    <code>git switch feature/xxx</code><br>
+                    <code>git merge develop</code>
+                </td>
+                <td>競合発生時期を分散</td>
+            </tr>
+            <tr>
+                <td>同じファイルを触らない</td>
+                <td>
+                    Slack等で「〇〇ファイル編集します」と宣言<br>
+                    チケットシステムで管理
+                </td>
+                <td>競合を根本的に防ぐ</td>
+            </tr>
+            <tr>
+                <td>ブランチ名で作業内容を明示</td>
+                <td>
+                    <code>feature/user-123-login-form</code><br>
+                    （Issue番号 + 機能名）
+                </td>
+                <td>他メンバーが内容把握可能</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン14: レビュアー側の操作 -->
+<div class="sheet-container">
+    <h2>👀 14. レビュアー側の操作（PRレビュー）</h2>
+    
+    <h3>シーン: チームメンバーからPRレビュー依頼が来た</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>操作</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td>GitHub上でPR確認</td>
+                <td>
+                    ・変更ファイル一覧<br>
+                    ・差分を確認<br>
+                    ・テスト結果を確認
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>必要に応じてローカルで動作確認</td>
+                <td>
+                    <code>git fetch origin</code><br>
+                    <code>git switch feature/user-login</code><br>
+                    ローカルで実行して動作確認
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td>コメント記入</td>
+                <td>
+                    ・良い点を褒める<br>
+                    ・改善提案<br>
+                    ・質問
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>レビュー結果を送信</td>
+                <td>
+                    <strong>Approve:</strong> 承認<br>
+                    <strong>Request changes:</strong> 修正依頼<br>
+                    <strong>Comment:</strong> コメントのみ
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td>修正後の再レビュー</td>
+                <td>修正内容を確認して最終承認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 良いレビューのコツ:</strong><br>
+        - 肯定的なフィードバックも忘れずに<br>
+        - 「なぜ」その修正が必要か理由を書く<br>
+        - コードだけでなくコミットメッセージも確認<br>
+        - 24時間以内にレビューする
+    </div>
+</div>
+
+<!-- シーン15: コードの巻き戻し -->
+<div class="sheet-container">
+    <h2>⏮️ 15. コードの巻き戻し（各シーン別）</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>シーン</th>
+                <th>コマンド</th>
+                <th>影響範囲</th>
+                <th>使用タイミング</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>コミット前の変更を取り消し</td>
+                <td><code>git restore &lt;ファイル&gt;</code></td>
+                <td>ワーキングツリーのみ</td>
+                <td>編集ミスの取り消し</td>
+            </tr>
+            <tr>
+                <td>ステージングを取り消し</td>
+                <td><code>git restore --staged &lt;ファイル&gt;</code></td>
+                <td>ステージングのみ</td>
+                <td>誤って add した時</td>
+            </tr>
+            <tr>
+                <td>直前のコミットを修正</td>
+                <td><code>git commit --amend</code></td>
+                <td>直前のコミットのみ</td>
+                <td>コミットメッセージ修正等</td>
+            </tr>
+            <tr>
+                <td>コミットを取り消し（変更は残す）</td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>コミット履歴のみ</td>
+                <td>コミットやり直し</td>
+            </tr>
+            <tr>
+                <td>コミットを取り消し（変更も消す）</td>
+                <td><code>git reset --hard HEAD~1</code></td>
+                <td>全て（危険）</td>
+                <td>ローカルの間違いを完全削除</td>
+            </tr>
+            <tr>
+                <td>特定コミットを打ち消す</td>
+                <td><code>git revert &lt;commitID&gt;</code></td>
+                <td>新しい取り消しコミット作成</td>
+                <td>push済みの取り消し（安全）</td>
+            </tr>
+            <tr>
+                <td>マージを取り消し</td>
+                <td><code>git merge --abort</code></td>
+                <td>マージ中の状態をリセット</td>
+                <td>競合解決を諦める時</td>
+            </tr>
+            <tr>
+                <td>消えたコミットを復元</td>
+                <td>
+                    <code>git reflog</code><br>
+                    <code>git reset --hard &lt;commitID&gt;</code>
+                </td>
+                <td>履歴の復元</td>
+                <td>誤って reset した時</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン16: CI/CDとの連携 -->
+<div class="sheet-container">
+    <h2>🤖 16. CI/CD との連携</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>イベント</th>
+                <th>トリガー</th>
+                <th>実行内容</th>
+                <th>対応環境</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>feature ブランチに push</td>
+                <td><code>git push origin feature/*</code></td>
+                <td>
+                    ・テスト実行<br>
+                    ・Lint チェック<br>
+                    ・ビルド確認
+                </td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>PR 作成</td>
+                <td>Pull Request 作成時</td>
+                <td>
+                    ・全自動テスト<br>
+                    ・コードカバレッジ<br>
+                    ・セキュリティスキャン
+                </td>
+                <td>-</td>
+            </tr>
+            <tr class="env-dev">
+                <td>develop にマージ</td>
+                <td>PR マージ完了時</td>
+                <td>
+                    ・ビルド<br>
+                    ・DEV環境へ自動デプロイ
+                </td>
+                <td>DEV</td>
+            </tr>
+            <tr class="env-stg">
+                <td>staging にマージ</td>
+                <td><code>git push origin staging</code></td>
+                <td>
+                    ・E2Eテスト<br>
+                    ・STG環境へ自動デプロイ
+                </td>
+                <td>STG</td>
+            </tr>
+            <tr class="env-pro">
+                <td>main にタグ付き push</td>
+                <td><code>git push origin --tags</code></td>
+                <td>
+                    ・本番ビルド<br>
+                    ・承認待ち<br>
+                    ・本番デプロイ（手動承認後）
+                </td>
+                <td>PRO</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 推奨設定:</strong><br>
+        - main ブランチは保護設定を有効化（直接 push 禁止）<br>
+        - PR マージ前に自動テスト通過を必須化<br>
+        - レビュー承認を必須化（最低2名）
+    </div>
+</div>
+
+<!-- 参考資料 -->
+<div class="sheet-container" style="background: #f0f8ff; border-left: 4px solid #2196f3;">
+    <h2>📚 参考資料</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>カテゴリ</th>
+                <th>資料名</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>公式</td>
+                <td>Git公式ドキュメント（日本語）</td>
+                <td>https://git-scm.com/book/ja/v2</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>GitHub Docs</td>
+                <td>https://docs.github.com/ja</td>
+            </tr>
+            <tr>
+                <td>入門</td>
+                <td>サル先生のGit入門</td>
+                <td>https://backlog.com/ja/git-tutorial/</td>
+            </tr>
+            <tr>
+                <td>チーム開発</td>
+                <td>Gitチーム開発のいろは - CodeZine</td>
+                <td>https://codezine.jp/article/detail/16910</td>
+            </tr>
+            <tr>
+                <td>ブランチ戦略</td>
+                <td>Git-flow と GitHub Flow</td>
+                <td>https://supersoftware.jp/tech/20221021/17928/</td>
+            </tr>
+            <tr>
+                <td>トラブル</td>
+                <td>Git初心者が踏みがちな地雷 - TechRacho</td>
+                <td>https://techracho.bpsinc.jp/morimorihoge/2020_09_09/16856</td>
+            </tr>
+            <tr>
+                <td>規約</td>
+                <td>Conventional Commits（日本語）</td>
+                <td>https://www.conventionalcommits.org/ja/</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p style="margin-top: 15px; color: #666; font-size: 13px;">
+        ※ 2025年10月時点の情報です。最新情報は公式ドキュメントをご確認ください。<br>
+        ※ チーム開発では、必ずプロジェクト固有のルールに従ってください。
+    </p>
+</div>
+
+</body>
+</html>

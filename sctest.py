@@ -1,0 +1,304 @@
+    # """
+    
+    # 【Python先生の解説】coorikuya.comのHTML構造分析
+    # このサイトをスクレイピングするために、まずHTML構造を調査しましょう！
+    #     1. サイト構造を調査するコード
+    
+    # """
+
+
+
+
+
+
+# 必要なライブラリをインポート
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import logging
+from bs4 import BeautifulSoup
+
+# ログ設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+def analyze_site_structure(url):
+    """
+    サイトのHTML構造を詳しく分析する関数
+    Args:
+        url: 分析するURL
+    """
+    # Chromeオプションを設定
+    chrome_options = Options()
+    
+    # ヘッドレスモードをオフ(画面を見ながら確認)
+    # chrome_options.add_argument('--headless')
+    
+    # その他の設定
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--window-size=1920,1080')
+    
+    # User-Agent設定
+    chrome_options.add_argument(
+        'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    )
+    
+    # ドライバーを自動セットアップ
+    service = Service(ChromeDriverManager().install())
+    
+    # ドライバーを起動
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    try:
+        # サイトにアクセス
+        logger.info(f"アクセス中: {url}")
+        driver.get(url)
+        
+        # ページが完全に読み込まれるまで待機
+        time.sleep(3)
+        
+        # ページタイトルを取得
+        title = driver.title
+        logger.info(f"ページタイトル: {title}")
+        
+        # 現在のURLを取得(リダイレクトされていないか確認)
+        current_url = driver.current_url
+        logger.info(f"現在のURL: {current_url}")
+        
+        # ページ全体のHTMLソースを取得
+        page_source = driver.page_source
+        
+        # BeautifulSoupで解析(見やすくするため)
+        soup = BeautifulSoup(page_source, 'html.parser')
+        
+        print("\n" + "="*80)
+        print("【HTML構造分析開始】")
+        print("="*80)
+        
+        # === 1. 基本情報 ===
+        print("\n【1. 基本情報】")
+        print(f"タイトルタグ: {soup.title.string if soup.title else 'なし'}")
+        
+        # メタタグ情報
+        meta_description = soup.find('meta', attrs={'name': 'description'})
+        if meta_description:
+            print(f"Description: {meta_description.get('content', '')[:100]}...")
+        
+        # === 2. ヘッダー構造 ===
+        print("\n【2. ヘッダー構造】")
+        header = soup.find('header')
+        if header:
+            print("✓ <header>タグ: 存在します")
+            # ヘッダー内のクラス名を表示
+            if header.get('class'):
+                print(f"  - クラス名: {' '.join(header.get('class'))}")
+            # ヘッダー内のナビゲーション
+            nav = header.find('nav')
+            if nav:
+                print("  - <nav>タグ: 存在します")
+                nav_links = nav.find_all('a')
+                print(f"  - ナビゲーションリンク数: {len(nav_links)}個")
+        else:
+            print("✗ <header>タグ: 見つかりません")
+        
+        # === 3. メインコンテンツ構造 ===
+        print("\n【3. メインコンテンツ構造】")
+        main = soup.find('main')
+        if main:
+            print("✓ <main>タグ: 存在します")
+            if main.get('class'):
+                print(f"  - クラス名: {' '.join(main.get('class'))}")
+        
+        # article タグ
+        articles = soup.find_all('article')
+        print(f"✓ <article>タグ: {len(articles)}個")
+        
+        # section タグ
+        sections = soup.find_all('section')
+        print(f"✓ <section>タグ: {len(sections)}個")
+        
+        # div要素(主要なクラス名を抽出)
+        divs_with_class = soup.find_all('div', class_=True)
+        print(f"✓ クラス付き<div>: {len(divs_with_class)}個")
+        
+        # === 4. 見出し構造 ===
+        print("\n【4. 見出し構造】")
+        for i in range(1, 7):
+            headings = soup.find_all(f'h{i}')
+            if headings:
+                print(f"<h{i}>タグ: {len(headings)}個")
+                # 最初の3つを表示
+                for j, h in enumerate(headings[:3], 1):
+                    print(f"  {j}. {h.get_text(strip=True)[:50]}")
+                if len(headings) > 3:
+                    print(f"  ... 他 {len(headings) - 3}個")
+        
+        # === 5. リスト構造 ===
+        print("\n【5. リスト・アイテム構造】")
+        ul_lists = soup.find_all('ul')
+        ol_lists = soup.find_all('ol')
+        print(f"<ul>タグ: {len(ul_lists)}個")
+        print(f"<ol>タグ: {len(ol_lists)}個")
+        
+        # よく使われるクラス名を抽出
+        print("\n【6. 頻出クラス名トップ10】")
+        class_counter = {}
+        for tag in soup.find_all(class_=True):
+            # クラス名を取得(複数ある場合はリスト)
+            classes = tag.get('class')
+            for cls in classes:
+                class_counter[cls] = class_counter.get(cls, 0) + 1
+        
+        # 出現回数でソート
+        sorted_classes = sorted(class_counter.items(), key=lambda x: x[1], reverse=True)
+        for i, (cls, count) in enumerate(sorted_classes[:10], 1):
+            print(f"{i:2d}. '{cls}' - {count}回")
+        
+        # === 7. ID属性 ===
+        print("\n【7. ID属性のある要素】")
+        elements_with_id = soup.find_all(id=True)
+        print(f"ID付き要素: {len(elements_with_id)}個")
+        for elem in elements_with_id[:10]:
+            print(f"  - #{elem.get('id')} ({elem.name})")
+        
+        # === 8. リンク構造 ===
+        print("\n【8. リンク構造】")
+        all_links = soup.find_all('a', href=True)
+        print(f"総リンク数: {len(all_links)}個")
+        
+        # 内部リンクと外部リンクを分類
+        internal_links = []
+        external_links = []
+        for link in all_links:
+            href = link.get('href')
+            if href.startswith('http'):
+                external_links.append(href)
+            else:
+                internal_links.append(href)
+        
+        print(f"  - 内部リンク: {len(internal_links)}個")
+        print(f"  - 外部リンク: {len(external_links)}個")
+        
+        # 最初の5つのリンクを表示
+        print("\n  最初の5つのリンク:")
+        for i, link in enumerate(all_links[:5], 1):
+            href = link.get('href', '')
+            text = link.get_text(strip=True)
+            print(f"  {i}. {text[:30]} -> {href[:50]}")
+        
+        # === 9. 画像 ===
+        print("\n【9. 画像要素】")
+        images = soup.find_all('img')
+        print(f"画像数: {len(images)}個")
+        
+        # 最初の3つの画像情報
+        print("  最初の3つの画像:")
+        for i, img in enumerate(images[:3], 1):
+            src = img.get('src', '')
+            alt = img.get('alt', '')
+            print(f"  {i}. alt='{alt[:30]}' src='{src[:50]}'")
+        
+        # === 10. フォーム要素 ===
+        print("\n【10. フォーム要素】")
+        forms = soup.find_all('form')
+        print(f"フォーム数: {len(forms)}個")
+        
+        input_fields = soup.find_all('input')
+        textareas = soup.find_all('textarea')
+        selects = soup.find_all('select')
+        buttons = soup.find_all('button')
+        
+        print(f"  - <input>: {len(input_fields)}個")
+        print(f"  - <textarea>: {len(textareas)}個")
+        print(f"  - <select>: {len(selects)}個")
+        print(f"  - <button>: {len(buttons)}個")
+        
+        # === 11. テーブル ===
+        print("\n【11. テーブル要素】")
+        tables = soup.find_all('table')
+        print(f"テーブル数: {len(tables)}個")
+        
+        # === 12. 特定のデータ属性 ===
+        print("\n【12. data-*属性】")
+        data_attributes = set()
+        for tag in soup.find_all():
+            for attr in tag.attrs:
+                if attr.startswith('data-'):
+                    data_attributes.add(attr)
+        
+        if data_attributes:
+            print(f"見つかったdata属性: {len(data_attributes)}種類")
+            for attr in sorted(data_attributes)[:10]:
+                print(f"  - {attr}")
+        else:
+            print("data属性は見つかりませんでした")
+        
+        # === 13. スクリプトとスタイル ===
+        print("\n【13. スクリプト・スタイル】")
+        scripts = soup.find_all('script')
+        styles = soup.find_all('style')
+        link_css = soup.find_all('link', rel='stylesheet')
+        
+        print(f"<script>タグ: {len(scripts)}個")
+        print(f"<style>タグ: {len(styles)}個")
+        print(f"外部CSS: {len(link_css)}個")
+        
+        # === 14. HTML全体を保存 ===
+        print("\n【14. HTMLソース保存】")
+        with open('coorikuya_source.html', 'w', encoding='utf-8') as f:
+            f.write(soup.prettify())
+        print("✓ HTMLソースを 'coorikuya_source.html' に保存しました")
+        
+        # === 15. 実際のSelenium要素も確認 ===
+        print("\n【15. Selenium要素確認】")
+        
+        # Seleniumで要素を直接検索してみる
+        try:
+            # h1タグ
+            h1_elements = driver.find_elements(By.TAG_NAME, 'h1')
+            print(f"Seleniumで取得したh1: {len(h1_elements)}個")
+            
+            # よくある記事リストのクラス名で検索
+            article_items = driver.find_elements(By.CSS_SELECTOR, 'article, .post, .entry, .item')
+            print(f"記事要素候補: {len(article_items)}個")
+            
+        except Exception as e:
+            print(f"Selenium要素検索エラー: {e}")
+        
+        print("\n" + "="*80)
+        print("【分析完了】")
+        print("="*80)
+        
+        # スクリーンショットを保存
+        driver.save_screenshot('coorikuya_screenshot.png')
+        logger.info("スクリーンショットを保存しました")
+        
+    except Exception as e:
+        logger.error(f"エラーが発生しました: {e}")
+        import traceback
+        traceback.print_exc()
+        
+    finally:
+        # ブラウザを閉じる
+        input("\nEnterキーを押すとブラウザが閉じます...")
+        driver.quit()
+        logger.info("ブラウザを閉じました")
+
+
+# 実行
+if __name__ == "__main__":
+    # 対象URL
+    target_url = "https://www.coorikuya.com/"
+    
+    # 構造分析を実行
+    analyze_site_structure(target_url)
