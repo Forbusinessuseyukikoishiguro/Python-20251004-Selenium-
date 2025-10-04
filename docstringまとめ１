@@ -1,0 +1,741 @@
+おっ、いい質問きましたね！✨
+新人エンジニアさんが「**docstring（ドックストリング）**」を押さえると、 **自分のコードを他人に説明できる力** が一気に上がります。
+Pythonでは「有名な書き方（記法スタイル）」がいくつかあるので、まとめてご紹介しますね。
+
+---
+
+# 🐍 Docstring（ドックストリング）とは？
+
+* 関数・クラス・モジュールの冒頭に書ける「説明用の文字列」。
+* `help()` や ドキュメント生成ツール（Sphinx, pdoc など）で使われる。
+* 書かないと「何の関数かわからないブラックボックス」になる。
+
+例：
+
+```python
+def add(a, b):
+    """
+    2つの数を足し算して返す関数
+
+    Args:
+        a (int): 1つ目の数
+        b (int): 2つ目の数
+
+    Returns:
+        int: a と b の和
+    """
+    return a + b
+```
+
+---
+
+# 🔹 Pythonの有名なDocstring記法
+
+Pythonには「公式のPEP 257ガイドライン」があり、さらに業界でよく使われる3大スタイルがあります。
+
+---
+
+## ① Googleスタイル（初心者向け・シンプルで有名）
+
+```python
+def multiply(a, b):
+    """
+    2つの数を掛け算する
+
+    Args:
+        a (int): 1つ目の数
+        b (int): 2つ目の数
+
+    Returns:
+        int: a と b の積
+    """
+    return a * b
+```
+
+👉 **Args / Returns / Raises** の3つをよく使う。
+👉 可読性が高く、機械にも人間にも優しい。
+
+---
+
+## ② NumPyスタイル（科学計算で有名）
+
+科学者や研究者がよく使う。表形式っぽい。
+
+```python
+def divide(a, b):
+    """
+    2つの数を割り算する
+
+    Parameters
+    ----------
+    a : float
+        割られる数
+    b : float
+        割る数
+
+    Returns
+    -------
+    float
+        a / b の結果
+    """
+    return a / b
+```
+
+👉 `Parameters` や `Returns` が見やすい。
+👉 NumPy, Pandas など大規模ライブラリで採用。
+
+---
+
+## ③ reStructuredText（Sphinxでよく使う）
+
+公式ドキュメント生成ツール「Sphinx」でそのまま使える。
+
+```python
+def subtract(a, b):
+    """
+    2つの数を引き算する
+
+    :param a: 引かれる数
+    :type a: int
+    :param b: 引く数
+    :type b: int
+    :return: a - b の結果
+    :rtype: int
+    """
+    return a - b
+```
+
+👉 記法はちょっと面倒だけど、**大規模プロジェクトでの標準**。
+👉 `:param name:` `:type name:` の形。
+
+---
+
+# 🔹 どれを使うべき？
+
+* **Googleスタイル** → 新人エンジニア / チーム開発でおすすめ（シンプル）
+* **NumPyスタイル** → データ分析・研究分野ならこれ
+* **reST(Sphinx)** → 本格的な公式ドキュメントを自動生成したいとき
+
+---
+
+# 🐇 ふわふわ大福店のたとえ
+
+* **docstring** = 大福レシピに書く「説明書」
+* **Googleスタイル** = 手書きのメモ（読みやすい）
+* **NumPyスタイル** = 表形式の整理されたレシピ（研究室仕様）
+* **reST** = 出版用のフォーマット（本格的）
+
+---
+
+👉 友季子さんに質問です！
+次に知りたいのは
+
+1. 実務で「どのスタイルが一番使われているか」
+2. 自分で「docstring を効率よく書くコツ」
+   どっちを先に解説しましょうか？
+
+
+
+      """
+====================================
+🐰 ふわふわ大福店で学ぶ
+Docstring書き方チートシート
+====================================
+
+Pythonの3大記法を完全マスター！
+1. Googleスタイル（初心者向け）
+2. NumPyスタイル（科学技術系）
+3. reSTスタイル（Sphinx用）
+"""
+
+# ====================================
+# 基礎知識: Docstringとは？
+# ====================================
+
+"""
+Docstring（ドキュメンテーション文字列）とは：
+- 関数やクラスの説明を書くための文字列
+- 三重引用符 ''' または """ で囲む
+- 関数定義の直後に書く
+- help()で表示される
+- 自動ドキュメント生成ツールが読み取る
+
+書く場所：
+def 関数名():
+    \"\"\"ここに書く！\"\"\"
+    処理...
+"""
+
+# ====================================
+# レベル1: 超基本（1行docstring）
+# ====================================
+
+# ----- 練習1: 最小限のdocstring -----
+def sell_daifuku(quantity):
+    """大福を販売する。"""
+    # ワンライナーなら1行で十分
+    return f"{quantity}個販売しました"
+
+
+# ----- 練習2: 引数がある場合 -----
+def calculate_price(quantity, unit_price):
+    """大福の合計金額を計算する。"""
+    return quantity * unit_price
+
+
+# ----- 使い方を確認 -----
+# help(sell_daifuku)  # コメントアウトを外して実行してみよう
+# 出力: Help on function sell_daifuku...
+#       sell_daifuku(quantity)
+#       大福を販売する。
+
+
+# ====================================
+# レベル2: Googleスタイル（初心者推奨）
+# ====================================
+
+"""
+【Googleスタイルの特徴】
+✅ 読みやすい
+✅ 書きやすい
+✅ 初心者に優しい
+✅ チーム開発で人気
+
+【基本テンプレート】
+def 関数名(引数):
+    \"\"\"
+    処理の説明（1〜2行）
+
+    Args:
+        引数名 (型): 説明
+        引数名 (型): 説明
+
+    Returns:
+        型: 説明
+    \"\"\"
+"""
+
+# ----- 練習3: Googleスタイルの基本 -----
+def sell_daifuku_google(quantity, price_per_item):
+    """
+    大福を販売して合計金額を計算する。
+
+    Args:
+        quantity (int): 販売する大福の個数
+        price_per_item (int): 1個あたりの価格（円）
+
+    Returns:
+        int: 合計金額（円）
+    """
+    total = quantity * price_per_item
+    return total
+
+
+# ----- 練習4: 例外も書く場合 -----
+def divide_daifuku(total, people):
+    """
+    大福を人数で割って1人あたりの個数を計算する。
+
+    Args:
+        total (int): 大福の総数
+        people (int): 分ける人数
+
+    Returns:
+        float: 1人あたりの個数
+
+    Raises:
+        ValueError: peopleが0以下の場合
+    """
+    if people <= 0:
+        raise ValueError("人数は1以上でお願いします")
+    return total / people
+
+
+# ----- 練習5: クラスのdocstring（Google） -----
+class DaifukuShop:
+    """
+    大福店クラス。
+
+    在庫管理と販売機能を提供する。
+
+    Attributes:
+        owner_name (str): 店長の名前
+        stock (int): 在庫数
+        sold (int): 累計販売数
+    """
+
+    def __init__(self, owner_name, stock):
+        """
+        大福店を初期化する。
+
+        Args:
+            owner_name (str): 店長の名前
+            stock (int): 初期在庫数
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.sold = 0
+
+    def sell(self, quantity):
+        """
+        大福を販売する。
+
+        Args:
+            quantity (int): 販売する個数
+
+        Returns:
+            bool: 販売成功ならTrue、在庫不足ならFalse
+
+        Examples:
+            >>> shop = DaifukuShop("うさうさ", 10)
+            >>> shop.sell(5)
+            True
+            >>> shop.stock
+            5
+        """
+        if quantity > self.stock:
+            return False
+        self.stock -= quantity
+        self.sold += quantity
+        return True
+
+
+# ====================================
+# レベル3: NumPyスタイル（科学技術系）
+# ====================================
+
+"""
+【NumPyスタイルの特徴】
+✅ データサイエンス分野で標準
+✅ 詳しく書ける
+✅ NumPy、SciPy、pandasで使用
+✅ 見やすいが書くのが少し手間
+
+【基本テンプレート】
+def 関数名(引数):
+    \"\"\"
+    処理の説明
+
+    Parameters
+    ----------
+    引数名 : 型
+        説明
+    引数名 : 型
+        説明
+
+    Returns
+    -------
+    型
+        説明
+    \"\"\"
+"""
+
+# ----- 練習6: NumPyスタイルの基本 -----
+def sell_daifuku_numpy(quantity, price_per_item):
+    """
+    大福を販売して合計金額を計算する。
+
+    Parameters
+    ----------
+    quantity : int
+        販売する大福の個数
+    price_per_item : int
+        1個あたりの価格（円）
+
+    Returns
+    -------
+    int
+        合計金額（円）
+    """
+    total = quantity * price_per_item
+    return total
+
+
+# ----- 練習7: 複数の戻り値（NumPy） -----
+def calculate_sales_stats(sales_list):
+    """
+    販売統計を計算する。
+
+    Parameters
+    ----------
+    sales_list : list of int
+        各日の販売数のリスト
+
+    Returns
+    -------
+    total : int
+        合計販売数
+    average : float
+        平均販売数
+    max_sales : int
+        最大販売数
+
+    Examples
+    --------
+    >>> calculate_sales_stats([10, 20, 15])
+    (45, 15.0, 20)
+    """
+    total = sum(sales_list)
+    average = total / len(sales_list)
+    max_sales = max(sales_list)
+    return total, average, max_sales
+
+
+# ----- 練習8: クラスのdocstring（NumPy） -----
+class PremiumDaifukuShop:
+    """
+    プレミアム大福店クラス。
+
+    基本的な販売機能に加えて、VIP会員管理機能を提供する。
+
+    Attributes
+    ----------
+    owner_name : str
+        店長の名前
+    stock : int
+        現在の在庫数
+    vip_count : int
+        VIP会員数
+
+    Methods
+    -------
+    sell(quantity)
+        大福を販売する
+    add_vip(count)
+        VIP会員を追加する
+    """
+
+    def __init__(self, owner_name, stock, vip_count):
+        """
+        プレミアム大福店を初期化する。
+
+        Parameters
+        ----------
+        owner_name : str
+            店長の名前
+        stock : int
+            初期在庫数
+        vip_count : int
+            初期VIP会員数
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.vip_count = vip_count
+
+    def sell(self, quantity):
+        """
+        大福を販売する。
+
+        Parameters
+        ----------
+        quantity : int
+            販売する個数
+
+        Returns
+        -------
+        bool
+            販売成功ならTrue、在庫不足ならFalse
+
+        Notes
+        -----
+        在庫が足りない場合は販売せず、Falseを返す。
+        """
+        if quantity > self.stock:
+            return False
+        self.stock -= quantity
+        return True
+
+
+# ====================================
+# レベル4: reSTスタイル（Sphinx用）
+# ====================================
+
+"""
+【reSTスタイルの特徴】
+✅ Sphinxドキュメント生成で使用
+✅ 公式ドキュメント作成向け
+✅ 型情報が明確
+✅ やや冗長
+
+【基本テンプレート】
+def 関数名(引数):
+    \"\"\"
+    処理の説明
+
+    :param 引数名: 説明
+    :type 引数名: 型
+    :return: 説明
+    :rtype: 型
+    \"\"\"
+"""
+
+# ----- 練習9: reSTスタイルの基本 -----
+def sell_daifuku_rest(quantity, price_per_item):
+    """
+    大福を販売して合計金額を計算する。
+
+    :param quantity: 販売する大福の個数
+    :type quantity: int
+    :param price_per_item: 1個あたりの価格（円）
+    :type price_per_item: int
+    :return: 合計金額（円）
+    :rtype: int
+    """
+    total = quantity * price_per_item
+    return total
+
+
+# ----- 練習10: 例外も書く（reST） -----
+def divide_daifuku_rest(total, people):
+    """
+    大福を人数で割って1人あたりの個数を計算する。
+
+    :param total: 大福の総数
+    :type total: int
+    :param people: 分ける人数
+    :type people: int
+    :return: 1人あたりの個数
+    :rtype: float
+    :raises ValueError: peopleが0以下の場合
+    """
+    if people <= 0:
+        raise ValueError("人数は1以上でお願いします")
+    return total / people
+
+
+# ----- 練習11: クラスのdocstring（reST） -----
+class VIPDaifukuShop:
+    """
+    VIP専門大福店クラス。
+
+    プレミアム機能に加えて、コンシェルジュサービスを提供する。
+
+    :ivar owner_name: 店長の名前
+    :vartype owner_name: str
+    :ivar stock: 現在の在庫数
+    :vartype stock: int
+    :ivar concierge_count: コンシェルジュの人数
+    :vartype concierge_count: int
+    """
+
+    def __init__(self, owner_name, stock, concierge_count):
+        """
+        VIP専門大福店を初期化する。
+
+        :param owner_name: 店長の名前
+        :type owner_name: str
+        :param stock: 初期在庫数
+        :type stock: int
+        :param concierge_count: コンシェルジュの人数
+        :type concierge_count: int
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.concierge_count = concierge_count
+
+
+# ====================================
+# 実践: 3スタイル比較
+# ====================================
+
+"""
+同じ関数を3つのスタイルで書き比べ！
+"""
+
+# ----- Google版 -----
+def calculate_discount_google(price, discount_rate):
+    """
+    割引後の価格を計算する。
+
+    Args:
+        price (int): 元の価格（円）
+        discount_rate (float): 割引率（0.0〜1.0）
+
+    Returns:
+        int: 割引後の価格（円）
+
+    Raises:
+        ValueError: discount_rateが0〜1の範囲外の場合
+    """
+    if not 0 <= discount_rate <= 1:
+        raise ValueError("割引率は0〜1の範囲で指定してください")
+    return int(price * (1 - discount_rate))
+
+
+# ----- NumPy版 -----
+def calculate_discount_numpy(price, discount_rate):
+    """
+    割引後の価格を計算する。
+
+    Parameters
+    ----------
+    price : int
+        元の価格（円）
+    discount_rate : float
+        割引率（0.0〜1.0）
+
+    Returns
+    -------
+    int
+        割引後の価格（円）
+
+    Raises
+    ------
+    ValueError
+        discount_rateが0〜1の範囲外の場合
+    """
+    if not 0 <= discount_rate <= 1:
+        raise ValueError("割引率は0〜1の範囲で指定してください")
+    return int(price * (1 - discount_rate))
+
+
+# ----- reST版 -----
+def calculate_discount_rest(price, discount_rate):
+    """
+    割引後の価格を計算する。
+
+    :param price: 元の価格（円）
+    :type price: int
+    :param discount_rate: 割引率（0.0〜1.0）
+    :type discount_rate: float
+    :return: 割引後の価格（円）
+    :rtype: int
+    :raises ValueError: discount_rateが0〜1の範囲外の場合
+    """
+    if not 0 <= discount_rate <= 1:
+        raise ValueError("割引率は0〜1の範囲で指定してください")
+    return int(price * (1 - discount_rate))
+
+
+# ====================================
+# 練習問題
+# ====================================
+
+"""
+【宿題1】次の関数にGoogleスタイルのdocstringを書いてみよう
+"""
+def add_stock(current_stock, add_amount):
+    # TODO: ここにGoogleスタイルのdocstringを書く
+    return current_stock + add_amount
+
+
+"""
+【宿題2】次の関数にNumPyスタイルのdocstringを書いてみよう
+"""
+def get_vip_discount(is_vip, base_discount):
+    # TODO: ここにNumPyスタイルのdocstringを書く
+    if is_vip:
+        return base_discount + 0.1
+    return base_discount
+
+
+"""
+【宿題3】次のクラスにdocstringを書いてみよう（好きなスタイルでOK）
+"""
+class DaifukuInventory:
+    # TODO: クラスのdocstringを書く
+    
+    def __init__(self, initial_stock):
+        # TODO: __init__のdocstringを書く
+        self.stock = initial_stock
+    
+    def add(self, amount):
+        # TODO: addのdocstringを書く
+        self.stock += amount
+    
+    def remove(self, amount):
+        # TODO: removeのdocstringを書く
+        if amount > self.stock:
+            raise ValueError("在庫不足")
+        self.stock -= amount
+
+
+# ====================================
+# コーディングのコツ
+# ====================================
+
+"""
+【コツ1】書く順番
+1. 関数を作る
+2. 動作を確認
+3. docstringを書く
+4. テストを書く
+
+【コツ2】何を書くか
+✅ 何をするか（What）
+✅ どう使うか（How）
+✅ 注意点（Warning）
+❌ 内部処理の詳細（コメントに書く）
+
+【コツ3】型ヒントと組み合わせる
+"""
+def sell_with_type_hints(quantity: int, price: int) -> int:
+    """
+    大福を販売して合計金額を計算する。
+
+    Args:
+        quantity: 販売個数（型ヒントで既に指定済み）
+        price: 単価（型ヒントで既に指定済み）
+
+    Returns:
+        合計金額（型ヒントで既に指定済み）
+    """
+    return quantity * price
+
+
+"""
+【コツ4】チーム開発での推奨
+- 初心者チーム → Googleスタイル
+- データ分析チーム → NumPyスタイル
+- 公式ライブラリ → reSTスタイル
+
+【コツ5】自動フォーマッター
+- black: コード整形
+- isort: import整理
+- pylint: コードチェック
+- pydocstyle: docstringチェック
+
+【コツ6】IDE活用
+- VS Code: Python Docstring Generator拡張機能
+- PyCharm: 自動docstring生成機能
+"""
+
+# ====================================
+# まとめ
+# ====================================
+
+print("="*70)
+print("🐰 Docstring書き方チートシート まとめ")
+print("="*70)
+print("""
+【3つのスタイル比較】
+
+1. Googleスタイル ★★★★★
+   - 初心者に最適
+   - 読みやすい、書きやすい
+   - チーム開発で人気
+
+2. NumPyスタイル ★★★★☆
+   - データサイエンス向け
+   - 詳細に書ける
+   - NumPy/pandas/SciPyで標準
+
+3. reSTスタイル ★★★☆☆
+   - Sphinxドキュメント用
+   - 公式ドキュメント向け
+   - やや冗長
+
+【学習ステップ】
+Week 1: 1行docstringから始める
+Week 2: Googleスタイルをマスター
+Week 3: 他のスタイルも試す
+
+【重要ポイント】
+✅ 関数定義の直後に書く
+✅ 三重引用符で囲む
+✅ 何をするかを明確に書く
+✅ 引数と戻り値を説明
+✅ 例外も書く
+
+まずはGoogleスタイルから始めましょう！
+""")
