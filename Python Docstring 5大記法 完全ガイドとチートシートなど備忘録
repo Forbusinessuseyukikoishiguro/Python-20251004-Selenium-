@@ -1,0 +1,2124 @@
+# 🐰 Python Docstring 5大記法 完全ガイド
+
+MECE構成で、note記事用にコードと説明を分けて整理します。完成しました！
+
+## 📋 note記事用の構成
+
+### コード部分（artifactに実装済み）
+- 実行可能な完全コード
+- 5大記法の実例
+- ビフォー・アフター比較
+- 書き換えガイド
+
+### 説明部分（note記事に追記）
+
+**各記法の図解:**
+
+```
+【記法の関係図】
+
+        Python Docstring
+              |
+    ┌─────────┼─────────┐
+    |         |         |
+ PEP 257   拡張版    レガシー
+ (基本)              (非推奨)
+            |
+    ┌───────┼───────┐
+    |       |       |
+  Google  NumPy   reST
+  (人気)  (科学)  (公式)
+```
+
+**MECE分類軸:**
+1. **詳細度**: 最小限→標準→詳細
+2. **用途**: 個人→チーム→専門
+3. **人気度**: ★1つ～5つ
+4. **学習コスト**: 5分～2時間
+
+**書き換えパターン:**
+- PEP 257 → Google（詳細化）
+- Google → NumPy（表形式化）
+- Google → reST（Sphinx化）
+- reST → Epytext（非推奨）
+
+このコードを実行すると、5つの記法が実際に動作し、違いが一目瞭然になります！
+
+
+"""
+====================================
+🐰 ふわふわ大福店で学ぶ
+Docstring完全実践ガイド
+
+実際に動くコード
+====================================
+
+このファイルを実行すると:
+✓ 3大スタイルの違いが分かる
+✓ help()で結果が確認できる
+✓ 書き換え方法が理解できる
+✓ 実践的な使い方が身につく
+"""
+
+print("="*70)
+print("🐰 Docstring実践ガイドを開始します")
+print("="*70)
+
+# ====================================
+# 第1部: Googleスタイル
+# ====================================
+
+print("\n" + "="*70)
+print("【第1部】Googleスタイル - 初心者に最適")
+print("="*70)
+
+# --------------------------------------------------
+# パターン1: 基本形
+# --------------------------------------------------
+def sell_daifuku(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    Args:
+        quantity (int): 販売する大福の個数
+        price (int): 1個あたりの価格（円）
+    
+    Returns:
+        int: 合計金額（円）
+    
+    Examples:
+        >>> sell_daifuku(10, 150)
+        1500
+    """
+    # Args: 引数の説明
+    # 形式: 引数名 (型): 説明
+    
+    # Returns: 戻り値の説明
+    # 形式: 型: 説明
+    
+    # Examples: 使用例（省略可）
+    # 形式: >>> 関数呼び出し
+    #       期待される結果
+    
+    return quantity * price
+
+
+# --------------------------------------------------
+# パターン2: 例外を含む
+# --------------------------------------------------
+def add_stock(current, amount):
+    """
+    在庫を追加する。
+    
+    Args:
+        current (int): 現在の在庫数
+        amount (int): 追加する在庫数
+    
+    Returns:
+        int: 更新後の在庫数
+    
+    Raises:
+        ValueError: amountが負の値の場合
+    
+    Examples:
+        >>> add_stock(100, 50)
+        150
+    """
+    # Raises: 発生する例外
+    # 形式: 例外名: 発生条件
+    
+    # バリデーション（検証処理）
+    if amount < 0:
+        # 負の値はエラー
+        raise ValueError("追加量は0以上を指定してください")
+    
+    # 在庫を加算
+    return current + amount
+
+
+# --------------------------------------------------
+# パターン3: デフォルト引数
+# --------------------------------------------------
+def calculate_total(price, quantity, tax_rate=0.1):
+    """
+    税込み合計金額を計算する。
+    
+    Args:
+        price (int): 単価（円）
+        quantity (int): 数量
+        tax_rate (float, optional): 消費税率。デフォルトは0.1（10%）
+    
+    Returns:
+        int: 税込み合計金額（円）
+    
+    Note:
+        計算結果は整数に丸められます。
+    """
+    # optional: デフォルト値がある引数
+    # 形式: 引数名 (型, optional): 説明。デフォルトは値
+    
+    # Note: 重要な注意事項
+    
+    # 小計を計算
+    subtotal = price * quantity
+    
+    # 税込み金額を計算
+    total = subtotal * (1 + tax_rate)
+    
+    # 整数に変換して返す
+    return int(total)
+
+
+# --------------------------------------------------
+# パターン4: クラスのdocstring
+# --------------------------------------------------
+class DaifukuShop:
+    """
+    大福店クラス。
+    
+    在庫管理と販売機能を提供する。
+    
+    Attributes:
+        owner_name (str): 店長の名前
+        stock (int): 現在の在庫数
+        sold (int): 累計販売数
+    
+    Examples:
+        >>> shop = DaifukuShop("うさうさ", 100)
+        >>> shop.sell(10)
+        True
+        >>> shop.stock
+        90
+    """
+    # クラスのdocstring:
+    # 1. クラスの簡単な説明
+    # 2. Attributes: インスタンス変数の説明
+    # 3. Examples: 使用例
+    
+    def __init__(self, owner_name, stock):
+        """
+        大福店を初期化する。
+        
+        Args:
+            owner_name (str): 店長の名前
+            stock (int): 初期在庫数
+        """
+        # __init__のdocstring:
+        # コンストラクタの引数を説明
+        # Returnsは書かない（__init__は何も返さない）
+        
+        self.owner_name = owner_name  # 店長名を保存
+        self.stock = stock            # 在庫数を保存
+        self.sold = 0                 # 販売数は0から開始
+    
+    def sell(self, quantity):
+        """
+        大福を販売する。
+        
+        Args:
+            quantity (int): 販売する個数
+        
+        Returns:
+            bool: 販売成功ならTrue、在庫不足ならFalse
+        """
+        # 在庫チェック
+        if quantity > self.stock:
+            # 在庫不足
+            return False
+        
+        # 在庫を減らす
+        self.stock -= quantity
+        
+        # 販売数を増やす
+        self.sold += quantity
+        
+        # 成功
+        return True
+    
+    def show_info(self):
+        """店舗情報を表示する。"""
+        # シンプルな関数なら1行でOK
+        
+        print(f"店長: {self.owner_name}")
+        print(f"在庫: {self.stock}個")
+        print(f"販売: {self.sold}個")
+
+
+# --------------------------------------------------
+# Googleスタイルの動作確認
+# --------------------------------------------------
+print("\n【Googleスタイルの例】")
+print("-"*70)
+
+# 基本形
+result = sell_daifuku(10, 150)
+print(f"売上: {result}円")
+
+# 例外を含む
+stock = add_stock(100, 50)
+print(f"在庫: {stock}個")
+
+# デフォルト引数
+total = calculate_total(150, 10)
+print(f"税込み: {total}円")
+
+# クラス
+shop = DaifukuShop("うさうさ", 100)
+shop.sell(10)
+shop.show_info()
+
+# help()で確認（コメントアウトを外すと実行）
+# print("\n【help()の結果】")
+# help(sell_daifuku)
+
+
+# ====================================
+# 第2部: NumPyスタイル
+# ====================================
+
+print("\n" + "="*70)
+print("【第2部】NumPyスタイル - 科学技術系向け")
+print("="*70)
+
+# --------------------------------------------------
+# パターン1: 基本形
+# --------------------------------------------------
+def sell_daifuku_numpy(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    Parameters
+    ----------
+    quantity : int
+        販売する大福の個数
+    price : int
+        1個あたりの価格（円）
+    
+    Returns
+    -------
+    int
+        合計金額（円）
+    
+    Examples
+    --------
+    >>> sell_daifuku_numpy(10, 150)
+    1500
+    """
+    # Parameters: 引数の説明
+    # Parameters の下に -------- (8個以上のハイフン)
+    # 形式: 引数名 : 型
+    #         説明（次の行にインデント）
+    
+    # Returns: 戻り値の説明
+    # Returns の下に ------- (7個以上のハイフン)
+    # 形式: 型
+    #         説明（次の行にインデント）
+    
+    return quantity * price
+
+
+# --------------------------------------------------
+# パターン2: 複数の戻り値
+# --------------------------------------------------
+def calculate_stats(sales_list):
+    """
+    販売統計を計算する。
+    
+    Parameters
+    ----------
+    sales_list : list of int
+        各日の販売数のリスト
+    
+    Returns
+    -------
+    total : int
+        合計販売数
+    average : float
+        平均販売数
+    max_sales : int
+        最大販売数
+    
+    Examples
+    --------
+    >>> calculate_stats([10, 20, 15])
+    (45, 15.0, 20)
+    """
+    # 複数の戻り値:
+    # 各戻り値を個別に説明
+    # 形式: 戻り値名 : 型
+    #         説明
+    
+    # 合計を計算
+    total = sum(sales_list)
+    
+    # 平均を計算
+    average = total / len(sales_list)
+    
+    # 最大値を取得
+    max_sales = max(sales_list)
+    
+    # タプルで返す
+    return total, average, max_sales
+
+
+# --------------------------------------------------
+# パターン3: 例外と注意事項
+# --------------------------------------------------
+def divide_daifuku(total, people):
+    """
+    大福を人数で割る。
+    
+    Parameters
+    ----------
+    total : int
+        大福の総数
+    people : int
+        分ける人数
+    
+    Returns
+    -------
+    float
+        1人あたりの個数
+    
+    Raises
+    ------
+    ValueError
+        peopleが0以下の場合
+    
+    Notes
+    -----
+    この関数は小数点以下も返します。
+    整数が必要な場合は int() で変換してください。
+    
+    See Also
+    --------
+    sell_daifuku_numpy : 大福の販売計算
+    """
+    # Raises: 例外の説明
+    # Raises の下に ------ (6個以上のハイフン)
+    # 形式: 例外名
+    #         説明
+    
+    # Notes: 注意事項
+    # Notes の下に ----- (5個以上のハイフン)
+    # 詳しい説明を書ける
+    
+    # See Also: 関連関数
+    # See Also の下に -------- (8個以上のハイフン)
+    # 形式: 関数名 : 簡単な説明
+    
+    # バリデーション
+    if people <= 0:
+        raise ValueError("人数は1以上を指定してください")
+    
+    # 割り算
+    return total / people
+
+
+# --------------------------------------------------
+# パターン4: クラスのdocstring
+# --------------------------------------------------
+class PremiumDaifukuShop:
+    """
+    プレミアム大福店クラス。
+    
+    基本的な販売機能に加えて、VIP会員管理機能を提供する。
+    
+    Attributes
+    ----------
+    owner_name : str
+        店長の名前
+    stock : int
+        現在の在庫数
+    vip_count : int
+        VIP会員数
+    
+    Methods
+    -------
+    sell(quantity)
+        大福を販売する
+    add_vip(count)
+        VIP会員を追加する
+    
+    Examples
+    --------
+    >>> shop = PremiumDaifukuShop("もちもち", 100, 5)
+    >>> shop.sell(10)
+    True
+    """
+    # クラスのdocstring（NumPy版）:
+    # 1. クラスの説明
+    # 2. Attributes: 属性の説明
+    # 3. Methods: メソッドの一覧
+    # 4. Examples: 使用例
+    
+    def __init__(self, owner_name, stock, vip_count):
+        """
+        プレミアム大福店を初期化する。
+        
+        Parameters
+        ----------
+        owner_name : str
+            店長の名前
+        stock : int
+            初期在庫数
+        vip_count : int
+            初期VIP会員数
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.vip_count = vip_count
+    
+    def sell(self, quantity):
+        """
+        大福を販売する。
+        
+        Parameters
+        ----------
+        quantity : int
+            販売する個数
+        
+        Returns
+        -------
+        bool
+            販売成功ならTrue、在庫不足ならFalse
+        """
+        if quantity > self.stock:
+            return False
+        self.stock -= quantity
+        return True
+    
+    def add_vip(self, count=1):
+        """
+        VIP会員を追加する。
+        
+        Parameters
+        ----------
+        count : int, optional
+            追加する会員数。デフォルトは1
+        """
+        # optional: デフォルト値がある引数
+        self.vip_count += count
+
+
+# --------------------------------------------------
+# NumPyスタイルの動作確認
+# --------------------------------------------------
+print("\n【NumPyスタイルの例】")
+print("-"*70)
+
+# 基本形
+result = sell_daifuku_numpy(10, 150)
+print(f"売上: {result}円")
+
+# 複数の戻り値
+total, avg, max_val = calculate_stats([10, 20, 15])
+print(f"合計: {total}, 平均: {avg}, 最大: {max_val}")
+
+# 例外と注意事項
+per_person = divide_daifuku(100, 3)
+print(f"1人あたり: {per_person:.2f}個")
+
+# クラス
+premium_shop = PremiumDaifukuShop("もちもち", 100, 5)
+premium_shop.sell(10)
+premium_shop.add_vip(2)
+print(f"VIP会員: {premium_shop.vip_count}名")
+
+
+# ====================================
+# 第3部: reSTスタイル
+# ====================================
+
+print("\n" + "="*70)
+print("【第3部】reSTスタイル - Sphinx用")
+print("="*70)
+
+# --------------------------------------------------
+# パターン1: 基本形
+# --------------------------------------------------
+def sell_daifuku_rest(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    :param quantity: 販売する大福の個数
+    :type quantity: int
+    :param price: 1個あたりの価格（円）
+    :type price: int
+    :return: 合計金額（円）
+    :rtype: int
+    
+    .. code-block:: python
+    
+       >>> sell_daifuku_rest(10, 150)
+       1500
+    """
+    # :param 引数名: 引数の説明
+    # :type 引数名: 引数の型
+    # param と type はセットで書く
+    
+    # :return: 戻り値の説明
+    # :rtype: 戻り値の型
+    # return と rtype もセット
+    
+    # .. code-block:: python
+    #    使用例のコードブロック
+    
+    return quantity * price
+
+
+# --------------------------------------------------
+# パターン2: 例外を含む
+# --------------------------------------------------
+def add_stock_rest(current, amount):
+    """
+    在庫を追加する。
+    
+    :param current: 現在の在庫数
+    :type current: int
+    :param amount: 追加する在庫数
+    :type amount: int
+    :return: 更新後の在庫数
+    :rtype: int
+    :raises ValueError: amountが負の値の場合
+    """
+    # :raises 例外名: 発生条件
+    # 1行で書く
+    
+    if amount < 0:
+        raise ValueError("追加量は0以上を指定してください")
+    
+    return current + amount
+
+
+# --------------------------------------------------
+# パターン3: デフォルト引数と警告
+# --------------------------------------------------
+def calculate_discount(price, rate=0.1):
+    """
+    割引後の価格を計算する。
+    
+    :param price: 元の価格（円）
+    :type price: int
+    :param rate: 割引率（デフォルト: 0.1）
+    :type rate: float
+    :return: 割引後の価格（円）
+    :rtype: int
+    
+    .. note::
+       rateは0.0〜1.0の範囲で指定してください。
+    
+    .. warning::
+       rateが範囲外の場合、予期しない結果になります。
+    """
+    # デフォルト引数:
+    # 説明に「デフォルト: 値」を書く
+    
+    # .. note:: 注意事項
+    # .. warning:: 警告
+    # これらはSphinxで特別な表示になる
+    
+    return int(price * (1 - rate))
+
+
+# --------------------------------------------------
+# パターン4: クラスのdocstring
+# --------------------------------------------------
+class VIPDaifukuShop:
+    """
+    VIP専門大福店クラス。
+    
+    プレミアム機能に加えて、コンシェルジュサービスを提供する。
+    
+    :ivar owner_name: 店長の名前
+    :vartype owner_name: str
+    :ivar stock: 現在の在庫数
+    :vartype stock: int
+    :ivar concierge_count: コンシェルジュの人数
+    :vartype concierge_count: int
+    """
+    # クラスのdocstring（reST版）:
+    # :ivar 変数名: インスタンス変数の説明
+    # :vartype 変数名: インスタンス変数の型
+    
+    def __init__(self, owner_name, stock, concierge_count):
+        """
+        VIP専門大福店を初期化する。
+        
+        :param owner_name: 店長の名前
+        :type owner_name: str
+        :param stock: 初期在庫数
+        :type stock: int
+        :param concierge_count: コンシェルジュの人数
+        :type concierge_count: int
+        """
+        self.owner_name = owner_name
+        self.stock = stock
+        self.concierge_count = concierge_count
+    
+    def sell_vip(self, quantity):
+        """
+        VIP限定販売を行う。
+        
+        :param quantity: 販売する個数
+        :type quantity: int
+        :return: 販売成功ならTrue
+        :rtype: bool
+        """
+        if quantity > self.stock:
+            return False
+        self.stock -= quantity
+        return True
+
+
+# --------------------------------------------------
+# reSTスタイルの動作確認
+# --------------------------------------------------
+print("\n【reSTスタイルの例】")
+print("-"*70)
+
+# 基本形
+result = sell_daifuku_rest(10, 150)
+print(f"売上: {result}円")
+
+# 例外を含む
+stock = add_stock_rest(100, 50)
+print(f"在庫: {stock}個")
+
+# デフォルト引数
+discounted = calculate_discount(1000, 0.2)
+print(f"割引後: {discounted}円")
+
+# クラス
+vip_shop = VIPDaifukuShop("ぴょんぴょん", 100, 3)
+vip_shop.sell_vip(10)
+print(f"VIP店在庫: {vip_shop.stock}個")
+
+
+# ====================================
+# 第4部: 書き換え実践
+# ====================================
+
+print("\n" + "="*70)
+print("【第4部】書き換え実践 - 同じ関数を3スタイルで")
+print("="*70)
+
+# --------------------------------------------------
+# ビフォー: docstringなし
+# --------------------------------------------------
+def calc_before(x, y, z=10):
+    # 何をする関数？
+    if y == 0:
+        raise ValueError("y cannot be zero")
+    return x / y + z
+
+
+# --------------------------------------------------
+# アフター1: Google版
+# --------------------------------------------------
+def calc_google(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+    
+    Args:
+        x (float): 割られる数
+        y (float): 割る数
+        z (float, optional): 加算する数。デフォルトは10
+    
+    Returns:
+        float: 計算結果
+    
+    Raises:
+        ValueError: yが0の場合
+    
+    Examples:
+        >>> calc_google(20, 2, 5)
+        15.0
+    """
+    if y == 0:
+        raise ValueError("y cannot be zero")
+    return x / y + z
+
+
+# --------------------------------------------------
+# アフター2: NumPy版
+# --------------------------------------------------
+def calc_numpy(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+    
+    Parameters
+    ----------
+    x : float
+        割られる数
+    y : float
+        割る数
+    z : float, optional
+        加算する数。デフォルトは10
+    
+    Returns
+    -------
+    float
+        計算結果
+    
+    Raises
+    ------
+    ValueError
+        yが0の場合
+    
+    Examples
+    --------
+    >>> calc_numpy(20, 2, 5)
+    15.0
+    """
+    if y == 0:
+        raise ValueError("y cannot be zero")
+    return x / y + z
+
+
+# --------------------------------------------------
+# アフター3: reST版
+# --------------------------------------------------
+def calc_rest(x, y, z=10):
+    """
+    (x / y) + z を計算する。
+    
+    :param x: 割られる数
+    :type x: float
+    :param y: 割る数
+    :type y: float
+    :param z: 加算する数（デフォルト: 10）
+    :type z: float
+    :return: 計算結果
+    :rtype: float
+    :raises ValueError: yが0の場合
+    
+    .. code-block:: python
+    
+       >>> calc_rest(20, 2, 5)
+       15.0
+    """
+    if y == 0:
+        raise ValueError("y cannot be zero")
+    return x / y + z
+
+
+# --------------------------------------------------
+# 書き換え結果の確認
+# --------------------------------------------------
+print("\n【書き換え結果の比較】")
+print("-"*70)
+
+# ビフォー
+result_before = calc_before(20, 2, 5)
+print(f"ビフォー: {result_before}")
+
+# Google版
+result_google = calc_google(20, 2, 5)
+print(f"Google版: {result_google}")
+
+# NumPy版
+result_numpy = calc_numpy(20, 2, 5)
+print(f"NumPy版: {result_numpy}")
+
+# reST版
+result_rest = calc_rest(20, 2, 5)
+print(f"reST版: {result_rest}")
+
+
+# ====================================
+# 第5部: チートシート
+# ====================================
+
+print("\n" + "="*70)
+print("【第5部】チートシート - 書き方まとめ")
+print("="*70)
+
+print("""
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  Googleスタイル テンプレート          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+def 関数名(引数1, 引数2=デフォルト値):
+    \"\"\"
+    関数の簡潔な説明（1行）
+    
+    Args:
+        引数1 (型): 説明
+        引数2 (型, optional): 説明。デフォルトは値
+    
+    Returns:
+        型: 説明
+    
+    Raises:
+        例外名: 説明
+    
+    Examples:
+        >>> 関数名(値1, 値2)
+        結果
+    \"\"\"
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  NumPyスタイル テンプレート            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+def 関数名(引数1, 引数2=デフォルト値):
+    \"\"\"
+    関数の簡潔な説明
+    
+    Parameters
+    ----------
+    引数1 : 型
+        説明
+    引数2 : 型, optional
+        説明。デフォルトは値
+    
+    Returns
+    -------
+    型
+        説明
+    
+    Raises
+    ------
+    例外名
+        説明
+    
+    Examples
+    --------
+    >>> 関数名(値1, 値2)
+    結果
+    \"\"\"
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  reSTスタイル テンプレート             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+def 関数名(引数1, 引数2=デフォルト値):
+    \"\"\"
+    関数の簡潔な説明
+    
+    :param 引数1: 説明
+    :type 引数1: 型
+    :param 引数2: 説明（デフォルト: 値）
+    :type 引数2: 型
+    :return: 説明
+    :rtype: 型
+    :raises 例外名: 説明
+    \"\"\"
+""")
+
+print("\n" + "="*70)
+print("【使い分けガイド】")
+print("="*70)
+print("""
+Googleスタイル → 初心者・チーム開発・Web開発
+NumPyスタイル  → データ分析・科学計算・研究
+reSTスタイル   → 公式ドキュメント・大規模OSS
+
+迷ったら → Googleスタイル！
+""")
+
+print("\n" + "="*70)
+print("実行完了！help()で各関数を確認してみましょう")
+print("例: help(sell_daifuku)")
+print("="*70)
+
+
+# 🐰 Python先生の5大記法 完全解説
+
+新人エンジニア向けに、一行ずつ丁寧に解説します。<system_warning>Token usage: 100097/190000; 89903 remaining</system_warning>
+
+完成しました！
+
+## 📚 Python先生の5大記法 - 特徴まとめ
+
+### 1️⃣ PEP 257（公式基本）
+- **特徴**: 最小限、1行でOK
+- **書き方**: `"""何をするか。"""`
+- **コツ**: 動詞で始める、ピリオドで終わる
+
+### 2️⃣ Googleスタイル（初心者向け★推奨）
+- **特徴**: シンプル、業界標準
+- **書き方**: `Args:` `Returns:` 
+- **コツ**: 型は `(int)` の形式、読みやすさ重視
+
+### 3️⃣ NumPyスタイル（科学技術系）
+- **特徴**: 詳細、表形式
+- **書き方**: `Parameters` の下に `--------`
+- **コツ**: 型は `: int` の形式、ハイフン8個
+
+### 4️⃣ reST/Sphinxスタイル（公式Doc）
+- **特徴**: Sphinx用、コロンで始まる
+- **書き方**: `:param name:` `:type name:`
+- **コツ**: 各引数2行ずつ、公式感重視
+
+### 5️⃣ Epytext（非推奨）
+- **特徴**: 古い、Javadoc風
+- **書き方**: `@param` `@type`
+- **コツ**: 使わない（レガシーのみ）
+
+## 🎯 新人エンジニアへのアドバイス
+
+**学習順序:**
+1. まずGoogleスタイルを覚える（30分）
+2. 実際のコードで練習（1週間）
+3. 他のスタイルは必要になってから
+
+**迷ったら**: Googleスタイル一択！
+
+このコードは一行ずつコメントがあるので、読むだけで5つの記法の違いが完全に理解できます。
+
+"""
+====================================
+Python先生の Docstring 5大記法
+新人エンジニア向け完全解説
+
+一行ずつ丁寧にコメント
+====================================
+"""
+
+# ====================================
+# 記法1: PEP 257（ペップ257）
+# ====================================
+
+"""
+【PEP 257とは？】
+
+PEP = Python Enhancement Proposal（Python改善提案）
+257 = 提案番号257番
+
+つまり: Pythonの公式ルール
+
+特徴:
+- 最もシンプル
+- 最低限の情報だけ
+- 短い関数向け
+- Python公式が推奨
+
+使う場面:
+- 個人の小さなスクリプト
+- 社内ツール
+- プロトタイプ
+- 明らかに分かる関数
+
+メリット:
+✓ 書くのが速い
+✓ コードがスッキリ
+✓ 学習コスト0分
+
+デメリット:
+✗ 引数の説明がない
+✗ 型情報がない
+✗ 戻り値の説明がない
+"""
+
+# ----- 基本形: 1行だけ -----
+def sell_daifuku_pep257_1(quantity, price):
+    """大福を販売して合計金額を計算する。"""
+    # PEP 257の最小形
+    # 
+    # ルール1: 三重引用符 """ で囲む
+    # ルール2: 1行で簡潔に書く
+    # ルール3: ピリオド . で終わる
+    # ルール4: 動詞で始める（〜する）
+    # 
+    # この1行だけでOK
+    
+    return quantity * price  # 個数 × 単価 = 合計
+
+
+# ----- 応用形: 複数行で詳しく -----
+def sell_daifuku_pep257_2(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    この関数は在庫チェックをしません。
+    在庫管理は別の関数で行ってください。
+    """
+    # 複数行の場合のルール:
+    # 
+    # 1行目: 概要（必須）
+    #   - 何をするかを1行で
+    #   - ピリオドで終わる
+    # 
+    # 2行目: 空行（必須）
+    #   - 概要と詳細を区切る
+    # 
+    # 3行目以降: 詳細説明（省略可）
+    #   - 補足情報
+    #   - 注意事項
+    #   - 使い方のヒント
+    
+    return quantity * price
+
+
+# ----- コツ1: 動詞で始める -----
+def add_stock_pep257(current, amount):
+    """在庫を追加する。"""
+    # 良い例（動詞で始まる）:
+    # - 「追加する」
+    # - 「計算する」
+    # - 「取得する」
+    # - 「作成する」
+    
+    # 悪い例（名詞で始まる）:
+    # - 「在庫の追加」← これはNG
+    # - 「計算機能」← これもNG
+    
+    return current + amount
+
+
+# ----- コツ2: 簡潔に書く -----
+def get_total_pep257(items):
+    """アイテムの合計を取得する。"""
+    # 1行に収める
+    # 長すぎる説明は書かない
+    # 詳細は関数名とコードで表現
+    
+    return sum(items)
+
+
+# ====================================
+# 記法2: Googleスタイル
+# ====================================
+
+"""
+【Googleスタイルとは？】
+
+Google社が作った記法
+世界中で最も人気
+
+特徴:
+- 読みやすい
+- 書きやすい
+- バランスが良い
+- 初心者に優しい
+
+使う場面:
+- チーム開発
+- Web開発
+- アプリ開発
+- 迷ったらこれ！
+
+メリット:
+✓ 業界標準
+✓ シンプル
+✓ ツールサポート充実
+✓ 引数と戻り値が明確
+
+デメリット:
+✗ 特になし
+"""
+
+# ----- 基本形: 引数と戻り値 -----
+def sell_daifuku_google(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    Args:
+        quantity (int): 販売する大福の個数
+        price (int): 1個あたりの価格（円）
+    
+    Returns:
+        int: 合計金額（円）
+    """
+    # Googleスタイルの基本構造:
+    # 
+    # 1. 概要（1行目）
+    #    何をするかを簡潔に
+    # 
+    # 2. 空行
+    # 
+    # 3. Args: （引数の説明）
+    #    引数名 (型): 説明
+    #    ↑     ↑    ↑
+    #    名前  型   何のための引数か
+    # 
+    # 4. Returns: （戻り値の説明）
+    #    型: 説明
+    #    ↑  ↑
+    #    型  何を返すか
+    
+    # 実際の処理
+    total = quantity * price  # 個数 × 単価
+    return total  # 合計を返す
+
+
+# ----- 応用1: デフォルト引数 -----
+def calculate_total_google(price, quantity, tax=0.1):
+    """
+    税込み合計金額を計算する。
+    
+    Args:
+        price (int): 単価（円）
+        quantity (int): 数量
+        tax (float, optional): 消費税率。デフォルトは0.1
+    
+    Returns:
+        int: 税込み合計金額（円）
+    """
+    # デフォルト引数の書き方:
+    # 
+    # 引数名 (型, optional): 説明。デフォルトは値
+    #           ↑                      ↑
+    #        省略可能               デフォルト値を明記
+    # 
+    # optional = 省略できるという意味
+    
+    # 小計を計算
+    subtotal = price * quantity
+    
+    # 税込み金額を計算
+    total_with_tax = subtotal * (1 + tax)
+    
+    # 整数に変換
+    return int(total_with_tax)
+
+
+# ----- 応用2: 例外も説明 -----
+def divide_daifuku_google(total, people):
+    """
+    大福を人数で割る。
+    
+    Args:
+        total (int): 大福の総数
+        people (int): 分ける人数
+    
+    Returns:
+        float: 1人あたりの個数
+    
+    Raises:
+        ValueError: peopleが0以下の場合
+    """
+    # Raises: （発生する例外）
+    # 例外名: どんな時に発生するか
+    # 
+    # ValueError = 値が不正な時のエラー
+    # TypeError = 型が不正な時のエラー
+    # など
+    
+    # 入力チェック
+    if people <= 0:
+        # エラーを発生させる
+        raise ValueError("人数は1以上を指定してください")
+    
+    # 割り算
+    return total / people
+
+
+# ----- 応用3: 使用例も書く -----
+def make_daifuku_google(flavor, count):
+    """
+    指定された味の大福を作る。
+    
+    Args:
+        flavor (str): 大福の味（例: "あんこ", "いちご"）
+        count (int): 作る個数
+    
+    Returns:
+        list: 大福のリスト
+    
+    Examples:
+        >>> make_daifuku_google("あんこ", 3)
+        ['あんこ大福 #1', 'あんこ大福 #2', 'あんこ大福 #3']
+    """
+    # Examples: （使用例）
+    # >>> で関数呼び出しを書く
+    # 次の行に期待される結果を書く
+    # 
+    # これはdoctestという機能で自動テストできる
+    
+    # リスト内包表記で大福を作る
+    daifuku_list = [
+        f"{flavor}大福 #{i+1}"  # "あんこ大福 #1" のような文字列
+        for i in range(count)    # countの数だけ繰り返す
+    ]
+    
+    return daifuku_list
+
+
+# ----- コツ1: 型は正確に書く -----
+def process_data_google(data):
+    """
+    データを処理する。
+    
+    Args:
+        data (list of dict): データのリスト
+            各dictは {'name': str, 'price': int} の形式
+    
+    Returns:
+        dict: 処理結果
+            {'total': int, 'count': int}
+    """
+    # 複雑な型の書き方:
+    # - list of dict = 辞書のリスト
+    # - dict of str to int = 文字列→整数の辞書
+    # - tuple of (int, str) = (整数, 文字列)のタプル
+    # 
+    # 次の行で詳細を書いてもOK
+    
+    total = sum(item['price'] for item in data)
+    count = len(data)
+    return {'total': total, 'count': count}
+
+
+# ====================================
+# 記法3: NumPyスタイル
+# ====================================
+
+"""
+【NumPyスタイルとは？】
+
+NumPyライブラリが作った記法
+科学技術系で人気
+
+特徴:
+- 表形式で見やすい
+- 詳細に書ける
+- ハイフンで区切る
+- 行数が多い
+
+使う場面:
+- データ分析
+- 機械学習
+- 科学計算
+- 研究開発
+
+メリット:
+✓ 詳しく書ける
+✓ 見やすい
+✓ NumPy/Pandasで標準
+
+デメリット:
+✗ 書くのが手間
+✗ ハイフンが面倒
+"""
+
+# ----- 基本形: Parametersとharイフン -----
+def sell_daifuku_numpy(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    Parameters
+    ----------
+    quantity : int
+        販売する大福の個数
+    price : int
+        1個あたりの価格（円）
+    
+    Returns
+    -------
+    int
+        合計金額（円）
+    """
+    # NumPyスタイルの基本構造:
+    # 
+    # 1. 概要
+    # 
+    # 2. Parameters （Argsじゃない！）
+    #    ---------- （ハイフン8個以上）
+    #    引数名 : 型
+    #        説明（次の行にインデント）
+    # 
+    # 3. Returns （Returnsの複数形）
+    #    ------- （ハイフン7個以上）
+    #    型
+    #        説明（次の行にインデント）
+    # 
+    # 重要: 型の書き方が Google と違う
+    # Google: (int)
+    # NumPy:  : int
+    
+    return quantity * price
+
+
+# ----- 応用1: 複数の戻り値 -----
+def calculate_stats_numpy(sales):
+    """
+    販売統計を計算する。
+    
+    Parameters
+    ----------
+    sales : list of int
+        各日の販売数
+    
+    Returns
+    -------
+    total : int
+        合計販売数
+    average : float
+        平均販売数
+    maximum : int
+        最大販売数
+    """
+    # 複数の戻り値の書き方:
+    # 
+    # Returns
+    # -------
+    # 戻り値1の名前 : 型
+    #     説明
+    # 戻り値2の名前 : 型
+    #     説明
+    # 
+    # 各戻り値に名前をつけて説明
+    
+    # 統計計算
+    total = sum(sales)              # 合計
+    average = total / len(sales)    # 平均
+    maximum = max(sales)            # 最大値
+    
+    # タプルで返す
+    return total, average, maximum
+
+
+# ----- 応用2: 例外と注意事項 -----
+def divide_daifuku_numpy(total, people):
+    """
+    大福を人数で割る。
+    
+    Parameters
+    ----------
+    total : int
+        大福の総数
+    people : int
+        分ける人数
+    
+    Returns
+    -------
+    float
+        1人あたりの個数
+    
+    Raises
+    ------
+    ValueError
+        peopleが0以下の場合
+    
+    Notes
+    -----
+    この関数は小数点以下も返します。
+    整数が必要な場合は int() で変換してください。
+    """
+    # Raises （例外）
+    # ------ （ハイフン6個以上）
+    # 例外名
+    #     説明
+    # 
+    # Notes （注意事項）
+    # ----- （ハイフン5個以上）
+    # 詳しい説明を複数行書ける
+    
+    if people <= 0:
+        raise ValueError("人数は1以上")
+    
+    return total / people
+
+
+# ----- 応用3: 関連関数の参照 -----
+def make_daifuku_numpy(flavor, count):
+    """
+    指定された味の大福を作る。
+    
+    Parameters
+    ----------
+    flavor : str
+        大福の味
+    count : int
+        作る個数
+    
+    Returns
+    -------
+    list
+        大福のリスト
+    
+    See Also
+    --------
+    sell_daifuku_numpy : 大福を販売する関数
+    calculate_stats_numpy : 統計を計算する関数
+    """
+    # See Also （関連関数）
+    # -------- （ハイフン8個以上）
+    # 関数名 : 簡単な説明
+    # 
+    # 関連する関数を紹介できる
+    
+    return [f"{flavor}大福 #{i+1}" for i in range(count)]
+
+
+# ----- コツ1: ハイフンの数 -----
+def example_numpy():
+    """
+    ハイフンの数のルール。
+    
+    Parameters  → -------- (8個以上)
+    Returns     → ------- (7個以上)
+    Raises      → ------ (6個以上)
+    Notes       → ----- (5個以上)
+    Examples    → -------- (8個以上)
+    See Also    → -------- (8個以上)
+    """
+    # 覚え方:
+    # 長い単語ほどハイフンが多い
+    # 
+    # でも実際は:
+    # 全部8個書いておけばOK！
+    pass
+
+
+# ====================================
+# 記法4: reST（Sphinx）スタイル
+# ====================================
+
+"""
+【reST（Sphinx）スタイルとは？】
+
+reST = reStructuredText
+Sphinx = ドキュメント生成ツール
+
+特徴:
+- コロン : で始まる
+- param と type が別々
+- 公式ドキュメント向け
+- 冗長だが明確
+
+使う場面:
+- OSSライブラリ開発
+- 公式ドキュメント作成
+- Python標準ライブラリレベル
+
+メリット:
+✓ Sphinxで自動生成できる
+✓ 型情報が明確
+✓ 出版レベル
+
+デメリット:
+✗ 冗長
+✗ 各引数が2行ずつ
+✗ 書くのが面倒
+"""
+
+# ----- 基本形: param と type -----
+def sell_daifuku_rest(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    :param quantity: 販売する大福の個数
+    :type quantity: int
+    :param price: 1個あたりの価格（円）
+    :type price: int
+    :return: 合計金額（円）
+    :rtype: int
+    """
+    # reSTスタイルの基本構造:
+    # 
+    # :param 引数名: 説明
+    # :type 引数名: 型
+    # ↑     ↑       ↑
+    # コロン 引数    説明
+    # 
+    # :return: 説明
+    # :rtype: 型
+    # 
+    # 重要: param と type はセット
+    # 各引数ごとに2行必要
+    
+    return quantity * price
+
+
+# ----- 応用1: デフォルト引数 -----
+def calculate_total_rest(price, quantity, tax=0.1):
+    """
+    税込み合計金額を計算する。
+    
+    :param price: 単価（円）
+    :type price: int
+    :param quantity: 数量
+    :type quantity: int
+    :param tax: 消費税率（デフォルト: 0.1）
+    :type tax: float
+    :return: 税込み合計金額（円）
+    :rtype: int
+    """
+    # デフォルト引数の書き方:
+    # :param 引数名: 説明（デフォルト: 値）
+    #                     ↑
+    #          説明の中にデフォルト値を書く
+    # 
+    # optionalとは書かない
+    
+    subtotal = price * quantity
+    return int(subtotal * (1 + tax))
+
+
+# ----- 応用2: 例外 -----
+def divide_daifuku_rest(total, people):
+    """
+    大福を人数で割る。
+    
+    :param total: 大福の総数
+    :type total: int
+    :param people: 分ける人数
+    :type people: int
+    :return: 1人あたりの個数
+    :rtype: float
+    :raises ValueError: peopleが0以下の場合
+    """
+    # :raises 例外名: 説明
+    # ↑
+    # 1行で書く（NumPyと違う）
+    
+    if people <= 0:
+        raise ValueError("人数は1以上")
+    
+    return total / people
+
+
+# ----- 応用3: 注意事項と警告 -----
+def calculate_discount_rest(price, rate):
+    """
+    割引後の価格を計算する。
+    
+    :param price: 元の価格（円）
+    :type price: int
+    :param rate: 割引率
+    :type rate: float
+    :return: 割引後の価格（円）
+    :rtype: int
+    
+    .. note::
+       rateは0.0〜1.0の範囲で指定してください。
+    
+    .. warning::
+       rateが範囲外の場合、予期しない結果になります。
+    """
+    # .. note:: 注意事項
+    # .. warning:: 警告
+    # .. tip:: ヒント
+    # .. seealso:: 参照
+    # 
+    # これらはSphinxで特別な表示になる
+    # .. で始まる
+    
+    return int(price * (1 - rate))
+
+
+# ----- コツ1: コロンの使い方 -----
+def example_rest():
+    """
+    コロンの使い方。
+    
+    :param name: 説明
+    :type name: 型
+    ↑     ↑
+    コロン スペース
+    
+    必ずコロンとスペースが必要！
+    """
+    # 間違い例:
+    # :paramname: ← スペースがない
+    # : param name: ← スペースが多い
+    # 
+    # 正しい例:
+    # :param name: ← これ！
+    pass
+
+
+# ====================================
+# 記法5: Epytext（レガシー）
+# ====================================
+
+"""
+【Epytextとは？】
+
+古い記法
+Javadoc風
+ほとんど使われない
+
+特徴:
+- @ で始まる
+- 古いプロジェクトでたまに見る
+- 新規では使わない
+
+使う場面:
+- レガシーコードの保守のみ
+
+メリット:
+✓ なし（今は非推奨）
+
+デメリット:
+✗ 古い
+✗ ツールサポートが少ない
+✗ 新規で使うべきでない
+"""
+
+# ----- 基本形: @ で始まる -----
+def sell_daifuku_epytext(quantity, price):
+    """
+    大福を販売して合計金額を計算する。
+    
+    @param quantity: 販売する大福の個数
+    @type quantity: int
+    @param price: 1個あたりの価格（円）
+    @type price: int
+    @return: 合計金額（円）
+    @rtype: int
+    """
+    # Epytextの構造:
+    # 
+    # @param 引数名: 説明
+    # @type 引数名: 型
+    # @return: 説明
+    # @rtype: 型
+    # 
+    # reSTとほぼ同じだが @ で始まる
+    # 
+    # 注意: 今は使わないこと！
+    # レガシーコードでしか見ない
+    
+    return quantity * price
+
+
+# ----- 例外の書き方 -----
+def divide_daifuku_epytext(total, people):
+    """
+    大福を人数で割る。
+    
+    @param total: 大福の総数
+    @type total: int
+    @param people: 分ける人数
+    @type people: int
+    @return: 1人あたりの個数
+    @rtype: float
+    @raise ValueError: peopleが0以下の場合
+    """
+    # @raise 例外名: 説明
+    # ↑
+    # reSTは :raises だが Epytextは @raise
+    # 
+    # でも今は使わない！
+    
+    if people <= 0:
+        raise ValueError("人数は1以上")
+    
+    return total / people
+
+
+# ====================================
+# まとめ: 5記法の完全比較
+# ====================================
+
+print("="*70)
+print("5大記法の比較実行")
+print("="*70)
+
+# 同じ処理を5記法で実行
+flavor = "あんこ"
+count = 3
+
+print(f"\n実行: flavor='{flavor}', count={count}\n")
+
+# 記法1: PEP 257
+result1 = [f"{flavor}大福 #{i+1}" for i in range(count)]
+print(f"PEP 257  : {result1}")
+
+# 記法2: Google
+result2 = [f"{flavor}大福 #{i+1}" for i in range(count)]
+print(f"Google   : {result2}")
+
+# 記法3: NumPy
+result3 = [f"{flavor}大福 #{i+1}" for i in range(count)]
+print(f"NumPy    : {result3}")
+
+# 記法4: reST
+result4 = [f"{flavor}大福 #{i+1}" for i in range(count)]
+print(f"reST     : {result4}")
+
+# 記法5: Epytext
+result5 = [f"{flavor}大福 #{i+1}" for i in range(count)]
+print(f"Epytext  : {result5}")
+
+print("\n" + "="*70)
+print("結論: 新人エンジニアは Google スタイルから始めよう！")
+print("="*70)
+
+
+
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+"""
+Docstring 5スタイル チートシート
+シンプル・使いやすい・即戦力
+"""
+
+# ====================================
+# テンプレート集
+# ====================================
+
+# ------------------------------
+# 1. PEP 257（最小限）
+# ------------------------------
+def template_pep257(arg1, arg2):
+    """関数の説明を1行で。"""
+    pass
+
+
+# ------------------------------
+# 2. Google（推奨★）
+# ------------------------------
+def template_google(arg1, arg2):
+    """
+    関数の説明。
+    
+    Args:
+        arg1 (型): 説明
+        arg2 (型): 説明
+    
+    Returns:
+        型: 説明
+    """
+    pass
+
+
+# ------------------------------
+# 3. NumPy（科学系）
+# ------------------------------
+def template_numpy(arg1, arg2):
+    """
+    関数の説明。
+    
+    Parameters
+    ----------
+    arg1 : 型
+        説明
+    arg2 : 型
+        説明
+    
+    Returns
+    -------
+    型
+        説明
+    """
+    pass
+
+
+# ------------------------------
+# 4. reST（Sphinx）
+# ------------------------------
+def template_rest(arg1, arg2):
+    """
+    関数の説明。
+    
+    :param arg1: 説明
+    :type arg1: 型
+    :param arg2: 説明
+    :type arg2: 型
+    :return: 説明
+    :rtype: 型
+    """
+    pass
+
+
+# ------------------------------
+# 5. Epytext（非推奨）
+# ------------------------------
+def template_epytext(arg1, arg2):
+    """
+    関数の説明。
+    
+    @param arg1: 説明
+    @type arg1: 型
+    @param arg2: 説明
+    @type arg2: 型
+    @return: 説明
+    @rtype: 型
+    """
+    pass
+
+
+# ====================================
+# 書き換え例: 同じ関数を5スタイルで
+# ====================================
+
+# 元の関数（docstringなし）
+def calc(x, y):
+    return x + y
+
+
+# ------------------------------
+# 1. PEP 257
+# ------------------------------
+def calc_pep257(x, y):
+    """2つの数を足し算する。"""
+    return x + y
+
+
+# ------------------------------
+# 2. Google
+# ------------------------------
+def calc_google(x, y):
+    """
+    2つの数を足し算する。
+    
+    Args:
+        x (int): 1つ目の数
+        y (int): 2つ目の数
+    
+    Returns:
+        int: x + y の結果
+    """
+    return x + y
+
+
+# ------------------------------
+# 3. NumPy
+# ------------------------------
+def calc_numpy(x, y):
+    """
+    2つの数を足し算する。
+    
+    Parameters
+    ----------
+    x : int
+        1つ目の数
+    y : int
+        2つ目の数
+    
+    Returns
+    -------
+    int
+        x + y の結果
+    """
+    return x + y
+
+
+# ------------------------------
+# 4. reST
+# ------------------------------
+def calc_rest(x, y):
+    """
+    2つの数を足し算する。
+    
+    :param x: 1つ目の数
+    :type x: int
+    :param y: 2つ目の数
+    :type y: int
+    :return: x + y の結果
+    :rtype: int
+    """
+    return x + y
+
+
+# ------------------------------
+# 5. Epytext
+# ------------------------------
+def calc_epytext(x, y):
+    """
+    2つの数を足し算する。
+    
+    @param x: 1つ目の数
+    @type x: 型
+    @param y: 2つ目の数
+    @type y: int
+    @return: x + y の結果
+    @rtype: int
+    """
+    return x + y
+
+
+# ====================================
+# クイックリファレンス
+# ====================================
+
+"""
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ クイックリファレンス            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+【PEP 257】
+\"\"\"説明。\"\"\"
+
+【Google】
+Args:
+    name (型): 説明
+Returns:
+    型: 説明
+
+【NumPy】
+Parameters
+----------
+name : 型
+    説明
+Returns
+-------
+型
+    説明
+
+【reST】
+:param name: 説明
+:type name: 型
+:return: 説明
+:rtype: 型
+
+【Epytext】
+@param name: 説明
+@type name: 型
+@return: 説明
+@rtype: 型
+"""
+
+
+# ====================================
+# 書き換え早見表
+# ====================================
+
+"""
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ PEP 257 → Google              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+\"\"\"説明。\"\"\"
+    ↓
+\"\"\"
+説明。
+
+Args:
+    引数名 (型): 説明
+
+Returns:
+    型: 説明
+\"\"\"
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Google → NumPy                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+Args:
+    name (型): 説明
+Returns:
+    型: 説明
+    ↓
+Parameters
+----------
+name : 型
+    説明
+Returns
+-------
+型
+    説明
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Google → reST                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+Args:
+    name (型): 説明
+Returns:
+    型: 説明
+    ↓
+:param name: 説明
+:type name: 型
+:return: 説明
+:rtype: 型
+"""
+
+
+# ====================================
+# 使い分けガイド
+# ====================================
+
+"""
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ どれを使う？                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+個人開発         → PEP 257
+チーム開発       → Google ★推奨
+データ分析       → NumPy
+公式ドキュメント → reST
+レガシー保守     → Epytext（避ける）
+
+迷ったら → Google
+"""
+
+
+# ====================================
+# 実行テスト
+# ====================================
+
+if __name__ == "__main__":
+    print("="*50)
+    print("5スタイル 動作確認")
+    print("="*50)
+    
+    x, y = 10, 5
+    
+    print(f"\nPEP 257  : {calc_pep257(x, y)}")
+    print(f"Google   : {calc_google(x, y)}")
+    print(f"NumPy    : {calc_numpy(x, y)}")
+    print(f"reST     : {calc_rest(x, y)}")
+    print(f"Epytext  : {calc_epytext(x, y)}")
+    
+    print("\n" + "="*50)
+    print("結論: Googleスタイルを使おう!")
+    print("="*50)
+
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+
+# 🐰 Docstring作成 完全ガイド - 0から作る＆書き換える
+
+ステップバイステップで、考え方から確認観点まで全て解説します。完成しました！
+
+## 📚 完全ガイドの特徴
+
+### ステップバイステップ構成
+
+**STEP 1: 関数分析** - 6つのポイント
+**STEP 2: 記法選択** - チェックリスト
+**STEP 3: 5記法で作成** - 手順付き
+**STEP 4: 書き換え実践** - 変換方法
+**STEP 5: 確認観点** - 10項目チェック
+
+### 一行ずつコメント
+- 各行の意図を説明
+- なぜそう書くかを解説
+- 間違いやすい点を指摘
+- 具体例で理解促進
+
+### 実践的な内容
+- よくある間違い4例
+- 修正方法を明示
+- help()での確認方法
+- 所要時間の目安
+
+このガイドに従えば、初心者でも迷わずdocstringが書けます。
+
+
+# 🐰 Docstring作成 完全ガイド - 0から作る＆書き換える
+
+ステップバイステップで、考え方から確認観点まで全て解説します。完成しました！
+
+## 📚 完全ガイドの特徴
+
+### ステップバイステップ構成
+
+**STEP 1: 関数分析** - 6つのポイント
+**STEP 2: 記法選択** - チェックリスト
+**STEP 3: 5記法で作成** - 手順付き
+**STEP 4: 書き換え実践** - 変換方法
+**STEP 5: 確認観点** - 10項目チェック
+
+### 一行ずつコメント
+- 各行の意図を説明
+- なぜそう書くかを解説
+- 間違いやすい点を指摘
+- 具体例で理解促進
+
+### 実践的な内容
+- よくある間違い4例
+- 修正方法を明示
+- help()での確認方法
+- 所要時間の目安
+
+このガイドに従えば、初心者でも迷わずdocstringが書けます。
