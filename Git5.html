@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git ローカル環境 実践テクニック集</title>
+    <style>
+        body {
+            font-family: "Yu Gothic", "Meiryo", sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .sheet-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #9b59b6;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h3 {
+            color: #34495e;
+            border-left: 4px solid #9b59b6;
+            padding-left: 10px;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+        }
+        th {
+            background: #9b59b6;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #8e44ad;
+        }
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #f4ecf7;
+        }
+        .step-number {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        code {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #c7254e;
+            font-size: 13px;
+        }
+        .command-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: "Consolas", monospace;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+        .scenario {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .method-compare {
+            background: #fff9e6;
+            border: 2px solid #ffd700;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instruction">
+    <strong>📋 使い方:</strong> 下の表を選択して <code>Ctrl+C</code> でコピー → Excelに <code>Ctrl+V</code> で貼り付け！<br>
+    <strong>🎯 対象:</strong> ローカル環境での実践的なGit操作テクニック
+</div>
+
+<!-- シーン1: 一部の変更だけをPRに含める -->
+<div class="sheet-container">
+    <h2>📦 1. 一部の変更だけをPRに含める（部分的なコミット）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - <code>login.js</code> はレビュー準備完了<br>
+        - <code>config.js</code> は作業中で含めたくない<br>
+        - <code>.env.local</code> はローカル設定で絶対含めない
+    </div>
+
+    <h3>方法1: ファイル単位で選択的にコミット</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git status</code></td>
+                <td>変更ファイル一覧を確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git add login.js</code></td>
+                <td>PRに含めたいファイルのみステージング</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git status</code></td>
+                <td>緑字でlogin.jsのみステージング済みか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git commit -m "feat: ログイン機能を追加"</code></td>
+                <td>ステージング済みファイルのみコミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git push -u origin feature/login</code></td>
+                <td>プッシュしてPR作成</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git status
+modified:   login.js
+modified:   config.js
+modified:   .env.local
+
+$ git add login.js
+
+$ git status
+Changes to be committed:
+  modified:   login.js
+
+Changes not staged for commit:
+  modified:   config.js
+  modified:   .env.local
+
+$ git commit -m "feat: ログイン機能を追加"
+$ git push -u origin feature/login
+    </div>
+
+    <h3>方法2: 対話的ステージング（細かい制御）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git add -p login.js</code></td>
+                <td>ファイル内の一部だけステージング（対話モード）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>対話モードで選択</td>
+                <td>
+                    <strong>y</strong> = この変更を追加<br>
+                    <strong>n</strong> = この変更をスキップ<br>
+                    <strong>s</strong> = より小さい塊に分割<br>
+                    <strong>q</strong> = 終了
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git diff --cached</code></td>
+                <td>ステージング済み内容を確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git commit -m "feat: ログイン機能の一部を追加"</code></td>
+                <td>選択した部分のみコミット</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 VSCodeでも可能:</strong><br>
+        左側の「ソース管理」で、変更行の一部だけを右クリック → 「選択した行をステージ」
+    </div>
+
+    <h3>方法3: 作業中のファイルは stash で退避</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git add login.js</code></td>
+                <td>PR用ファイルをステージング</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git stash --keep-index</code></td>
+                <td>ステージング済み以外を退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git status</code></td>
+                <td>login.jsのみ残っているか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git commit -m "feat: ログイン機能を追加"</code></td>
+                <td>コミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git push -u origin feature/login</code></td>
+                <td>プッシュ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git stash pop</code></td>
+                <td>退避していた作業中ファイルを復元</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 注意:</strong> <code>.env.local</code> など絶対にコミットしたくないファイルは <code>.gitignore</code> に追加！
+    </div>
+</div>
+
+<!-- シーン2: 朝に最新のリポジトリをプル（基本） -->
+<div class="sheet-container">
+    <h2>🌅 2. 朝に最新のリポジトリをプルする（基本編）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        出勤したら、まずチームの最新コードを取得したい
+    </div>
+
+    <h3>パターン1: 作業中のファイルがない場合（シンプル）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git switch develop</code></td>
+                <td>developブランチに移動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git status</code></td>
+                <td>変更がないか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin develop</code></td>
+                <td>最新を取得してマージ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git log -5 --oneline</code></td>
+                <td>最新5件のコミットを確認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git switch develop
+$ git pull origin develop
+remote: Counting objects: 15, done.
+remote: Compressing objects: 100% (10/10), done.
+Updating 3f2a1b4..9c8e5d2
+Fast-forward
+ src/login.js | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+    </div>
+
+    <h3>パターン2: 安全に取得（確認してからマージ）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git fetch origin</code></td>
+                <td>リモートの情報を取得（マージはしない）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git log HEAD..origin/develop --oneline</code></td>
+                <td>リモートの新しいコミットを確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git diff HEAD origin/develop</code></td>
+                <td>差分を確認（必要に応じて）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git merge origin/develop</code></td>
+                <td>問題なければマージ</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="success">
+        <strong>✅ おすすめ:</strong> 慣れるまでは <code>fetch</code> → 確認 → <code>merge</code> の流れが安全！
+    </div>
+</div>
+
+<!-- シーン3: ローカル設定を保存したまま最新をプル -->
+<div class="sheet-container">
+    <h2>💾 3. ローカル設定を保存したまま最新をプル（実践編）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - 昨日の作業途中でPCをシャットダウン<br>
+        - 今朝、作業中のファイルがある状態で最新を取得したい<br>
+        - ローカルの <code>.env.local</code> や設定ファイルは保持したい
+    </div>
+
+    <h3>方法1: stash を使う（最も一般的）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git status</code></td>
+                <td>作業中のファイルを確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git stash save "朝の作業前退避"</code></td>
+                <td>作業中の変更を一時退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin develop</code></td>
+                <td>最新を取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git stash list</code></td>
+                <td>退避一覧を確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git stash pop</code></td>
+                <td>退避した変更を復元</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>競合があれば解決</td>
+                <td>VSCodeで差分を解決</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git status
+modified:   src/config.js
+modified:   .env.local
+
+$ git stash save "朝の作業前退避"
+Saved working directory and index state On develop: 朝の作業前退避
+
+$ git pull origin develop
+Updating 3f2a1b4..9c8e5d2
+Fast-forward
+ src/api.js | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+$ git stash pop
+Auto-merging src/config.js
+On branch develop
+Changes not staged for commit:
+  modified:   src/config.js
+  modified:   .env.local
+    </div>
+
+    <h3>方法2: WIP コミットを使う（記録を残したい場合）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git add .</code></td>
+                <td>全変更をステージング</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git commit -m "WIP: 作業中の一時保存"</code></td>
+                <td>作業中コミット作成</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git pull origin develop</code></td>
+                <td>最新を取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>作業を続行</td>
+                <td>そのまま開発継続</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>後でWIPコミットを取り消し（任意）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 WIP とは:</strong> Work In Progress（作業中）の略。まだ完成していない一時的なコミットに使用
+    </div>
+
+    <h3>方法3: .gitignore でローカル設定を除外（恒久的対策）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>ファイル</th>
+                <th>内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>.gitignore</code></td>
+                <td>
+                    <code>.env.local</code><br>
+                    <code>.env.development.local</code><br>
+                    <code>config/local.json</code><br>
+                    <code>*.local</code>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git add .gitignore</code></td>
+                <td>.gitignore をコミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git commit -m "chore: ローカル設定を除外"</code></td>
+                <td>チームで共有</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 既に追跡されているファイルの場合:</strong><br>
+        <code>git rm --cached .env.local</code> で追跡解除してから .gitignore に追加
+    </div>
+</div>
+
+<!-- シーン4: 作業ブランチで最新を取り込む -->
+<div class="sheet-container">
+    <h2>🔄 4. 作業ブランチで最新のdevelopを取り込む</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - feature/login ブランチで作業中<br>
+        - developに新しい変更が入った<br>
+        - 作業中の変更を保ちつつ、最新のdevelopを取り込みたい
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git status</code></td>
+                <td>作業ブランチの状態確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git add . && git commit -m "WIP: 一時保存"</code></td>
+                <td>作業中の内容をコミット（または stash）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git fetch origin</code></td>
+                <td>リモートの最新情報を取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git merge origin/develop</code></td>
+                <td>developの最新を現在のブランチにマージ</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td>競合があれば解決</td>
+                <td>VSCodeで差分解決 → add → commit</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>作業続行</td>
+                <td>最新のdevelopが取り込まれた状態で開発継続</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="method-compare">
+        <strong>🔀 merge vs rebase の比較:</strong>
+        <table style="margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th>方法</th>
+                    <th>コマンド</th>
+                    <th>特徴</th>
+                    <th>おすすめ度</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>merge</td>
+                    <td><code>git merge origin/develop</code></td>
+                    <td>
+                        ・マージコミットが残る<br>
+                        ・履歴がそのまま残る<br>
+                        ・安全で分かりやすい
+                    </td>
+                    <td>★★★（初心者推奨）</td>
+                </tr>
+                <tr>
+                    <td>rebase</td>
+                    <td><code>git rebase origin/develop</code></td>
+                    <td>
+                        ・履歴が直線的になる<br>
+                        ・きれいな履歴<br>
+                        ・競合解決が少し複雑
+                    </td>
+                    <td>★★☆（上級者向け）</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- シーン5: 毎朝のルーティン（完全版） -->
+<div class="sheet-container">
+    <h2>☕ 5. 毎朝のGitルーティン（完全版フロー）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        朝の出勤時、効率的に1日の作業を始めるためのチェックリスト
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>順序</th>
+                <th>操作</th>
+                <th>コマンド</th>
+                <th>目的</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td>作業中ブランチの状態確認</td>
+                <td><code>git status</code></td>
+                <td>昨日の作業状況把握</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>作業を一時保存</td>
+                <td><code>git stash save "朝のルーティン前"</code></td>
+                <td>変更を退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td>developに移動</td>
+                <td><code>git switch develop</code></td>
+                <td>メインブランチに移動</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>最新を取得</td>
+                <td><code>git pull origin develop</code></td>
+                <td>チームの最新コードを取得</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td>昨夜の更新を確認</td>
+                <td><code>git log --since="yesterday" --oneline</code></td>
+                <td>チームメンバーの変更確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td>作業ブランチに戻る</td>
+                <td><code>git switch feature/your-branch</code></td>
+                <td>昨日のブランチに戻る</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td>最新developを取り込む</td>
+                <td><code>git merge develop</code></td>
+                <td>ブランチを最新に更新</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td>作業を復元</td>
+                <td><code>git stash pop</code></td>
+                <td>退避した変更を戻す</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">9</span></td>
+                <td>テスト実行</td>
+                <td><code>npm test</code> など</td>
+                <td>マージ後の動作確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">10</span></td>
+                <td>作業開始</td>
+                <td>-</td>
+                <td>今日のタスク着手</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 一連のコマンド（コピペ用）
+git status
+git stash save "朝のルーティン前"
+git switch develop
+git pull origin develop
+git log --since="yesterday" --oneline
+git switch feature/your-branch
+git merge develop
+git stash pop
+npm test
+    </div>
+
+    <div class="success">
+        <strong>✅ 習慣化のコツ:</strong><br>
+        - 毎朝コーヒーを飲みながらこのルーティンを実行<br>
+        - Slackで「おはようございます！今日のタスク: 〇〇」と共有<br>
+        - カレンダーに「9:00 - Git更新」をリマインダー設定
+    </div>
+</div>
+
+<!-- シーン6: 複数の作業ブランチを管理 -->
+<div class="sheet-container">
+    <h2>🌿 6. 複数の作業ブランチを管理</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - feature/login で作業中<br>
+        - feature/dashboard も並行作業<br>
+        - bugfix/urgent も対応が必要<br>
+        それぞれの作業状態を保ちながら切り替えたい
+    </div>
+
+    <h3>方法1: ブランチごとに stash を使い分ける</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git stash save "login: 認証処理作業中"</code></td>
+                <td>現在の作業を名前付きで退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td><code>git switch feature/dashboard</code></td>
+                <td>別のブランチに切り替え</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git stash list</code></td>
+                <td>保存されている作業一覧を確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td>dashboard で作業</td>
+                <td>作業実施</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git stash save "dashboard: グラフ実装中"</code></td>
+                <td>dashboard の作業も退避</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">6</span></td>
+                <td><code>git switch feature/login</code></td>
+                <td>元のブランチに戻る</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">7</span></td>
+                <td><code>git stash list</code></td>
+                <td>どれを復元するか確認</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">8</span></td>
+                <td><code>git stash apply stash@{1}</code></td>
+                <td>特定の stash を復元（残す）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># stash の確認例
+$ git stash list
+stash@{0}: On feature/dashboard: dashboard: グラフ実装中
+stash@{1}: On feature/login: login: 認証処理作業中
+stash@{2}: On develop: 朝のルーティン前
+
+# 特定の stash を復元
+$ git stash apply stash@{1}
+    </div>
+
+    <h3>方法2: WIPコミットで管理（履歴に残す）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ブランチ</th>
+                <th>操作</th>
+                <th>メリット</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>feature/login</td>
+                <td><code>git commit -m "WIP: 認証処理実装中"</code></td>
+                <td>コミット履歴で進捗が見える</td>
+            </tr>
+            <tr>
+                <td>feature/dashboard</td>
+                <td><code>git commit -m "WIP: グラフコンポーネント作成中"</code></td>
+                <td>ブランチ切替が安全</td>
+            </tr>
+            <tr>
+                <td>復元時</td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>WIPコミットを取り消して作業継続</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 おすすめ:</strong> stash は一時的な退避、WIPコミットは長期的な作業保存に使い分ける
+    </div>
+
+    <h3>ブランチ間の移動一覧表</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>現在のブランチ</th>
+                <th>変更の状態</th>
+                <th>推奨操作</th>
+                <th>コマンド</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>feature/login</td>
+                <td>変更あり（未完成）</td>
+                <td>stash で退避</td>
+                <td><code>git stash save "login作業中"</code></td>
+            </tr>
+            <tr>
+                <td>feature/login</td>
+                <td>変更あり（区切り良い）</td>
+                <td>WIPコミット</td>
+                <td><code>git commit -m "WIP: ログイン機能"</code></td>
+            </tr>
+            <tr>
+                <td>feature/login</td>
+                <td>変更なし</td>
+                <td>そのまま切替</td>
+                <td><code>git switch feature/dashboard</code></td>
+            </tr>
+            <tr>
+                <td>feature/login</td>
+                <td>完成してPR準備OK</td>
+                <td>コミット＆プッシュ</td>
+                <td><code>git commit && git push</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン7: .gitignore の活用 -->
+<div class="sheet-container">
+    <h2>🚫 7. ローカル設定ファイルの完全除外（.gitignore活用）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - <code>.env.local</code> は絶対にコミットしたくない<br>
+        - <code>node_modules/</code> は容量が大きい<br>
+        - エディタ設定ファイルは個人用
+    </div>
+
+    <h3>.gitignore の基本設定</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>対象</th>
+                <th>.gitignore記述</th>
+                <th>理由</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>環境変数</td>
+                <td>
+                    <code>.env.local</code><br>
+                    <code>.env.*.local</code><br>
+                    <code>.env.development.local</code>
+                </td>
+                <td>APIキーなど機密情報を含む</td>
+            </tr>
+            <tr>
+                <td>依存関係</td>
+                <td>
+                    <code>node_modules/</code><br>
+                    <code>vendor/</code>
+                </td>
+                <td>容量が大きい、再生成可能</td>
+            </tr>
+            <tr>
+                <td>ビルド成果物</td>
+                <td>
+                    <code>dist/</code><br>
+                    <code>build/</code><br>
+                    <code>*.min.js</code>
+                </td>
+                <td>自動生成ファイル</td>
+            </tr>
+            <tr>
+                <td>エディタ設定</td>
+                <td>
+                    <code>.vscode/</code><br>
+                    <code>.idea/</code><br>
+                    <code>*.swp</code>
+                </td>
+                <td>個人の開発環境設定</td>
+            </tr>
+            <tr>
+                <td>OS生成ファイル</td>
+                <td>
+                    <code>.DS_Store</code><br>
+                    <code>Thumbs.db</code>
+                </td>
+                <td>OS自動生成ファイル</td>
+            </tr>
+            <tr>
+                <td>ログファイル</td>
+                <td>
+                    <code>*.log</code><br>
+                    <code>logs/</code>
+                </td>
+                <td>実行時生成ファイル</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>既に追跡されているファイルを除外する手順</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git rm --cached .env.local</code></td>
+                <td>Gitの追跡から除外（ファイルは残る）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>.gitignore に <code>.env.local</code> 追加</td>
+                <td>今後追跡しないように設定</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git add .gitignore</code></td>
+                <td>.gitignore の変更をステージング</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git commit -m "chore: .env.localを除外"</code></td>
+                <td>コミット</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># .gitignore の例（Node.jsプロジェクト）
+
+# 環境変数
+.env.local
+.env.*.local
+
+# 依存関係
+node_modules/
+
+# ビルド
+dist/
+build/
+*.min.js
+*.min.css
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ログ
+*.log
+logs/
+
+# テスト
+coverage/
+.nyc_output/
+    </div>
+
+    <div class="warning">
+        <strong>⚠️ 重要:</strong> APIキーやパスワードを含むファイルは必ず .gitignore に追加！<br>
+        誤ってコミットした場合は、すぐにキーを無効化して再発行してください。
+    </div>
+</div>
+
+<!-- シーン8: ローカル専用ブランチの管理 -->
+<div class="sheet-container">
+    <h2>🔒 8. ローカル専用ブランチの管理</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong><br>
+        - 実験的なコードを試したい<br>
+        - ローカルだけで保持したい設定がある<br>
+        - チームには共有しないブランチを作りたい
+    </div>
+
+    <h3>ローカル専用ブランチの作成と管理</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="step-number">1</span></td>
+                <td><code>git switch -c local/my-experiments</code></td>
+                <td>ローカル専用ブランチ作成（local/接頭辞推奨）</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">2</span></td>
+                <td>実験的なコードを追加</td>
+                <td>自由に試す</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">3</span></td>
+                <td><code>git add . && git commit -m "実験: 新しいアプローチ"</code></td>
+                <td>ローカルにコミット</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">4</span></td>
+                <td><code>git push</code> しない</td>
+                <td>リモートには送信しない</td>
+            </tr>
+            <tr>
+                <td><span class="step-number">5</span></td>
+                <td><code>git branch -a</code></td>
+                <td>ローカルブランチのみ表示されることを確認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>誤ってプッシュしそうになった時</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>状況</th>
+                <th>対処法</th>
+                <th>コマンド</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>まだプッシュしていない</td>
+                <td>そのまま放置でOK</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>誤ってプッシュした</td>
+                <td>リモートブランチを削除</td>
+                <td><code>git push origin --delete local/my-experiments</code></td>
+            </tr>
+            <tr>
+                <td>今後プッシュを防ぎたい</td>
+                <td>.git/config で設定</td>
+                <td>
+                    <code>[branch "local/my-experiments"]</code><br>
+                    <code>  remote = .</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 使用例:</strong><br>
+        - パフォーマンス改善の実験<br>
+        - 新しいライブラリの検証<br>
+        - ローカルのデバッグ用設定<br>
+        - 個人的なメモやTODOコメント
+    </div>
+</div>
+
+<!-- シーン9: チーム開発での朝のベストプラクティス -->
+<div class="sheet-container">
+    <h2>👥 9. チーム開発での朝のベストプラクティス</h2>
+    
+    <h3>パターン別：朝の最適なGitフロー</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>あなたの状況</th>
+                <th>推奨フロー</th>
+                <th>コマンド例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>昨日はPRをマージして終了</td>
+                <td>
+                    1. develop を pull<br>
+                    2. 新しいブランチ作成<br>
+                    3. 今日のタスク開始
+                </td>
+                <td>
+                    <code>git switch develop</code><br>
+                    <code>git pull origin develop</code><br>
+                    <code>git switch -c feature/new-task</code>
+                </td>
+            </tr>
+            <tr>
+                <td>昨日の作業が途中</td>
+                <td>
+                    1. 作業を stash<br>
+                    2. develop を pull<br>
+                    3. 作業ブランチに最新を取り込む<br>
+                    4. stash を復元
+                </td>
+                <td>
+                    <code>git stash</code><br>
+                    <code>git switch develop && git pull</code><br>
+                    <code>git switch - && git merge develop</code><br>
+                    <code>git stash pop</code>
+                </td>
+            </tr>
+            <tr>
+                <td>PR待ち（レビュー中）</td>
+                <td>
+                    1. develop を pull<br>
+                    2. 別の新しいタスク用ブランチ作成<br>
+                    3. レビュー対応は後で
+                </td>
+                <td>
+                    <code>git switch develop</code><br>
+                    <code>git pull origin develop</code><br>
+                    <code>git switch -c feature/another-task</code>
+                </td>
+            </tr>
+            <tr>
+                <td>複数ブランチで並行作業中</td>
+                <td>
+                    1. develop を pull<br>
+                    2. 全作業ブランチに最新を取り込む<br>
+                    3. 優先度の高いブランチから再開
+                </td>
+                <td>
+                    <code>git switch develop && git pull</code><br>
+                    各ブランチで <code>git merge develop</code><br>
+                    <code>git switch feature/priority-task</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>朝のコミュニケーション連携</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>タイミング</th>
+                <th>やること</th>
+                <th>目的</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Git pull 前</td>
+                <td>Slackで「おはようございます！」</td>
+                <td>チームに出勤を知らせる</td>
+            </tr>
+            <tr>
+                <td>Git pull 後</td>
+                <td><code>git log --since="yesterday"</code> でチームの更新確認</td>
+                <td>昨夜の変更を把握</td>
+            </tr>
+            <tr>
+                <td>作業開始前</td>
+                <td>Slackで「今日のタスク: 〇〇」</td>
+                <td>重複作業を防ぐ</td>
+            </tr>
+            <tr>
+                <td>ブランチ作成時</td>
+                <td>Slackで「feature/xxx 作成しました」</td>
+                <td>作業の可視化</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- シーン10: トラブルシューティング -->
+<div class="sheet-container">
+    <h2>🚨 10. よくあるトラブルと解決法</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>トラブル</th>
+                <th>原因</th>
+                <th>解決コマンド</th>
+                <th>予防策</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>stash pop で競合発生</td>
+                <td>stash した後にファイルが変更された</td>
+                <td>
+                    VSCodeで差分解決<br>
+                    <code>git add .</code><br>
+                    <code>git stash drop</code>
+                </td>
+                <td>こまめに stash pop する</td>
+            </tr>
+            <tr>
+                <td>間違えたファイルを add してしまった</td>
+                <td>確認不足</td>
+                <td><code>git restore --staged &lt;ファイル&gt;</code></td>
+                <td><code>git add</code> 前に <code>git status</code></td>
+            </tr>
+            <tr>
+                <td>.env.local をコミットしてしまった</td>
+                <td>.gitignore 設定漏れ</td>
+                <td>
+                    <code>git rm --cached .env.local</code><br>
+                    .gitignore に追加<br>
+                    <code>git commit --amend</code>
+                </td>
+                <td>最初に .gitignore を設定</td>
+            </tr>
+            <tr>
+                <td>stash がどれか分からない</td>
+                <td>名前を付けずに stash した</td>
+                <td>
+                    <code>git stash list</code><br>
+                    <code>git stash show -p stash@{0}</code>
+                </td>
+                <td>必ず名前付きで stash</td>
+            </tr>
+            <tr>
+                <td>pull で大量の競合</td>
+                <td>長期間 pull していない</td>
+                <td>
+                    <code>git merge --abort</code><br>
+                    段階的に過去の develop をマージ
+                </td>
+                <td>毎朝必ず pull する</td>
+            </tr>
+            <tr>
+                <td>誤って main に直接 push</td>
+                <td>ブランチ確認不足</td>
+                <td>
+                    <code>git revert HEAD</code><br>
+                    正しいブランチで再作業
+                </td>
+                <td>main は保護設定を有効化</td>
+            </tr>
+            <tr>
+                <td>WIPコミットが溜まりすぎた</td>
+                <td>整理していない</td>
+                <td>
+                    <code>git rebase -i HEAD~5</code><br>
+                    squash でまとめる
+                </td>
+                <td>定期的にコミットを整理</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="danger" style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 12px; margin: 15px 0;">
+        <strong>🚨 絶対にやってはいけないこと:</strong><br>
+        1. 機密情報（API キー、パスワード）をコミット<br>
+        2. <code>git push --force</code> を共有ブランチで実行<br>
+        3. 他人のブランチで <code>git reset --hard</code><br>
+        4. .git フォルダを削除<br>
+        5. コミット前の確認を怠る
+    </div>
+</div>
+
+<!-- 参考資料 -->
+<div class="sheet-container" style="background: #f0f8ff; border-left: 4px solid #2196f3;">
+    <h2>📚 参考資料</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>カテゴリ</th>
+                <th>資料名</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>公式</td>
+                <td>Git公式ドキュメント（日本語）</td>
+                <td>https://git-scm.com/book/ja/v2</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>GitHub Docs</td>
+                <td>https://docs.github.com/ja</td>
+            </tr>
+            <tr>
+                <td>入門</td>
+                <td>サル先生のGit入門</td>
+                <td>https://backlog.com/ja/git-tutorial/</td>
+            </tr>
+            <tr>
+                <td>stash</td>
+                <td>Git stash 完全ガイド</td>
+                <td>https://git-scm.com/docs/git-stash</td>
+            </tr>
+            <tr>
+                <td>.gitignore</td>
+                <td>gitignore テンプレート集</td>
+                <td>https://github.com/github/gitignore</td>
+            </tr>
+            <tr>
+                <td>チーム開発</td>
+                <td>Gitチーム開発のいろは - CodeZine</td>
+                <td>https://codezine.jp/article/detail/16910</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p style="margin-top: 15px; color: #666; font-size: 13px;">
+        ※ 2025年10月時点の情報です。最新情報は公式ドキュメントをご確認ください。<br>
+        ※ チーム開発では、必ずプロジェクト固有のルールに従ってください。
+    </p>
+</div>
+
+</body>
+</html>
