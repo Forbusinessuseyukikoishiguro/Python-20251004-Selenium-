@@ -1,0 +1,124 @@
+あっ！これは **PowerShell** のエラーですね！
+
+PowerShellで `help()` を実行しようとしています。でもPythonのコードなので、**Pythonで実行**する必要があります😊
+
+## 🔧 正しい実行方法
+
+### ステップ1: Pythonファイルを作る
+1. さっきのコードを `docstring_test.py` という名前で保存
+2. 保存場所: `C:\Users\yukik\Downloads\` でOK
+
+### ステップ2: Pythonで実行
+
+```powershell
+# PowerShellで、まずPythonを起動
+python
+
+# ↑これでPythonの対話モードになります
+# >>> という記号が出たら成功！
+```
+
+### ステップ3: ファイルを読み込む
+
+```python
+>>> # Pythonの対話モード内で実行
+>>> exec(open('docstring_test.py').read())
+```
+
+これで全部のコードが実行されます！
+
+---
+
+## 📝 もっと簡単な方法：helpを試すだけ
+
+もし `help()` の動作だけ見たいなら、PowerShellで：
+
+```powershell
+python -c "
+def good_google(x, y, z=10):
+    '''
+    (x / y) + z を計算する。
+    
+    Args:
+        x (float): 割られる数
+        y (float): 割る数
+        z (float, optional): 加算する数。デフォルトは10
+    
+    Returns:
+        float: 計算結果
+    '''
+    if y == 0:
+        raise ValueError('yは0以外')
+    return x / y + z
+
+help(good_google)
+"
+```
+
+でも長いので...
+
+---
+
+## ⚡ 一番簡単な確認方法
+
+```powershell
+# 1. Pythonを起動
+python
+
+# 2. Pythonの中で関数を定義して確認
+```
+
+Pythonの対話モードで：
+
+```python
+>>> def good_google(x, y, z=10):
+...     """
+...     (x / y) + z を計算する。
+...     
+...     Args:
+...         x (float): 割られる数
+...         y (float): 割る数
+...         z (float, optional): 加算する数。デフォルトは10
+...     
+...     Returns:
+...         float: 計算結果
+...     """
+...     if y == 0:
+...         raise ValueError("yは0以外")
+...     return x / y + z
+... 
+>>> # ↑ここまで入力したら、Enterを2回押す
+>>> 
+>>> help(good_google)
+```
+
+すると、こんな感じで表示されます↓
+
+```
+Help on function good_google in module __main__:
+
+good_google(x, y, z=10)
+    (x / y) + z を計算する。
+    
+    Args:
+        x (float): 割られる数
+        y (float): 割る数
+        z (float, optional): 加算する数。デフォルトは10
+    
+    Returns:
+        float: 計算結果
+```
+
+---
+
+## 🎯 まとめ
+
+| エラーの原因 | 解決方法 |
+|------------|---------|
+| PowerShellで実行してる | `python` と入力してPythonに切り替え |
+| 関数が定義されてない | 先に関数を定義する必要がある |
+
+**今の状況**: PowerShell（Windowsのコマンド）で実行 ❌  
+**正しい状況**: Python対話モードで実行 ✅
+
+もう一度試してみてください！わからなかったらまた聞いてくださいね😊
