@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐰 Python継承 完全ガイド</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background: linear-gradient(135deg, #fef5f7 0%, #f3e7f8 100%);
+            padding: 20px;
+            line-height: 1.8;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header .emoji {
+            font-size: 3em;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .alert {
+            background: #fff9e6;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            color: #666;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn.active {
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .nav-btn.green.active { background: #4caf50; }
+        .nav-btn.blue.active { background: #2196f3; }
+        .nav-btn.purple.active { background: #9c27b0; }
+        
+        .section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .diagram {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .box {
+            display: inline-block;
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            margin: 10px;
+        }
+        
+        .box.green { background: #4caf50; }
+        .box.green-dark { background: #388e3c; }
+        .box.blue-light { background: #90caf9; }
+        .box.blue { background: #2196f3; }
+        .box.blue-dark { background: #1976d2; }
+        .box.purple { background: #ba68c8; }
+        .box.purple-dark { background: #7b1fa2; }
+        
+        .arrow {
+            font-size: 2em;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .code-block .comment {
+            color: #6a9955;
+        }
+        
+        .code-block .keyword {
+            color: #569cd6;
+        }
+        
+        .code-block .string {
+            color: #ce9178;
+        }
+        
+        .code-block .function {
+            color: #dcdcaa;
+        }
+        
+        .explanation {
+            background: #e3f2fd;
+            border-left: 5px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .explanation h4 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .explanation-item {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .tips {
+            background: #f1f8e9;
+            border-left: 5px solid #8bc34a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .tips h4 {
+            color: #689f38;
+            margin-bottom: 15px;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning h4 {
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+        
+        ul {
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 10px 0;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 30px;
+        }
+        
+        .summary h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .multi-parent-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .small-box {
+            padding: 15px 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <div class="header">
+            <h1>
+                <span class="emoji">🐰</span>
+                Python継承 完全ガイド
+            </h1>
+            <p style="font-size: 1.2em; color: #666; margin-top: 15px;">
+                プログラミング初心者のための、やさしい継承の教科書
+            </p>
+            <div class="alert">
+                <strong>💡 継承とは?</strong><br>
+                親の機能を子供が受け継ぐこと！
+            </div>
+        </div>
+
+        <!-- ナビゲーション -->
+        <div class="nav-buttons">
+            <button class="nav-btn green active" onclick="showSection(0)">
+                👤 単一継承
+            </button>
+            <button class="nav-btn blue" onclick="showSection(1)">
+                👨‍👩‍👧 階層継承
+            </button>
+            <button class="nav-btn purple" onclick="showSection(2)">
+                👨‍👩‍👧‍👦 多重継承
+            </button>
+        </div>
+
+        <!-- セクション1: 単一継承 -->
+        <div class="section active" id="section-0">
+            <h2>⭐ 単一継承 - 一番簡単な継承!</h2>
+            
+            <div class="diagram">
+                <h3 style="color: #4caf50; margin-bottom: 20px;">📖 イメージ図</h3>
+                <div class="box green">
+                    親クラス (DaifukuShop)<br>
+                    <small>基本の大福店</small>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="box green-dark">
+                    子クラス (PremiumDaifukuShop)<br>
+                    <small>プレミアム大福店</small>
+                </div>
+                <p style="margin-top: 20px; color: #666;">
+                    子クラスは親クラスの全機能 + 新機能を持つ!
+                </p>
+            </div>
+
+            <h3>ステップ1: 親クラスを作る</h3>
+            <div class="code-block">
+<span class="comment"># 親クラスの定義</span>
+<span class="keyword">class</span> <span class="function">DaifukuShop</span>:
+    <span class="string">"""大福店の基本クラス"""</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, owner_name, stock):
+        <span class="comment"># self = このインスタンス(このお店)自身</span>
+        self.owner_name = owner_name  <span class="comment"># 店長名を保存</span>
+        self.stock = stock            <span class="comment"># 在庫数を保存</span>
+        self.sold = <span class="string">0</span>                 <span class="comment"># 販売数は0から</span>
+        <span class="keyword">print</span>(<span class="string">f"🏪 {owner_name}店長の店を開店!"</span>)
+    
+    <span class="keyword">def</span> <span class="function">sell</span>(self, quantity):
+        <span class="string">"""大福を販売するメソッド"""</span>
+        <span class="keyword">if</span> quantity > self.stock:
+            <span class="keyword">print</span>(<span class="string">"❌ 在庫不足!"</span>)
+            <span class="keyword">return</span> <span class="string">False</span>
+        
+        self.stock -= quantity  <span class="comment"># 在庫を減らす</span>
+        self.sold += quantity   <span class="comment"># 販売数を増やす</span>
+        <span class="keyword">print</span>(<span class="string">f"💰 {quantity}個売れた!"</span>)
+        <span class="keyword">return</span> <span class="string">True</span>
+            </div>
+
+            <div class="explanation">
+                <h4>【一行ずつ解説】</h4>
+                <div class="explanation-item">
+                    <strong>class DaifukuShop:</strong><br>
+                    → 「DaifukuShop」という名前のクラス(設計図)を作る<br>
+                    → class = クラスを作る命令<br>
+                    → : (コロン) = ここからクラスの中身という印
+                </div>
+                <div class="explanation-item">
+                    <strong>def __init__(self, owner_name, stock):</strong><br>
+                    → __init__ = 初期化メソッド(お店を作る時に自動で実行される)<br>
+                    → self = このお店自身<br>
+                    → owner_name = 店長の名前(引数)<br>
+                    → stock = 在庫の数(引数)
+                </div>
+                <div class="explanation-item">
+                    <strong>self.owner_name = owner_name</strong><br>
+                    → 引数でもらった店長名を、このお店の変数として保存<br>
+                    → self.変数名 = インスタンス変数(このお店専用の変数)
+                </div>
+                <div class="explanation-item">
+                    <strong>def sell(self, quantity):</strong><br>
+                    → sell = 販売するメソッド(機能)<br>
+                    → quantity = 売る個数(引数)
+                </div>
+                <div class="explanation-item">
+                    <strong>self.stock -= quantity</strong><br>
+                    → 在庫から売った分を引く<br>
+                    → -= は「引き算して代入」の意味<br>
+                    → self.stock = self.stock - quantity と同じ
+                </div>
+            </div>
+
+            <h3>ステップ2: 子クラスを作る (継承!)</h3>
+            <div class="code-block">
+<span class="keyword">class</span> <span class="function">PremiumDaifukuShop</span>(DaifukuShop):
+    <span class="string">"""プレミアム大福店 - 親を継承!"""</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, owner_name, stock, vip_count):
+        <span class="comment"># super() = 親クラスを呼び出す魔法の言葉</span>
+        <span class="keyword">super</span>().__init__(owner_name, stock)
+        
+        <span class="comment"># 子クラス独自の変数</span>
+        self.vip_count = vip_count
+        <span class="keyword">print</span>(<span class="string">f"✨ VIP会員: {vip_count}名"</span>)
+    
+    <span class="keyword">def</span> <span class="function">sell_premium</span>(self, quantity):
+        <span class="string">"""プレミアム販売 - 子クラス独自の機能!"""</span>
+        <span class="comment"># 親のsellメソッドを使う</span>
+        result = <span class="keyword">super</span>().sell(quantity)
+        
+        <span class="keyword">if</span> result:
+            price = quantity * <span class="string">225</span>  <span class="comment"># 高級価格</span>
+            <span class="keyword">print</span>(<span class="string">f"✨ プレミアム価格: ¥{price}"</span>)
+        <span class="keyword">return</span> result
+            </div>
+
+            <div class="explanation">
+                <h4>【継承の仕組み】</h4>
+                <div class="explanation-item">
+                    <strong>class PremiumDaifukuShop(DaifukuShop):</strong><br>
+                    → カッコの中に親クラス名を書く!<br>
+                    → これで「DaifukuShopを継承します」という宣言<br>
+                    → 親の機能が全部使えるようになる
+                </div>
+                <div class="explanation-item">
+                    <strong>super().__init__(owner_name, stock)</strong><br>
+                    → super() = 親クラスのこと<br>
+                    → 親の__init__を呼ぶ = 親の初期化処理を実行<br>
+                    → これで owner_name と stock が親と同じように設定される<br>
+                    → super()を忘れると親の初期化がされないので注意!
+                </div>
+                <div class="explanation-item">
+                    <strong>self.vip_count = vip_count</strong><br>
+                    → 子クラス独自の変数を追加<br>
+                    → 親にはない、プレミアム店だけの情報<br>
+                    → 親の変数 + 子の変数 = 両方持てる
+                </div>
+                <div class="explanation-item">
+                    <strong>def sell_premium(self, quantity):</strong><br>
+                    → 子クラス独自のメソッド(機能)を追加<br>
+                    → 親のsellに加えて、sell_premiumも使える!
+                </div>
+                <div class="explanation-item">
+                    <strong>result = super().sell(quantity)</strong><br>
+                    → 親のsellメソッドを呼んで使う<br>
+                    → 継承してるから親のメソッドが使える!<br>
+                    → 親の機能を再利用できるのが継承の利点
+                </div>
+            </div>
+
+            <h3>ステップ3: 使ってみる!</h3>
+            <div class="code-block">
+<span class="comment"># 親クラスのインスタンスを作る</span>
+basic = DaifukuShop(<span class="string">"うさうさ"</span>, <span class="string">20</span>)
+basic.sell(<span class="string">5</span>)
+
+<span class="comment"># 子クラスのインスタンスを作る</span>
+premium = PremiumDaifukuShop(<span class="string">"もちもち"</span>, <span class="string">30</span>, <span class="string">5</span>)
+premium.sell(<span class="string">3</span>)         <span class="comment"># 親から継承したメソッド</span>
+premium.sell_premium(<span class="string">2</span>) <span class="comment"># 子クラス独自のメソッド</span>
+            </div>
+
+            <div class="explanation">
+                <h4>【使い方の解説】</h4>
+                <div class="explanation-item">
+                    <strong>basic = DaifukuShop("うさうさ", 20)</strong><br>
+                    → 親クラスのインスタンス(お店)を作る<br>
+                    → "うさうさ"店長、在庫20個でスタート<br>
+                    → クラス名() でインスタンスを作成
+                </div>
+                <div class="explanation-item">
+                    <strong>premium = PremiumDaifukuShop("もちもち", 30, 5)</strong><br>
+                    → 子クラスのインスタンス(お店)を作る<br>
+                    → VIP会員5名の情報も追加<br>
+                    → 引数3つ必要(owner_name, stock, vip_count)
+                </div>
+                <div class="explanation-item">
+                    <strong>premium.sell(3)</strong><br>
+                    → 子クラスだけど、親のメソッドが使える!<br>
+                    → これが継承の力!<br>
+                    → 親で定義したsellメソッドを呼び出せる
+                </div>
+                <div class="explanation-item">
+                    <strong>premium.sell_premium(2)</strong><br>
+                    → 子クラス独自のメソッドも使える<br>
+                    → 親の機能 + 子の機能 = 両方使える!
+                </div>
+            </div>
+
+            <div class="tips">
+                <h4>✅ 単一継承のポイント</h4>
+                <ul>
+                    <li>一番シンプルで理解しやすい</li>
+                    <li>90%のケースはこれで十分</li>
+                    <li>親の機能を全部使える + 新機能も追加できる</li>
+                    <li>迷ったらまずこれを使う!</li>
+                    <li>is-a関係が成り立つか確認 (プレミアム店「は」大福店「である」)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- セクション2: 階層継承 -->
+        <div class="section" id="section-1">
+            <h2>👨‍👩‍👧 階層継承 - 親→子→孫と続く継承</h2>
+            
+            <div class="diagram">
+                <h3 style="color: #2196f3; margin-bottom: 20px;">📖 イメージ図</h3>
+                <div class="box blue-light">
+                    祖父クラス (DaifukuShop)<br>
+                    <small>基本店</small>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="box blue">
+                    父クラス (PremiumDaifukuShop)<br>
+                    <small>プレミアム店</small>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="box blue-dark">
+                    孫クラス (VIPDaifukuShop)<br>
+                    <small>VIP専門店</small>
+                </div>
+                <p style="margin-top: 20px; color: #666;">
+                    段階的に機能を追加していく!
+                </p>
+            </div>
+
+            <h3>孫クラスを作る</h3>
+            <div class="code-block">
+<span class="keyword">class</span> <span class="function">VIPDaifukuShop</span>(PremiumDaifukuShop):
+    <span class="string">"""VIP専門店 - プレミアム店を継承!"""</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, owner_name, stock, vip_count, concierge):
+        <span class="comment"># 親(PremiumDaifukuShop)の__init__を呼ぶ</span>
+        <span class="comment"># すると自動的に祖父(DaifukuShop)も初期化される!</span>
+        <span class="keyword">super</span>().__init__(owner_name, stock, vip_count)
+        
+        <span class="comment"># 孫クラス独自の変数</span>
+        self.concierge = concierge
+        <span class="keyword">print</span>(<span class="string">f"👑 コンシェルジュ: {concierge}名"</span>)
+    
+    <span class="keyword">def</span> <span class="function">sell_vip_exclusive</span>(self, quantity):
+        <span class="string">"""VIP限定販売 - 孫クラス独自の機能!"""</span>
+        result = <span class="keyword">super</span>().sell_premium(quantity)
+        <span class="keyword">if</span> result:
+            price = quantity * <span class="string">450</span>  <span class="comment"># 超高級</span>
+            <span class="keyword">print</span>(<span class="string">f"👑 VIP限定: ¥{price}"</span>)
+        <span class="keyword">return</span> result
+            </div>
+
+            <div class="explanation">
+                <h4>【階層継承の仕組み】</h4>
+                <div class="explanation-item">
+                    <strong>class VIPDaifukuShop(PremiumDaifukuShop):</strong><br>
+                    → プレミアム店(父)を継承する<br>
+                    → すると祖父の機能も自動的に受け継ぐ!<br>
+                    → 継承の連鎖が起こる
+                </div>
+                <div class="explanation-item">
+                    <strong>super().__init__(owner_name, stock, vip_count)</strong><br>
+                    → 父のPremiumDaifukuShopの__init__を呼ぶ<br>
+                    → 父の中でさらに祖父の__init__が呼ばれる<br>
+                    → つまり: 孫 → 父 → 祖父 の順に初期化される<br>
+                    → super()の連鎖が自動的に起こる
+                </div>
+                <div class="explanation-item">
+                    <strong>【継承の連鎖】</strong><br>
+                    祖父: owner_name, stock, sell()<br>
+                    父: 祖父の全部 + vip_count, sell_premium()<br>
+                    孫: 父の全部 + concierge, sell_vip_exclusive()<br>
+                    <br>
+                    → 孫は3世代全部の機能が使える!
+                </div>
+            </div>
+
+            <h3>孫クラスを使ってみる</h3>
+            <div class="code-block">
+vip = VIPDaifukuShop(<span class="string">"ぴょん"</span>, <span class="string">40</span>, <span class="string">10</span>, <span class="string">3</span>)
+
+vip.sell(<span class="string">2</span>)              <span class="comment"># 祖父から継承</span>
+vip.sell_premium(<span class="string">3</span>)      <span class="comment"># 父から継承</span>
+vip.sell_vip_exclusive(<span class="string">1</span>) <span class="comment"># 孫独自</span>
+            </div>
+
+            <div class="explanation">
+                <h4>【3世代の機能を全部使える】</h4>
+                <div class="explanation-item">
+                    <strong>vip.sell(2)</strong><br>
+                    → 祖父クラス(DaifukuShop)のメソッド<br>
+                    → 孫でも使える!
+                </div>
+                <div class="explanation-item">
+                    <strong>vip.sell_premium(3)</strong><br>
+                    → 父クラス(PremiumDaifukuShop)のメソッド<br>
+                    → 孫でも使える!
+                </div>
+                <div class="explanation-item">
+                    <strong>vip.sell_vip_exclusive(1)</strong><br>
+                    → 孫クラス独自のメソッド<br>
+                    <br>
+                    つまり、孫は3世代全部の機能が使える!<br>
+                    祖父の機能 + 父の機能 + 孫の機能 = 全部!
+                </div>
+            </div>
+
+            <div class="warning">
+                <h4>⚠️ 注意点</h4>
+                <ul>
+                    <li>階層は2-3階層までがおすすめ</li>
+                    <li>深すぎると複雑になる (5階層以上はNG)</li>
+                    <li>super()の連鎖を理解する</li>
+                    <li>どのクラスから何を継承してるか把握する</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- セクション3: 多重継承 -->
+        <div class="section" id="section-2">
+            <h2>👨‍👩‍👧‍👦 多重継承 - 複数の親から継承</h2>
+            
+            <div class="diagram">
+                <h3 style="color: #9c27b0; margin-bottom: 20px;">📖 イメージ図</h3>
+                <div class="multi-parent-boxes">
+                    <div class="box purple small-box">親A<br>店舗</div>
+                    <div class="box purple small-box">親B<br>オンライン</div>
+                    <div class="box purple small-box">親C<br>配達</div>
+                    <div class="box purple small-box">親D<br>会員</div>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="box purple-dark">
+                    子クラス (HybridDaifukuShop)<br>
+                    <small>全機能統合!</small>
+                </div>
+                <p style="margin-top: 20px; color: #666;">
+                    複数の親の機能を全部組み合わせる!
+                </p>
+            </div>
+
+            <h3>4つの親クラスを作る</h3>
+            <div class="code-block">
+<span class="comment"># 親A: 店舗機能</span>
+<span class="keyword">class</span> <span class="function">ShopBase</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, owner_name, stock):
+        self.owner_name = owner_name
+        self.stock = stock
+
+<span class="comment"># 親B: オンライン機能</span>
+<span class="keyword">class</span> <span class="function">OnlineServiceMixin</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.online_orders = <span class="string">0</span>
+
+<span class="comment"># 親C: 配達機能</span>
+<span class="keyword">class</span> <span class="function">DeliveryServiceMixin</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.deliveries = <span class="string">0</span>
+
+<span class="comment"># 親D: 会員機能</span>
+<span class="keyword">class</span> <span class="function">MembershipServiceMixin</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self):
+        self.members = []
+            </div>
+
+            <div class="explanation">
+                <h4>【4つの独立した機能】</h4>
+                <div class="explanation-item">
+                    <strong>親A (ShopBase):</strong><br>
+                    → 店舗としての基本機能<br>
+                    → 店長名と在庫を管理
+                </div>
+                <div class="explanation-item">
+                    <strong>親B (OnlineServiceMixin):</strong><br>
+                    → オンライン注文の機能<br>
+                    → Mixin = 機能追加専用クラス<br>
+                    → 注文数を管理
+                </div>
+                <div class="explanation-item">
+                    <strong>親C (DeliveryServiceMixin):</strong><br>
+                    → 配達サービスの機能<br>
+                    → 配達回数を管理
+                </div>
+                <div class="explanation-item">
+                    <strong>親D (MembershipServiceMixin):</strong><br>
+                    → 会員管理の機能<br>
+                    → 会員リストを管理<br>
+                    <br>
+                    それぞれ独立した機能 = 組み合わせ自由!
+                </div>
+            </div>
+
+            <h3>4つを統合した子クラス</h3>
+            <div class="code-block">
+<span class="keyword">class</span> <span class="function">HybridDaifukuShop</span>(ShopBase, 
+                        OnlineServiceMixin,
+                        DeliveryServiceMixin,
+                        MembershipServiceMixin):
+    <span class="string">"""ハイブリッド店 - 4つの親を継承!"""</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, owner_name, stock):
+        <span class="comment"># 全ての親を初期化する必要がある!</span>
+        ShopBase.__init__(self, owner_name, stock)
+        OnlineServiceMixin.__init__(self)
+        DeliveryServiceMixin.__init__(self)
+        MembershipServiceMixin.__init__(self)
+        <span class="keyword">print</span>(<span class="string">"✅ 全機能OK!"</span>)
+    
+    <span class="keyword">def</span> <span class="function">process_order</span>(self, customer, quantity, address):
+        <span class="string">"""統合注文処理 - 全機能を組み合わせ!"""</span>
+        <span class="keyword">print</span>(<span class="string">f"\n注文処理: {customer}様"</span>)
+        
+        <span class="comment"># 1. オンライン注文(親B)</span>
+        self.online_orders += <span class="string">1</span>
+        <span class="keyword">print</span>(<span class="string">f"🌐 注文 #{self.online_orders}"</span>)
+        
+        <span class="comment"># 2. 販売(親A)</span>
+        <span class="keyword">if</span> quantity <= self.stock:
+            self.stock -= quantity
+            
+            <span class="comment"># 3. 配達(親C)</span>
+            self.deliveries += <span class="string">1</span>
+            <span class="keyword">print</span>(<span class="string">f"🚚 配達: {address}へ"</span>)
+            
+            <span class="comment"># 4. 会員登録(親D)</span>
+            <span class="keyword">if</span> customer <span class="keyword">not in</span> self.members:
+                self.members.append(customer)
+                <span class="keyword">print</span>(<span class="string">f"💳 会員登録: {customer}様"</span>)
+            
+            <span class="keyword">print</span>(<span class="string">"✅ 注文完了\n"</span>)
+            </div>
+
+            <div class="explanation">
+                <h4>【多重継承の書き方】</h4>
+                <div class="explanation-item">
+                    <strong>class HybridDaifukuShop(親A, 親B, 親C, 親D):</strong><br>
+                    → カッコの中に複数の親をカンマ区切りで書く!<br>
+                    → これで4つ全部の機能を継承<br>
+                    → 順番は重要（左から優先される）
+                </div>
+                <div class="explanation-item">
+                    <strong>親A.__init__(self, owner_name, stock)</strong><br>
+                    → 親Aを直接呼んで初期化<br>
+                    → 親クラス名.__init__() の形式<br>
+                    → 注意: super()じゃなくて親名.__init__()を使う!<br>
+                    → なぜなら複数の親があるから
+                </div>
+                <div class="explanation-item">
+                    <strong>全ての親を初期化する</strong><br>
+                    → 親A、B、C、Dを全部初期化<br>
+                    → 一つでも忘れるとその機能が使えない<br>
+                    → 多重継承の難しいところ
+                </div>
+                <div class="explanation-item">
+                    <strong>def process_order(...):</strong><br>
+                    → 4つの親の機能を組み合わせて使う<br>
+                    → self.online_orders (親B)<br>
+                    → self.stock (親A)<br>
+                    → self.deliveries (親C)<br>
+                    → self.members (親D)<br>
+                    → 全部使える!
+                </div>
+            </div>
+
+            <h3>使ってみる</h3>
+            <div class="code-block">
+hybrid = HybridDaifukuShop(<span class="string">"ふわふわ"</span>, <span class="string">50</span>)
+
+hybrid.process_order(<span class="string">"田中太郎"</span>, <span class="string">5</span>, <span class="string">"東京都渋谷区"</span>)
+hybrid.process_order(<span class="string">"佐藤花子"</span>, <span class="string">3</span>, <span class="string">"東京都新宿区"</span>)
+
+<span class="comment"># 統計表示</span>
+<span class="keyword">print</span>(<span class="string">f"在庫: {hybrid.stock}個"</span>)
+<span class="keyword">print</span>(<span class="string">f"オンライン注文: {hybrid.online_orders}件"</span>)
+<span class="keyword">print</span>(<span class="string">f"配達回数: {hybrid.deliveries}回"</span>)
+<span class="keyword">print</span>(<span class="string">f"会員数: {len(hybrid.members)}名"</span>)
+            </div>
+
+            <div class="warning">
+                <h4>⚠️ 注意点</h4>
+                <ul>
+                    <li>一番複雑なパターン</li>
+                    <li>慎重に使う必要がある</li>
+                    <li>全ての親を初期化すること (忘れやすい!)</li>
+                    <li>本当に必要な時だけ使う</li>
+                    <li>MRO (メソッド解決順序) を理解する必要がある</li>
+                    <li>ダイヤモンド継承問題に注意</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- まとめ -->
+        <div class="summary">
+            <h3>🎯 まとめ - どれを使えばいい?</h3>
+            
+            <div class="summary-item">
+                <strong style="font-size: 1.3em;">単一継承 ★★★★★</strong>
+                <p>一番簡単! 迷ったらこれ!</p>
+                <p>使用頻度: 90%</p>
+                <p>例: 基本店 → プレミアム店</p>
+            </div>
+            
+            <div class="summary-item">
+                <strong style="font-size: 1.3em;">階層継承 ★★★☆☆</strong>
+                <p>段階的に機能追加したい時</p>
+                <p>使用頻度: 9%</p>
+                <p>例: 基本店 → プレミアム店 → VIP専門店</p>
+            </div>
+            
+            <div class="summary-item">
+                <strong style="font-size: 1.3em;">多重継承 ★★☆☆☆</strong>
+                <p>複雑! 本当に必要な時だけ</p>
+                <p>使用頻度: 1%</p>
+                <p>例: 店舗 + オンライン + 配達 + 会員</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.3); padding: 20px; border-radius: 10px; margin-top: 30px;">
+                <h4 style="margin-bottom: 15px;">💡 重要な文法ポイント</h4>
+                <ul>
+                    <li><strong>class クラス名:</strong> クラスを作る</li>
+                    <li><strong>class 子(親):</strong> 継承する</li>
+                    <li><strong>self</strong> このインスタンス自身</li>
+                    <li><strong>super()</strong> 親クラスのこと</li>
+                    <li><strong>__init__</strong> 初期化メソッド</li>
+                    <li><strong>def メソッド名(self):</strong> メソッドを定義</li>
+                </ul>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.3); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h4 style="margin-bottom: 15px;">🐰 うさうさ先生からのアドバイス</h4>
+                <p style="margin-bottom: 10px;">
+                    <strong>初心者の方へ:</strong><br>
+                    まずは単一継承だけで十分です！<br>
+                    親から子への単純な拡張を練習しましょう。
+                </p>
+                <p>
+                    <strong>覚える順番:</strong><br>
+                    1週目: 単一継承をマスター<br>
+                    2週目: 階層継承を理解<br>
+                    3週目: 多重継承に挑戦 (余裕があれば)
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // タブ切り替え機能
+        function showSection(index) {
+            // 全セクションを非表示
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 選択されたセクションを表示
+            sections[index].classList.add('active');
+            
+            // ボタンのスタイル更新
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            buttons[index].classList.add('active');
+            
+            // ページトップにスクロール
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
