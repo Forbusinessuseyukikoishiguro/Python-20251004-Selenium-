@@ -1,0 +1,1749 @@
+# 🐰 Python特殊メソッド完全チートシート
+## 新人エンジニア必携！コピペで使える実践ガイド
+
+---
+
+## 📋 目次
+
+1. [基本の特殊メソッド](#1-基本の特殊メソッド)
+2. [算術演算子](#2-算術演算子)
+3. [比較演算子](#3-比較演算子)
+4. [コンテナ型](#4-コンテナ型)
+5. [文字列・表現](#5-文字列表現)
+6. [その他便利メソッド](#6-その他便利メソッド)
+7. [実践テンプレート集](#7-実践テンプレート集)
+
+---
+
+## 1️⃣ 基本の特殊メソッド
+
+### `__init__` と `__del__`
+
+```python
+class Product:
+    """商品クラス - 基本テンプレート"""
+    
+    def __init__(self, name, price):
+        """
+        インスタンス作成時に自動実行
+        用途: 初期化処理
+        """
+        self.name = name
+        self.price = price
+        print(f"✅ {name}を作成しました")
+    
+    def __del__(self):
+        """
+        インスタンス削除時に自動実行
+        用途: クリーンアップ処理
+        """
+        print(f"🗑️ {self.name}を削除しました")
+
+# 使用例
+product = Product("りんご", 100)  # __init__が呼ばれる
+del product  # __del__が呼ばれる
+```
+
+**📝 使い分け：**
+| メソッド | タイミング | 主な用途 |
+|---------|-----------|---------|
+| `__init__` | 作成時 | 変数の初期化 |
+| `__del__` | 削除時 | ファイルを閉じる、接続解除など |
+
+---
+
+## 2️⃣ 算術演算子
+
+### 基本の算術演算
+
+```python
+class Money:
+    """お金クラス - 算術演算の完全実装"""
+    
+    def __init__(self, yen):
+        self.yen = yen
+    
+    # ===== 加算 =====
+    def __add__(self, other):
+        """+ 演算子: money + 100"""
+        if isinstance(other, Money):
+            return Money(self.yen + other.yen)
+        return Money(self.yen + other)
+    
+    def __radd__(self, other):
+        """+ 演算子（逆）: 100 + money"""
+        return self.__add__(other)
+    
+    # ===== 減算 =====
+    def __sub__(self, other):
+        """- 演算子: money - 100"""
+        if isinstance(other, Money):
+            return Money(self.yen - other.yen)
+        return Money(self.yen - other)
+    
+    def __rsub__(self, other):
+        """- 演算子（逆）: 100 - money"""
+        return Money(other - self.yen)
+    
+    # ===== 乗算 =====
+    def __mul__(self, other):
+        """* 演算子: money * 2"""
+        return Money(self.yen * other)
+    
+    def __rmul__(self, other):
+        """* 演算子（逆）: 2 * money"""
+        return self.__mul__(other)
+    
+    # ===== 除算 =====
+    def __truediv__(self, other):
+        """/ 演算子: money / 2"""
+        return Money(self.yen / other)
+    
+    def __floordiv__(self, other):
+        """// 演算子: money // 2"""
+        return Money(self.yen // other)
+    
+    # ===== 剰余 =====
+    def __mod__(self, other):
+        """% 演算子: money % 100"""
+        return Money(self.yen % other)
+    
+    # ===== べき乗 =====
+    def __pow__(self, other):
+        """** 演算子: money ** 2"""
+        return Money(self.yen ** other)
+    
+    def __str__(self):
+        return f"¥{self.yen:,}"
+
+# 使用例
+money = Money(1000)
+print(money + 500)      # ¥1,500
+print(1000 + money)     # ¥2,000
+print(money - 300)      # ¥700
+print(money * 2)        # ¥2,000
+print(money / 4)        # ¥250.0
+print(money // 3)       # ¥333
+print(money % 300)      # ¥100
+```
+
+### 複合代入演算子
+
+```python
+class Counter:
+    """カウンタークラス - 複合代入演算"""
+    
+    def __init__(self, count=0):
+        self.count = count
+    
+    def __iadd__(self, other):
+        """+= 演算子: counter += 5"""
+        self.count += other
+        return self  # 自分自身を返す（重要！）
+    
+    def __isub__(self, other):
+        """-= 演算子: counter -= 3"""
+        self.count -= other
+        return self
+    
+    def __imul__(self, other):
+        """*= 演算子: counter *= 2"""
+        self.count *= other
+        return self
+    
+    def __str__(self):
+        return f"Count: {self.count}"
+
+# 使用例
+counter = Counter(10)
+counter += 5   # 15
+counter -= 3   # 12
+counter *= 2   # 24
+print(counter)  # Count: 24
+```
+
+**📊 算術演算子一覧表：**
+
+| 演算子 | 通常メソッド | 逆順メソッド | 複合代入 | 例 |
+|-------|------------|------------|---------|-----|
+| `+` | `__add__` | `__radd__` | `__iadd__` | `a + b` |
+| `-` | `__sub__` | `__rsub__` | `__isub__` | `a - b` |
+| `*` | `__mul__` | `__rmul__` | `__imul__` | `a * b` |
+| `/` | `__truediv__` | `__rtruediv__` | `__itruediv__` | `a / b` |
+| `//` | `__floordiv__` | `__rfloordiv__` | `__ifloordiv__` | `a // b` |
+| `%` | `__mod__` | `__rmod__` | `__imod__` | `a % b` |
+| `**` | `__pow__` | `__rpow__` | `__ipow__` | `a ** b` |
+
+---
+
+## 3️⃣ 比較演算子
+
+```python
+class Score:
+    """スコアクラス - 比較演算の完全実装"""
+    
+    def __init__(self, points):
+        self.points = points
+    
+    def __eq__(self, other):
+        """== 演算子: 等しい"""
+        if isinstance(other, Score):
+            return self.points == other.points
+        return self.points == other
+    
+    def __ne__(self, other):
+        """!= 演算子: 等しくない"""
+        return not self.__eq__(other)
+    
+    def __lt__(self, other):
+        """< 演算子: 小なり"""
+        if isinstance(other, Score):
+            return self.points < other.points
+        return self.points < other
+    
+    def __le__(self, other):
+        """<= 演算子: 以下"""
+        if isinstance(other, Score):
+            return self.points <= other.points
+        return self.points <= other
+    
+    def __gt__(self, other):
+        """> 演算子: 大なり"""
+        if isinstance(other, Score):
+            return self.points > other.points
+        return self.points > other
+    
+    def __ge__(self, other):
+        """>= 演算子: 以上"""
+        if isinstance(other, Score):
+            return self.points >= other.points
+        return self.points >= other
+    
+    def __str__(self):
+        return f"{self.points}点"
+
+# 使用例
+score1 = Score(85)
+score2 = Score(92)
+
+print(score1 == 85)      # True
+print(score1 != score2)  # True
+print(score1 < score2)   # True
+print(score1 <= 85)      # True
+print(score2 > score1)   # True
+print(score2 >= 90)      # True
+```
+
+**📊 比較演算子一覧表：**
+
+| 演算子 | メソッド | 意味 | 例 |
+|-------|---------|------|-----|
+| `==` | `__eq__` | 等しい | `a == b` |
+| `!=` | `__ne__` | 等しくない | `a != b` |
+| `<` | `__lt__` | 小なり | `a < b` |
+| `<=` | `__le__` | 以下 | `a <= b` |
+| `>` | `__gt__` | 大なり | `a > b` |
+| `>=` | `__ge__` | 以上 | `a >= b` |
+
+---
+
+## 4️⃣ コンテナ型
+
+```python
+class ShoppingCart:
+    """ショッピングカート - コンテナ型の完全実装"""
+    
+    def __init__(self):
+        self.items = []
+    
+    # ===== 基本操作 =====
+    def __len__(self):
+        """len() 関数: カートの商品数"""
+        return len(self.items)
+    
+    def __getitem__(self, index):
+        """[] 取得: cart[0]"""
+        return self.items[index]
+    
+    def __setitem__(self, index, value):
+        """[] 代入: cart[0] = "りんご" """
+        self.items[index] = value
+    
+    def __delitem__(self, index):
+        """del 削除: del cart[0]"""
+        del self.items[index]
+    
+    def __contains__(self, item):
+        """in 演算子: "りんご" in cart"""
+        return item in self.items
+    
+    # ===== イテレーション =====
+    def __iter__(self):
+        """for ループ: for item in cart"""
+        return iter(self.items)
+    
+    def __reversed__(self):
+        """reversed() 関数"""
+        return reversed(self.items)
+    
+    # ===== 追加機能 =====
+    def __iadd__(self, item):
+        """+=: cart += "りんご" """
+        self.items.append(item)
+        return self
+    
+    def __str__(self):
+        return f"カート({len(self)}点): {', '.join(self.items)}"
+
+# 使用例
+cart = ShoppingCart()
+
+# 追加
+cart += "りんご"
+cart += "バナナ"
+cart += "みかん"
+
+# 長さ
+print(len(cart))  # 3
+
+# インデックスアクセス
+print(cart[0])    # りんご
+cart[1] = "いちご"  # バナナ → いちご
+
+# メンバーシップ
+print("りんご" in cart)  # True
+
+# イテレーション
+for item in cart:
+    print(f"- {item}")
+
+# 削除
+del cart[0]
+print(cart)  # カート(2点): いちご, みかん
+```
+
+**📊 コンテナ型メソッド一覧表：**
+
+| 操作 | メソッド | 用途 | 例 |
+|-----|---------|------|-----|
+| `len(obj)` | `__len__` | 長さ取得 | `len(cart)` |
+| `obj[key]` | `__getitem__` | 要素取得 | `cart[0]` |
+| `obj[key] = val` | `__setitem__` | 要素設定 | `cart[0] = "apple"` |
+| `del obj[key]` | `__delitem__` | 要素削除 | `del cart[0]` |
+| `item in obj` | `__contains__` | 含有判定 | `"apple" in cart` |
+| `for x in obj` | `__iter__` | イテレーション | `for item in cart` |
+| `reversed(obj)` | `__reversed__` | 逆順 | `reversed(cart)` |
+
+---
+
+## 5️⃣ 文字列・表現
+
+```python
+class Product:
+    """商品クラス - 文字列表現の完全実装"""
+    
+    def __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+    
+    def __str__(self):
+        """
+        str() / print() で使われる
+        用途: 人間が読みやすい形式
+        """
+        return f"{self.name}（¥{self.price:,}）"
+    
+    def __repr__(self):
+        """
+        repr() / デバッグで使われる
+        用途: 開発者向け、再現可能な形式
+        """
+        return f"Product(name='{self.name}', price={self.price}, stock={self.stock})"
+    
+    def __format__(self, format_spec):
+        """
+        f"{obj:書式}" で使われる
+        用途: カスタム書式指定
+        """
+        if format_spec == "full":
+            return f"{self.name}: ¥{self.price:,}（在庫{self.stock}個）"
+        elif format_spec == "short":
+            return f"{self.name}(¥{self.price})"
+        else:
+            return str(self)
+    
+    def __bytes__(self):
+        """
+        bytes() で使われる
+        用途: バイト列変換
+        """
+        return f"{self.name},{self.price},{self.stock}".encode('utf-8')
+
+# 使用例
+product = Product("りんご", 150, 50)
+
+print(str(product))           # りんご（¥150）
+print(repr(product))          # Product(name='りんご', price=150, stock=50)
+print(f"{product}")           # りんご（¥150）
+print(f"{product:full}")      # りんご: ¥150（在庫50個）
+print(f"{product:short}")     # りんご(¥150)
+print(bytes(product))         # b'りんご,150,50'
+```
+
+**📊 文字列表現メソッド一覧表：**
+
+| 関数/構文 | メソッド | 用途 | 返り値 |
+|----------|---------|------|--------|
+| `str(obj)` | `__str__` | ユーザー向け表示 | 読みやすい文字列 |
+| `repr(obj)` | `__repr__` | 開発者向け表示 | 再現可能な文字列 |
+| `f"{obj:fmt}"` | `__format__` | カスタム書式 | 書式化された文字列 |
+| `bytes(obj)` | `__bytes__` | バイト列化 | バイト列 |
+
+---
+
+## 6️⃣ その他便利メソッド
+
+### 真偽値判定
+
+```python
+class Stock:
+    """在庫クラス - 真偽値判定"""
+    
+    def __init__(self, quantity):
+        self.quantity = quantity
+    
+    def __bool__(self):
+        """
+        bool() / if文 で使われる
+        用途: 真偽値判定
+        """
+        return self.quantity > 0
+    
+    def __str__(self):
+        return f"在庫: {self.quantity}個"
+
+# 使用例
+stock1 = Stock(10)
+stock2 = Stock(0)
+
+if stock1:
+    print("在庫あり")  # ✅ 実行される
+
+if not stock2:
+    print("在庫なし")  # ✅ 実行される
+
+print(bool(stock1))  # True
+print(bool(stock2))  # False
+```
+
+### 呼び出し可能オブジェクト
+
+```python
+class PriceCalculator:
+    """価格計算機 - 呼び出し可能"""
+    
+    def __init__(self, tax_rate=0.1):
+        self.tax_rate = tax_rate
+    
+    def __call__(self, price):
+        """
+        obj() で呼び出し可能にする
+        用途: インスタンスを関数のように使う
+        """
+        return int(price * (1 + self.tax_rate))
+    
+# 使用例
+calc = PriceCalculator(0.1)  # 10%の消費税
+
+# インスタンスを関数のように呼び出せる
+print(calc(1000))  # 1100
+print(calc(500))   # 550
+```
+
+### コンテキストマネージャー
+
+```python
+class FileManager:
+    """ファイルマネージャー - with文対応"""
+    
+    def __init__(self, filename):
+        self.filename = filename
+        self.file = None
+    
+    def __enter__(self):
+        """
+        with文の開始時に実行
+        用途: リソースの取得
+        """
+        print(f"📂 {self.filename} を開きます")
+        self.file = open(self.filename, 'w', encoding='utf-8')
+        return self.file
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        with文の終了時に実行（エラー時も実行される）
+        用途: リソースの解放
+        
+        引数:
+            exc_type: 例外の型
+            exc_value: 例外の値
+            traceback: トレースバック
+        """
+        if self.file:
+            self.file.close()
+            print(f"✅ {self.filename} を閉じました")
+        
+        # False を返すと例外を再発生
+        # True を返すと例外を抑制
+        return False
+
+# 使用例
+with FileManager("test.txt") as f:
+    f.write("Hello, World!")
+# 自動的にファイルが閉じられる
+```
+
+### 属性アクセス
+
+```python
+class SmartDict:
+    """スマート辞書 - 属性アクセス制御"""
+    
+    def __init__(self):
+        self._data = {}
+    
+    def __getattr__(self, name):
+        """
+        obj.name で存在しない属性にアクセス時
+        用途: 動的な属性取得
+        """
+        if name in self._data:
+            return self._data[name]
+        raise AttributeError(f"'{name}' は存在しません")
+    
+    def __setattr__(self, name, value):
+        """
+        obj.name = value で属性設定時
+        用途: 属性設定の制御
+        """
+        if name == "_data":
+            # _data は通常通り設定
+            super().__setattr__(name, value)
+        else:
+            # その他は _data 辞書に保存
+            self._data[name] = value
+    
+    def __delattr__(self, name):
+        """
+        del obj.name で属性削除時
+        用途: 属性削除の制御
+        """
+        if name in self._data:
+            del self._data[name]
+        else:
+            raise AttributeError(f"'{name}' は存在しません")
+    
+    def __dir__(self):
+        """
+        dir() で利用可能な属性一覧
+        用途: 自動補完のサポート
+        """
+        return list(self._data.keys())
+
+# 使用例
+obj = SmartDict()
+obj.name = "うさうさ"     # __setattr__
+obj.age = 25            # __setattr__
+
+print(obj.name)         # __getattr__ → うさうさ
+print(dir(obj))         # __dir__ → ['name', 'age']
+
+del obj.age             # __delattr__
+```
+
+**📊 その他便利メソッド一覧表：**
+
+| 機能 | メソッド | 用途 | 例 |
+|-----|---------|------|-----|
+| 真偽値判定 | `__bool__` | `if obj` | `if stock:` |
+| 呼び出し | `__call__` | `obj()` | `calc(100)` |
+| with文開始 | `__enter__` | リソース取得 | `with obj:` |
+| with文終了 | `__exit__` | リソース解放 | `with obj:` |
+| 属性取得 | `__getattr__` | `obj.attr` | `obj.name` |
+| 属性設定 | `__setattr__` | `obj.attr = val` | `obj.name = "x"` |
+| 属性削除 | `__delattr__` | `del obj.attr` | `del obj.name` |
+| 属性一覧 | `__dir__` | `dir(obj)` | `dir(obj)` |
+
+---
+
+## 7️⃣ 実践テンプレート集
+
+### テンプレート1：価格クラス（完全版）
+
+```python
+class Price:
+    """
+    価格クラス - 実務で使える完全実装
+    
+    機能:
+    - 算術演算（+, -, *, /）
+    - 比較演算（==, <, > など）
+    - 文字列表現
+    - 真偽値判定
+    """
+    
+    def __init__(self, yen):
+        """初期化"""
+        if yen < 0:
+            raise ValueError("価格は0以上である必要があります")
+        self._yen = yen
+    
+    # ===== 算術演算 =====
+    def __add__(self, other):
+        if isinstance(other, Price):
+            return Price(self._yen + other._yen)
+        return Price(self._yen + other)
+    
+    def __radd__(self, other):
+        return self.__add__(other)
+    
+    def __sub__(self, other):
+        if isinstance(other, Price):
+            return Price(self._yen - other._yen)
+        return Price(self._yen - other)
+    
+    def __mul__(self, other):
+        return Price(int(self._yen * other))
+    
+    def __rmul__(self, other):
+        return self.__mul__(other)
+    
+    def __truediv__(self, other):
+        return Price(int(self._yen / other))
+    
+    # ===== 比較演算 =====
+    def __eq__(self, other):
+        if isinstance(other, Price):
+            return self._yen == other._yen
+        return self._yen == other
+    
+    def __lt__(self, other):
+        if isinstance(other, Price):
+            return self._yen < other._yen
+        return self._yen < other
+    
+    def __le__(self, other):
+        return self.__eq__(other) or self.__lt__(other)
+    
+    def __gt__(self, other):
+        if isinstance(other, Price):
+            return self._yen > other._yen
+        return self._yen > other
+    
+    def __ge__(self, other):
+        return self.__eq__(other) or self.__gt__(other)
+    
+    # ===== 文字列表現 =====
+    def __str__(self):
+        return f"¥{self._yen:,}"
+    
+    def __repr__(self):
+        return f"Price({self._yen})"
+    
+    def __format__(self, format_spec):
+        if format_spec == "k":
+            # 千円単位
+            return f"¥{self._yen/1000:.1f}K"
+        return str(self)
+    
+    # ===== その他 =====
+    def __bool__(self):
+        """0円ならFalse"""
+        return self._yen > 0
+    
+    def __int__(self):
+        """int()で整数化"""
+        return self._yen
+    
+    def __float__(self):
+        """float()で浮動小数点化"""
+        return float(self._yen)
+
+# 使用例
+p1 = Price(1000)
+p2 = Price(500)
+
+print(p1 + p2)        # ¥1,500
+print(p1 > p2)        # True
+print(f"{p1:k}")      # ¥1.0K
+print(int(p1))        # 1000
+print(bool(Price(0))) # False
+```
+
+### テンプレート2：コレクションクラス
+
+```python
+class ProductList:
+    """
+    商品リストクラス - コレクション型の完全実装
+    
+    機能:
+    - リスト操作
+    - イテレーション
+    - フィルタリング
+    """
+    
+    def __init__(self, products=None):
+        """初期化"""
+        self._products = products or []
+    
+    # ===== コンテナ操作 =====
+    def __len__(self):
+        return len(self._products)
+    
+    def __getitem__(self, index):
+        return self._products[index]
+    
+    def __setitem__(self, index, value):
+        self._products[index] = value
+    
+    def __delitem__(self, index):
+        del self._products[index]
+    
+    def __contains__(self, item):
+        return item in self._products
+    
+    def __iter__(self):
+        return iter(self._products)
+    
+    def __reversed__(self):
+        return reversed(self._products)
+    
+    # ===== 追加機能 =====
+    def __add__(self, other):
+        """リスト結合"""
+        if isinstance(other, ProductList):
+            return ProductList(self._products + other._products)
+        return ProductList(self._products + [other])
+    
+    def __iadd__(self, item):
+        """+=で追加"""
+        self._products.append(item)
+        return self
+    
+    def __mul__(self, n):
+        """リスト複製"""
+        return ProductList(self._products * n)
+    
+    # ===== 文字列表現 =====
+    def __str__(self):
+        return f"ProductList({len(self)}点)"
+    
+    def __repr__(self):
+        return f"ProductList({self._products})"
+    
+    # ===== 真偽値 =====
+    def __bool__(self):
+        return len(self._products) > 0
+
+# 使用例
+products = ProductList()
+products += "りんご"
+products += "バナナ"
+products += "みかん"
+
+print(len(products))       # 3
+print(products[0])         # りんご
+print("りんご" in products) # True
+
+for product in products:
+    print(f"- {product}")
+```
+
+### テンプレート3：設定クラス
+
+```python
+class Config:
+    """
+    設定クラス - 属性アクセスの実装
+    
+    機能:
+    - 辞書のように扱える
+    - 属性としてアクセス可能
+    - 読み取り専用設定
+    """
+    
+    def __init__(self, **kwargs):
+        """初期化"""
+        self._config = kwargs
+        self._readonly = set()
+    
+    # ===== 属性アクセス =====
+    def __getattr__(self, name):
+        if name.startswith('_'):
+            raise AttributeError(f"'{name}'はアクセスできません")
+        if name in self._config:
+            return self._config[name]
+        raise AttributeError(f"'{name}'は存在しません")
+    
+    def __setattr__(self, name, value):
+        if name.startswith('_'):
+            # 内部属性は通常通り設定
+            super().__setattr__(name, value)
+        elif name in self._readonly:
+            raise AttributeError(f"'{name}'は読み取り専用です")
+        else:
+            self._config[name] = value
+    
+    def __delattr__(self, name):
+        if name in self._readonly:
+            raise AttributeError(f"'{name}'は削除できません")
+        if name in self._config:
+            del self._config[name]
+    
+    # ===== 辞書風アクセス =====
+    def __getitem__(self, key):
+        return self._config[key]
+    
+    def __setitem__(self, key, value):
+        if key in self._readonly:
+            raise KeyError(f"'{key}'は読み取り専用です")
+        self._config[key] = value
+    
+    def __contains__(self, key):
+        return key in self._config
+    
+    # ===== ユーティリティ =====
+    def set_readonly(self, *keys):
+        """読み取り専用に設定"""
+        self._readonly.update(keys)
+    
+    def __str__(self):
+        return f"Config({len(self._config)}項目)"
+    
+    def __repr__(self):
+        return f"Config({self._config})"
+
+# 使用例
+config = Config(
+    host="localhost",
+    port=8080,
+    debug=True
+)
+
+# 属性アクセス
+print(config.host)      # localhost
+config.timeout = 30     # 追加
+
+# 辞書アクセス
+print(config["port"])   # 8080
+
+# 読み取り専用設定
+config.set_readonly("host", "port")
+
+try:
+    config.host = "example.com"  # エラー！
+except AttributeError as e:
+    print(f"エラー: {e}")
+```
+
+---
+
+## 📊 特殊メソッド早見表（全体）
+
+### カテゴリ別一覧
+
+```python
+"""
+【初期化・削除】
+__init__(self, ...)          # 初期化
+__del__(self)                # 削除
+
+【文字列表現】
+__str__(self)                # str(), print()
+__repr__(self)               # repr(), デバッグ
+__format__(self, spec)       # f"{obj:spec}"
+__bytes__(self)              # bytes()
+
+【算術演算】
+__add__(self, other)         # +
+__sub__(self, other)         # -
+__mul__(self, other)         # *
+__truediv__(self, other)     # /
+__floordiv__(self
+
+
+# 🐰 Python特殊メソッド完全チートシート（続き）
+
+---
+
+## 📊 特殊メソッド早見表（全体）続き
+
+### カテゴリ別一覧（続き）
+
+```python
+"""
+【算術演算】
+__add__(self, other)         # +
+__sub__(self, other)         # -
+__mul__(self, other)         # *
+__truediv__(self, other)     # /
+__floordiv__(self, other)    # //
+__mod__(self, other)         # %
+__pow__(self, other)         # **
+__matmul__(self, other)      # @ (行列乗算)
+
+【算術演算（逆順）】
+__radd__(self, other)        # other + self
+__rsub__(self, other)        # other - self
+__rmul__(self, other)        # other * self
+__rtruediv__(self, other)    # other / self
+__rfloordiv__(self, other)   # other // self
+__rmod__(self, other)        # other % self
+__rpow__(self, other)        # other ** self
+
+【複合代入演算】
+__iadd__(self, other)        # +=
+__isub__(self, other)        # -=
+__imul__(self, other)        # *=
+__itruediv__(self, other)    # /=
+__ifloordiv__(self, other)   # //=
+__imod__(self, other)        # %=
+__ipow__(self, other)        # **=
+
+【単項演算】
+__neg__(self)                # -obj
+__pos__(self)                # +obj
+__abs__(self)                # abs(obj)
+__invert__(self)             # ~obj
+
+【比較演算】
+__eq__(self, other)          # ==
+__ne__(self, other)          # !=
+__lt__(self, other)          # 
+__le__(self, other)          # <=
+__gt__(self, other)          # >
+__ge__(self, other)          # >=
+
+【コンテナ】
+__len__(self)                # len(obj)
+__getitem__(self, key)       # obj[key]
+__setitem__(self, key, val)  # obj[key] = val
+__delitem__(self, key)       # del obj[key]
+__contains__(self, item)     # item in obj
+__iter__(self)               # for x in obj
+__reversed__(self)           # reversed(obj)
+__next__(self)               # next(obj)
+
+【属性アクセス】
+__getattr__(self, name)      # obj.name (存在しない時)
+__setattr__(self, name, val) # obj.name = val
+__delattr__(self, name)      # del obj.name
+__getattribute__(self, name) # obj.name (常に)
+__dir__(self)                # dir(obj)
+
+【呼び出し・コンテキスト】
+__call__(self, ...)          # obj()
+__enter__(self)              # with obj:
+__exit__(self, ...)          # with obj: の終了
+
+【型変換】
+__int__(self)                # int(obj)
+__float__(self)              # float(obj)
+__complex__(self)            # complex(obj)
+__bool__(self)               # bool(obj)
+__str__(self)                # str(obj)
+__bytes__(self)              # bytes(obj)
+__hash__(self)               # hash(obj)
+
+【その他】
+__sizeof__(self)             # sys.getsizeof(obj)
+__index__(self)              # list[obj]のインデックス
+__instancecheck__(self, inst)# isinstance()
+__subclasscheck__(self, sub) # issubclass()
+"""
+```
+
+---
+
+## 8️⃣ 実践パターン集
+
+### パターン1：イミュータブル（不変）クラス
+
+```python
+class ImmutablePoint:
+    """
+    不変な座標クラス
+    
+    特徴:
+    - 一度作成したら値を変更できない
+    - ハッシュ可能（辞書のキーにできる）
+    """
+    
+    __slots__ = ('_x', '_y')  # メモリ効率化
+    
+    def __init__(self, x, y):
+        """初期化（特別に__setattr__を回避）"""
+        object.__setattr__(self, '_x', x)
+        object.__setattr__(self, '_y', y)
+    
+    @property
+    def x(self):
+        """x座標の取得のみ可能"""
+        return self._x
+    
+    @property
+    def y(self):
+        """y座標の取得のみ可能"""
+        return self._y
+    
+    def __setattr__(self, name, value):
+        """属性の変更を禁止"""
+        raise AttributeError("ImmutablePointは変更できません")
+    
+    def __delattr__(self, name):
+        """属性の削除を禁止"""
+        raise AttributeError("ImmutablePointは削除できません")
+    
+    def __hash__(self):
+        """ハッシュ値（辞書のキーに使える）"""
+        return hash((self._x, self._y))
+    
+    def __eq__(self, other):
+        """等価比較"""
+        if isinstance(other, ImmutablePoint):
+            return self._x == other._x and self._y == other._y
+        return False
+    
+    def __add__(self, other):
+        """新しいPointを返す（元のオブジェクトは変更しない）"""
+        if isinstance(other, ImmutablePoint):
+            return ImmutablePoint(self._x + other._x, self._y + other._y)
+        return NotImplemented
+    
+    def __str__(self):
+        return f"Point({self._x}, {self._y})"
+    
+    def __repr__(self):
+        return f"ImmutablePoint({self._x}, {self._y})"
+
+# 使用例
+p1 = ImmutablePoint(10, 20)
+p2 = ImmutablePoint(5, 15)
+
+print(p1 + p2)  # Point(15, 35)
+
+# 辞書のキーとして使える
+points = {
+    p1: "始点",
+    p2: "終点"
+}
+print(points[p1])  # 始点
+
+# 変更しようとするとエラー
+try:
+    p1.x = 100
+except AttributeError as e:
+    print(f"エラー: {e}")
+```
+
+### パターン2：遅延評価クラス
+
+```python
+class LazyProperty:
+    """
+    遅延評価プロパティデスクリプタ
+    
+    特徴:
+    - 初回アクセス時のみ計算
+    - 結果をキャッシュ
+    """
+    
+    def __init__(self, func):
+        self.func = func
+        self.name = func.__name__
+    
+    def __get__(self, instance, owner):
+        """属性取得時"""
+        if instance is None:
+            return self
+        
+        # 初回計算
+        value = self.func(instance)
+        
+        # インスタンスに結果を保存（次回以降は計算不要）
+        setattr(instance, self.name, value)
+        
+        return value
+
+class DataProcessor:
+    """データ処理クラス - 遅延評価の例"""
+    
+    def __init__(self, data):
+        self.data = data
+    
+    @LazyProperty
+    def total(self):
+        """合計（初回のみ計算）"""
+        print("  計算中: 合計...")
+        return sum(self.data)
+    
+    @LazyProperty
+    def average(self):
+        """平均（初回のみ計算）"""
+        print("  計算中: 平均...")
+        return self.total / len(self.data)
+    
+    @LazyProperty
+    def max_value(self):
+        """最大値（初回のみ計算）"""
+        print("  計算中: 最大値...")
+        return max(self.data)
+
+# 使用例
+processor = DataProcessor([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+print("1回目のアクセス:")
+print(f"合計: {processor.total}")      # 計算される
+
+print("\n2回目のアクセス:")
+print(f"合計: {processor.total}")      # キャッシュから取得（計算なし）
+
+print("\n他のプロパティ:")
+print(f"平均: {processor.average}")    # 計算される
+print(f"最大: {processor.max_value}")  # 計算される
+```
+
+### パターン3：チェーン可能なビルダー
+
+```python
+class QueryBuilder:
+    """
+    SQLクエリビルダー - メソッドチェーン
+    
+    特徴:
+    - メソッドが自分自身を返す
+    - 読みやすいAPIを提供
+    """
+    
+    def __init__(self, table):
+        self._table = table
+        self._select = []
+        self._where = []
+        self._order = []
+        self._limit = None
+    
+    def select(self, *columns):
+        """SELECT句を追加"""
+        self._select.extend(columns)
+        return self  # 自分自身を返してチェーン可能に
+    
+    def where(self, condition):
+        """WHERE句を追加"""
+        self._where.append(condition)
+        return self
+    
+    def order_by(self, column, direction="ASC"):
+        """ORDER BY句を追加"""
+        self._order.append(f"{column} {direction}")
+        return self
+    
+    def limit(self, count):
+        """LIMIT句を追加"""
+        self._limit = count
+        return self
+    
+    def __str__(self):
+        """クエリ文字列を生成"""
+        # SELECT句
+        if self._select:
+            query = f"SELECT {', '.join(self._select)}"
+        else:
+            query = "SELECT *"
+        
+        # FROM句
+        query += f" FROM {self._table}"
+        
+        # WHERE句
+        if self._where:
+            query += f" WHERE {' AND '.join(self._where)}"
+        
+        # ORDER BY句
+        if self._order:
+            query += f" ORDER BY {', '.join(self._order)}"
+        
+        # LIMIT句
+        if self._limit:
+            query += f" LIMIT {self._limit}"
+        
+        return query
+    
+    def __repr__(self):
+        return f"QueryBuilder('{self._table}')"
+
+# 使用例
+query = (QueryBuilder("users")
+         .select("id", "name", "email")
+         .where("age >= 18")
+         .where("status = 'active'")
+         .order_by("created_at", "DESC")
+         .limit(10))
+
+print(query)
+# SELECT id, name, email FROM users 
+# WHERE age >= 18 AND status = 'active' 
+# ORDER BY created_at DESC LIMIT 10
+```
+
+### パターン4：デコレーターとして使えるクラス
+
+```python
+class CountCalls:
+    """
+    関数呼び出し回数をカウントするデコレータクラス
+    
+    特徴:
+    - デコレーターとして使える
+    - 呼び出し回数を記録
+    """
+    
+    def __init__(self, func):
+        """初期化"""
+        self.func = func
+        self.count = 0
+    
+    def __call__(self, *args, **kwargs):
+        """関数として呼び出された時"""
+        self.count += 1
+        print(f"📞 呼び出し回数: {self.count}")
+        return self.func(*args, **kwargs)
+    
+    def __repr__(self):
+        return f"CountCalls({self.func.__name__}, count={self.count})"
+
+# 使用例
+@CountCalls
+def greet(name):
+    """挨拶する関数"""
+    return f"こんにちは、{name}さん！"
+
+print(greet("太郎"))
+print(greet("花子"))
+print(greet("次郎"))
+print(f"\n{greet}")  # CountCalls(greet, count=3)
+```
+
+### パターン5：シングルトンパターン
+
+```python
+class Singleton:
+    """
+    シングルトンパターン
+    
+    特徴:
+    - インスタンスが1つだけ存在
+    - どこからアクセスしても同じインスタンス
+    """
+    
+    _instance = None
+    
+    def __new__(cls, *args, **kwargs):
+        """
+        インスタンス生成を制御
+        既にインスタンスがあれば、それを返す
+        """
+        if cls._instance is None:
+            print("  新しいインスタンスを作成")
+            cls._instance = super().__new__(cls)
+        else:
+            print("  既存のインスタンスを返す")
+        return cls._instance
+    
+    def __init__(self, name="Default"):
+        """初期化（毎回呼ばれるので注意）"""
+        if not hasattr(self, 'initialized'):
+            self.name = name
+            self.initialized = True
+            print(f"  初期化: {self.name}")
+
+# 使用例
+print("1つ目のインスタンス作成:")
+s1 = Singleton("First")
+
+print("\n2つ目のインスタンス作成:")
+s2 = Singleton("Second")
+
+print("\n同じインスタンス？")
+print(s1 is s2)  # True
+print(s1.name)   # First（最初の名前のまま）
+```
+
+---
+
+## 9️⃣ デバッグ・開発に便利な特殊メソッド
+
+### パターン1：詳細なデバッグ情報
+
+```python
+class DebugObject:
+    """
+    デバッグ用のクラス
+    
+    特徴:
+    - すべての操作をログ出力
+    - 動作を追跡しやすい
+    """
+    
+    def __init__(self, value):
+        print(f"🔧 __init__: value={value}")
+        self.value = value
+    
+    def __repr__(self):
+        """開発者向け表現"""
+        return f"DebugObject(value={self.value})"
+    
+    def __str__(self):
+        """ユーザー向け表現"""
+        return f"Value: {self.value}"
+    
+    def __getattribute__(self, name):
+        """すべての属性アクセスをログ"""
+        print(f"🔍 __getattribute__: {name}")
+        return super().__getattribute__(name)
+    
+    def __setattr__(self, name, value):
+        """すべての属性設定をログ"""
+        print(f"✏️  __setattr__: {name} = {value}")
+        super().__setattr__(name, value)
+    
+    def __delattr__(self, name):
+        """すべての属性削除をログ"""
+        print(f"🗑️  __delattr__: {name}")
+        super().__delattr__(name)
+    
+    def __call__(self, *args, **kwargs):
+        """呼び出しをログ"""
+        print(f"📞 __call__: args={args}, kwargs={kwargs}")
+        return f"Called with {args}"
+
+# 使用例
+print("=== オブジェクト作成 ===")
+obj = DebugObject(100)
+
+print("\n=== 属性アクセス ===")
+print(obj.value)
+
+print("\n=== 属性設定 ===")
+obj.new_attr = "test"
+
+print("\n=== 呼び出し ===")
+result = obj("arg1", "arg2", key="value")
+print(result)
+```
+
+### パターン2：型チェック付きクラス
+
+```python
+class TypedProperty:
+    """
+    型チェック付きプロパティデスクリプタ
+    """
+    
+    def __init__(self, name, expected_type):
+        self.name = name
+        self.expected_type = expected_type
+    
+    def __get__(self, instance, owner):
+        """値の取得"""
+        if instance is None:
+            return self
+        return instance.__dict__.get(self.name)
+    
+    def __set__(self, instance, value):
+        """値の設定（型チェック付き）"""
+        if not isinstance(value, self.expected_type):
+            raise TypeError(
+                f"{self.name}は{self.expected_type.__name__}型である必要があります。"
+                f"実際: {type(value).__name__}"
+            )
+        instance.__dict__[self.name] = value
+    
+    def __delete__(self, instance):
+        """値の削除"""
+        del instance.__dict__[self.name]
+
+class Product:
+    """型安全な商品クラス"""
+    
+    name = TypedProperty("name", str)
+    price = TypedProperty("price", int)
+    in_stock = TypedProperty("in_stock", bool)
+    
+    def __init__(self, name, price, in_stock=True):
+        self.name = name
+        self.price = price
+        self.in_stock = in_stock
+    
+    def __repr__(self):
+        return f"Product(name='{self.name}', price={self.price}, in_stock={self.in_stock})"
+
+# 使用例
+product = Product("りんご", 150, True)
+print(product)
+
+# 正しい型
+product.price = 200  # ✅ OK
+
+# 間違った型
+try:
+    product.price = "300円"  # ❌ エラー
+except TypeError as e:
+    print(f"エラー: {e}")
+```
+
+---
+
+## 🔟 パフォーマンス最適化パターン
+
+### パターン1：`__slots__` でメモリ節約
+
+```python
+class WithoutSlots:
+    """通常のクラス"""
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class WithSlots:
+    """__slots__を使ったクラス"""
+    __slots__ = ('x', 'y')  # 属性を制限
+    
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+import sys
+
+# メモリ使用量の比較
+obj1 = WithoutSlots(1, 2)
+obj2 = WithSlots(1, 2)
+
+print(f"通常のクラス: {sys.getsizeof(obj1.__dict__)} bytes")
+print(f"__slots__付き: {sys.getsizeof(obj2)} bytes")
+
+# __slots__の制限
+try:
+    obj2.z = 3  # ❌ エラー（定義されていない属性）
+except AttributeError as e:
+    print(f"エラー: {e}")
+```
+
+### パターン2：`__getattr__` vs `__getattribute__`
+
+```python
+class GetAttrExample:
+    """__getattr__の例（存在しない属性のみ）"""
+    
+    def __init__(self):
+        self.existing = "存在する属性"
+    
+    def __getattr__(self, name):
+        """存在しない属性にアクセスした時のみ呼ばれる"""
+        print(f"  __getattr__: {name}")
+        return f"動的に生成: {name}"
+
+class GetAttributeExample:
+    """__getattribute__の例（すべての属性）"""
+    
+    def __init__(self):
+        super().__setattr__('existing', "存在する属性")
+    
+    def __getattribute__(self, name):
+        """すべての属性アクセスで呼ばれる（重い！）"""
+        print(f"  __getattribute__: {name}")
+        return super().__getattribute__(name)
+
+# 使用例
+print("=== __getattr__の動作 ===")
+obj1 = GetAttrExample()
+print(obj1.existing)      # __getattr__は呼ばれない
+print(obj1.not_existing)  # __getattr__が呼ばれる
+
+print("\n=== __getattribute__の動作 ===")
+obj2 = GetAttributeExample()
+print(obj2.existing)      # __getattribute__が呼ばれる
+```
+
+---
+
+## 1️⃣1️⃣ よくあるエラーと対処法
+
+### エラー1：無限再帰
+
+```python
+# ❌ 悪い例
+class BadExample:
+    def __init__(self):
+        self.value = 0
+    
+    def __getattribute__(self, name):
+        # これは無限再帰になる！
+        # return self.value  # self.value を取得しようとして、
+                             # また __getattribute__ が呼ばれる
+        pass
+
+# ✅ 良い例
+class GoodExample:
+    def __init__(self):
+        self.value = 0
+    
+    def __getattribute__(self, name):
+        # super()を使って安全に取得
+        return super().__getattribute__(name)
+```
+
+### エラー2：`__init__` vs `__new__`
+
+```python
+class NewExample:
+    """__new__と__init__の違い"""
+    
+    def __new__(cls, *args, **kwargs):
+        """
+        インスタンスの生成を制御
+        インスタンスを返す必要がある
+        """
+        print("  1. __new__が呼ばれた")
+        instance = super().__new__(cls)
+        return instance
+    
+    def __init__(self, value):
+        """
+        インスタンスの初期化
+        返り値は無視される
+        """
+        print("  2. __init__が呼ばれた")
+        self.value = value
+
+# 使用例
+obj = NewExample(100)
+```
+
+**使い分け：**
+- `__new__`: インスタンス生成を制御（シングルトンなど）
+- `__init__`: インスタンスの初期化（通常はこちらを使う）
+
+### エラー3：可変デフォルト引数
+
+```python
+# ❌ 危険な例
+class BadList:
+    def __init__(self, items=[]):  # 危険！
+        self.items = items
+
+obj1 = BadList()
+obj1.items.append(1)
+
+obj2 = BadList()  # obj1と同じリストを共有！
+print(obj2.items)  # [1]（予期しない動作）
+
+# ✅ 正しい例
+class GoodList:
+    def __init__(self, items=None):
+        self.items = items if items is not None else []
+
+obj3 = GoodList()
+obj3.items.append(1)
+
+obj4 = GoodList()
+print(obj4.items)  # []（期待通り）
+```
+
+---
+
+## 1️⃣2️⃣ 特殊メソッド実装チェックリスト
+
+### 最小限の実装
+
+```python
+class MinimalClass:
+    """最小限の実装で使いやすいクラス"""
+    
+    def __init__(self, value):
+        """✅ 必須: 初期化"""
+        self.value = value
+    
+    def __str__(self):
+        """✅ 推奨: 人間が読みやすい表現"""
+        return f"Value: {self.value}"
+    
+    def __repr__(self):
+        """✅ 推奨: 開発者向け表現"""
+        return f"MinimalClass({self.value!r})"
+    
+    def __eq__(self, other):
+        """✅ 推奨: 等価比較"""
+        if isinstance(other, MinimalClass):
+            return self.value == other.value
+        return False
+```
+
+### 完全な実装チェックリスト
+
+```markdown
+## 基本（ほぼすべてのクラスで実装）
+- [ ] `__init__` - 初期化
+- [ ] `__str__` - 文字列表現
+- [ ] `__repr__` - デバッグ表現
+
+## 比較が必要な場合
+- [ ] `__eq__` - 等価比較
+- [ ] `__ne__` - 不等価比較（通常は不要）
+- [ ] `__lt__` - 小なり
+- [ ] `__le__` - 以下
+- [ ] `__gt__` - 大なり
+- [ ] `__ge__` - 以上
+- [ ] `__hash__` - ハッシュ化（辞書のキーにする場合）
+
+## 算術演算が必要な場合
+- [ ] `__add__` / `__radd__` - 加算
+- [ ] `__sub__` / `__rsub__` - 減算
+- [ ] `__mul__` / `__rmul__` - 乗算
+- [ ] `__truediv__` / `__rtruediv__` - 除算
+
+## コンテナ型の場合
+- [ ] `__len__` - 長さ
+- [ ] `__getitem__` - 要素取得
+- [ ] `__setitem__` - 要素設定
+- [ ] `__delitem__` - 要素削除
+- [ ] `__contains__` - 含有チェック
+- [ ] `__iter__` - イテレーション
+
+## その他
+- [ ] `__bool__` - 真偽値判定
+- [ ] `__call__` - 呼び出し可能
+- [ ] `__enter__` / `__exit__` - コンテキストマネージャー
+```
+
+---
+
+## 🎓 まとめ：新人エンジニアへのアドバイス
+
+### 🎯 学習の順序
+
+```python
+"""
+ステップ1: 基本を押さえる
+- __init__, __str__, __repr__
+これだけでも十分使える！
+
+ステップ2: 用途に応じて追加
+- 比較が必要 → __eq__, __lt__ など
+- 計算が必要 → __add__, __mul__ など
+- コンテナ型 → __len__, __getitem__ など
+
+ステップ3: 高度な機能
+- __call__, __enter__/__exit__
+- __getattr__, __setattr__
+- __new__, __slots__
+"""
+```
+
+### 💡 実装のコツ
+
+1. **最初から完璧を目指さない**
+   ```python
+   # まずは最小限で動くものを作る
+   class Product:
+       def __init__(self, name, price):
+           self.name = name
+           self.price = price
+       
+       def __str__(self):
+           return f"{self.name}: ¥{self.price}"
+   
+   # 必要に応じて機能を追加
+   ```
+
+2. **Pythonの組み込み型を参考にする**
+   ```python
+   # list, dict, set などの動作を真似る
+   # help(list) でメソッドを確認
+   ```
+
+3. **テストを書く**
+   ```python
+   # 特殊メソッドの動作を確認
+   product = Product("りんご", 150)
+   assert str(product) == "りんご: ¥150"
+   assert product == Product("りんご", 150)
+   ```
+
+---
+
+## 📚 クイックリファレンス
+
+### よく使う特殊メソッドTop 10
+
+```python
+# 🥇 1位: __init__ - 必須！
+def __init__(self, ...):
+    """初期化"""
+    pass
+
+# 🥈 2位: __str__ - print()で見やすく
+def __str__(self):
+    """文字列表現"""
+    return "..."
+
+# 🥉 3位: __repr__ - デバッグに便利
+def __repr__(self):
+    """開発者向け表現"""
+    return "ClassName(...)"
+
+# 4位: __eq__ - 比較
+def __eq__(self, other):
+    """等価比較"""
+    return ...
+
+# 5位: __len__ - コンテナの長さ
+def __len__(self):
+    """長さ"""
+    return ...
+
+# 6位: __getitem__ - obj[key]
+def __getitem__(self, key):
+    """要素取得"""
+    return ...
+
+# 7位: __add__ - 加算
+def __add__(self, other):
+    """加算"""
+    return ...
+
+# 8位: __iter__ - forループ
+def __iter__(self):
+    """イテレータ"""
+    return iter(...)
+
+# 9位: __bool__ - if文
+def __bool__(self):
+    """真偽値"""
+    return ...
+
+# 10位: __enter__ / __exit__ - with文
+def __enter__(self):
+    """with開始"""
+    return self
+
+def __exit__(self, *args):
+    """with終了"""
+    pass
+```
+
+---
+
+🐰 **このチートシートを印刷して、デスクに貼っておこう！**
+
+特殊メソッドを使いこなせば、Pythonらしい美しいコードが書けるようになるよ！🍡✨
