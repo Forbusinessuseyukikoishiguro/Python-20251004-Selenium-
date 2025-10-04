@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git 差分・履歴・巻き戻し完全ガイド</title>
+    <style>
+        body {
+            font-family: "Yu Gothic", "Meiryo", sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .sheet-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h3 {
+            color: #34495e;
+            border-left: 4px solid #e74c3c;
+            padding-left: 10px;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+        }
+        th {
+            background: #e74c3c;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #c0392b;
+        }
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #ffebee;
+        }
+        .danger-high { background: #ffcdd2; border-left: 4px solid #f44336; }
+        .danger-mid { background: #ffe0b2; border-left: 4px solid #ff9800; }
+        .danger-low { background: #c8e6c9; border-left: 4px solid #4caf50; }
+        code {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #c7254e;
+            font-size: 13px;
+        }
+        .command-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: "Consolas", monospace;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+        .scenario {
+            background: #fff9e6;
+            padding: 15px;
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .comparison-table {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instruction">
+    <strong>📋 使い方:</strong> 下の表を選択して <code>Ctrl+C</code> でコピー → Excelに <code>Ctrl+V</code> で貼り付け！<br>
+    <strong>🎯 対象:</strong> 差分比較・履歴確認・巻き戻し・トラブル対応に特化
+</div>
+
+<!-- セクション1: 差分比較の完全ガイド -->
+<div class="sheet-container">
+    <h2>🔍 1. 差分比較（git diff）完全ガイド</h2>
+    
+    <h3>基本的な差分確認</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>確認したい内容</th>
+                <th>コマンド</th>
+                <th>表示内容</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>作業中の変更</td>
+                <td><code>git diff</code></td>
+                <td>ワーキングツリーの変更（未ステージング）</td>
+                <td>コミット前の確認</td>
+            </tr>
+            <tr>
+                <td>ステージング済みの変更</td>
+                <td><code>git diff --cached</code></td>
+                <td>ステージング済みの差分</td>
+                <td><code>git add</code> 後の最終確認</td>
+            </tr>
+            <tr>
+                <td>全ての変更</td>
+                <td><code>git diff HEAD</code></td>
+                <td>ステージング済み＋未ステージングの全変更</td>
+                <td>現在の全変更を一度に確認</td>
+            </tr>
+            <tr>
+                <td>特定ファイルの差分</td>
+                <td><code>git diff &lt;ファイル名&gt;</code></td>
+                <td>指定ファイルのみの差分</td>
+                <td>大量変更時の個別確認</td>
+            </tr>
+            <tr>
+                <td>特定ディレクトリの差分</td>
+                <td><code>git diff src/</code></td>
+                <td>指定ディレクトリ配下の差分</td>
+                <td>フォルダ単位での確認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>コミット間の差分比較</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>比較内容</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>直前のコミットとの差分</td>
+                <td><code>git diff HEAD~1</code></td>
+                <td>1つ前のコミットと現在の差分</td>
+            </tr>
+            <tr>
+                <td>2つのコミット間の差分</td>
+                <td><code>git diff &lt;commitID1&gt; &lt;commitID2&gt;</code></td>
+                <td>指定した2つのコミット間の差分</td>
+            </tr>
+            <tr>
+                <td>特定コミットと現在の差分</td>
+                <td><code>git diff &lt;commitID&gt;</code></td>
+                <td>指定コミットから現在までの変更</td>
+            </tr>
+            <tr>
+                <td>過去3コミット前との差分</td>
+                <td><code>git diff HEAD~3</code></td>
+                <td>3つ前のコミットとの差分</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ブランチ間の差分比較</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>比較内容</th>
+                <th>コマンド</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2つのブランチの差分</td>
+                <td><code>git diff develop main</code></td>
+                <td>ブランチ間の違いを確認</td>
+            </tr>
+            <tr>
+                <td>現在のブランチと別ブランチ</td>
+                <td><code>git diff feature/login</code></td>
+                <td>作業ブランチとの比較</td>
+            </tr>
+            <tr>
+                <td>リモートブランチとの差分</td>
+                <td><code>git diff origin/develop</code></td>
+                <td>push前の確認</td>
+            </tr>
+            <tr>
+                <td>マージ前の差分確認</td>
+                <td><code>git diff develop...feature/login</code></td>
+                <td>PRレビュー前の確認（3ドット）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>差分表示のオプション</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>オプション</th>
+                <th>コマンド例</th>
+                <th>効果</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>統計情報のみ表示</td>
+                <td><code>git diff --stat</code></td>
+                <td>変更ファイル数と行数のサマリー</td>
+            </tr>
+            <tr>
+                <td>変更ファイル名のみ</td>
+                <td><code>git diff --name-only</code></td>
+                <td>ファイル名のリストのみ</td>
+            </tr>
+            <tr>
+                <td>変更ファイル名＋状態</td>
+                <td><code>git diff --name-status</code></td>
+                <td>追加/変更/削除の状態付き</td>
+            </tr>
+            <tr>
+                <td>単語単位の差分</td>
+                <td><code>git diff --word-diff</code></td>
+                <td>行単位ではなく単語単位で表示</td>
+            </tr>
+            <tr>
+                <td>空白の違いを無視</td>
+                <td><code>git diff -w</code></td>
+                <td>空白・タブの違いを無視</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git diff
+diff --git a/login.js b/login.js
+index 3f2a1b4..9c8e5d2 100644
+--- a/login.js
++++ b/login.js
+@@ -10,7 +10,10 @@ function login(username, password) {
+-  if (username && password) {
++  if (!username || !password) {
++    return { error: 'ユーザー名とパスワードは必須です' };
++  }
++  if (username && password) {
+     return authenticate(username, password);
+   }
+    </div>
+
+    <div class="tip">
+        <strong>💡 VSCodeでの差分確認:</strong><br>
+        左側の「ソース管理」→ 変更ファイルをクリック → 自動的に差分表示<br>
+        視覚的に分かりやすいのでおすすめ！
+    </div>
+</div>
+
+<!-- セクション2: 履歴確認の完全ガイド -->
+<div class="sheet-container">
+    <h2>📜 2. 履歴確認（git log）完全ガイド</h2>
+    
+    <h3>基本的な履歴確認</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>確認したい内容</th>
+                <th>コマンド</th>
+                <th>表示形式</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>標準の履歴表示</td>
+                <td><code>git log</code></td>
+                <td>詳細な履歴（コミットID、作者、日時、メッセージ）</td>
+                <td>詳細確認</td>
+            </tr>
+            <tr>
+                <td>簡潔な履歴表示</td>
+                <td><code>git log --oneline</code></td>
+                <td>1行でコミットIDとメッセージ</td>
+                <td>概要確認</td>
+            </tr>
+            <tr>
+                <td>最新5件のみ</td>
+                <td><code>git log -5</code></td>
+                <td>直近5件のコミット</td>
+                <td>最新の変更確認</td>
+            </tr>
+            <tr>
+                <td>グラフ表示</td>
+                <td><code>git log --oneline --graph --all</code></td>
+                <td>ブランチ構造をグラフ化</td>
+                <td>ブランチの分岐確認</td>
+            </tr>
+            <tr>
+                <td>統計情報付き</td>
+                <td><code>git log --stat</code></td>
+                <td>変更ファイルと行数を表示</td>
+                <td>変更量の確認</td>
+            </tr>
+            <tr>
+                <td>差分付き履歴</td>
+                <td><code>git log -p</code></td>
+                <td>各コミットの差分も表示</td>
+                <td>詳細な変更内容確認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>条件付き履歴検索</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>検索条件</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>特定ファイルの履歴</td>
+                <td><code>git log -- &lt;ファイル名&gt;</code></td>
+                <td>指定ファイルに関する履歴のみ</td>
+            </tr>
+            <tr>
+                <td>特定作者の履歴</td>
+                <td><code>git log --author="Tanaka"</code></td>
+                <td>指定した作者のコミットのみ</td>
+            </tr>
+            <tr>
+                <td>期間指定</td>
+                <td><code>git log --since="2025-01-01"</code></td>
+                <td>指定日以降のコミット</td>
+            </tr>
+            <tr>
+                <td>昨日以降</td>
+                <td><code>git log --since="yesterday"</code></td>
+                <td>昨日からの変更</td>
+            </tr>
+            <tr>
+                <td>過去1週間</td>
+                <td><code>git log --since="1 week ago"</code></td>
+                <td>1週間分の履歴</td>
+            </tr>
+            <tr>
+                <td>メッセージで検索</td>
+                <td><code>git log --grep="ログイン"</code></td>
+                <td>メッセージに「ログイン」を含むコミット</td>
+            </tr>
+            <tr>
+                <td>コード内容で検索</td>
+                <td><code>git log -S"function login"</code></td>
+                <td>「function login」が追加/削除されたコミット</td>
+            </tr>
+            <tr>
+                <td>複数条件の組み合わせ</td>
+                <td><code>git log --author="Tanaka" --since="1 week ago"</code></td>
+                <td>Tanakaさんの過去1週間のコミット</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>カスタム表示フォーマット</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>表示内容</th>
+                <th>コマンド</th>
+                <th>出力例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>コミットID + メッセージ</td>
+                <td><code>git log --pretty=format:"%h - %s"</code></td>
+                <td>3f2a1b4 - feat: ログイン機能追加</td>
+            </tr>
+            <tr>
+                <td>日時 + 作者 + メッセージ</td>
+                <td><code>git log --pretty=format:"%ad %an: %s"</code></td>
+                <td>2025-10-04 田中太郎: バグ修正</td>
+            </tr>
+            <tr>
+                <td>相対日時表示</td>
+                <td><code>git log --pretty=format:"%h %ar %s"</code></td>
+                <td>3f2a1b4 2 hours ago ログイン機能追加</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git log --oneline --graph --all
+* 9c8e5d2 (HEAD -> feature/login) feat: ログイン機能を追加
+* 3f2a1b4 fix: バリデーションエラーを修正
+| * 7a4b2c1 (develop) docs: READMEを更新
+|/
+* 2e1f9d3 chore: 依存関係を更新
+
+$ git log --since="yesterday" --author="Tanaka" --oneline
+9c8e5d2 feat: ログイン機能を追加
+3f2a1b4 fix: バリデーションエラーを修正
+    </div>
+
+    <h3>特定のコミット詳細を確認</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>git show &lt;commitID&gt;</code></td>
+                <td>コミットの詳細と差分を表示</td>
+                <td>特定コミットの内容確認</td>
+            </tr>
+            <tr>
+                <td><code>git show HEAD</code></td>
+                <td>最新コミットの詳細</td>
+                <td>直前のコミット確認</td>
+            </tr>
+            <tr>
+                <td><code>git show HEAD~3</code></td>
+                <td>3つ前のコミット詳細</td>
+                <td>過去のコミット確認</td>
+            </tr>
+            <tr>
+                <td><code>git blame &lt;ファイル名&gt;</code></td>
+                <td>各行の最終編集者と日時</td>
+                <td>誰がいつ変更したか調査</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- セクション3: 戻す方法の完全ガイド -->
+<div class="sheet-container">
+    <h2>⏮️ 3. 戻す方法（巻き戻し）完全ガイド</h2>
+    
+    <div class="scenario">
+        <strong>⚠️ 重要:</strong> 巻き戻しは<strong>どの段階で間違えたか</strong>によって使うコマンドが異なります！
+    </div>
+
+    <h3>状態別：戻し方の選択フローチャート</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>現在の状態</th>
+                <th>やりたいこと</th>
+                <th>コマンド</th>
+                <th>危険度</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td>ファイルを編集中<br>（まだ add していない）</td>
+                <td>編集を取り消したい</td>
+                <td><code>git restore &lt;ファイル名&gt;</code></td>
+                <td>低</td>
+            </tr>
+            <tr class="danger-low">
+                <td>全ファイルの編集を取り消し</td>
+                <td>全変更を破棄</td>
+                <td><code>git restore .</code></td>
+                <td>中</td>
+            </tr>
+            <tr class="danger-low">
+                <td>add してしまった<br>（ステージング済み）</td>
+                <td>ステージングを解除</td>
+                <td><code>git restore --staged &lt;ファイル名&gt;</code></td>
+                <td>低</td>
+            </tr>
+            <tr class="danger-low">
+                <td>commit してしまった<br>（push はまだ）</td>
+                <td>コミットを取り消し（変更は残す）</td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>低</td>
+            </tr>
+            <tr class="danger-mid">
+                <td>commit してしまった</td>
+                <td>コミットと変更を両方取り消し</td>
+                <td><code>git reset --hard HEAD~1</code></td>
+                <td>高</td>
+            </tr>
+            <tr class="danger-low">
+                <td>commit したがメッセージだけ間違えた</td>
+                <td>メッセージのみ修正</td>
+                <td><code>git commit --amend -m "正しいメッセージ"</code></td>
+                <td>低</td>
+            </tr>
+            <tr class="danger-low">
+                <td>push してしまった</td>
+                <td>安全に取り消す</td>
+                <td><code>git revert &lt;commitID&gt;</code></td>
+                <td>低</td>
+            </tr>
+            <tr class="danger-high">
+                <td>push してしまった</td>
+                <td>強制的に削除（危険）</td>
+                <td><code>git reset --hard HEAD~1</code><br><code>git push --force</code></td>
+                <td>最高</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>方法1: restore（ファイルの変更を戻す）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>シーン</th>
+                <th>コマンド</th>
+                <th>結果</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>特定ファイルの編集を取り消し</td>
+                <td><code>git restore login.js</code></td>
+                <td>login.js が最新コミット時点に戻る</td>
+            </tr>
+            <tr>
+                <td>全ファイルの編集を取り消し</td>
+                <td><code>git restore .</code></td>
+                <td>全変更が破棄される</td>
+            </tr>
+            <tr>
+                <td>ステージングを解除</td>
+                <td><code>git restore --staged login.js</code></td>
+                <td>add を取り消し（ファイルの変更は残る）</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 実行例
+$ git status
+modified:   login.js
+
+$ git restore login.js
+
+$ git status
+nothing to commit, working tree clean
+    </div>
+
+    <h3>方法2: reset（コミットを戻す）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>オプション</th>
+                <th>コマンド</th>
+                <th>コミット履歴</th>
+                <th>ステージング</th>
+                <th>ワーキングツリー</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td>--soft</td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>削除</td>
+                <td>保持</td>
+                <td>保持</td>
+            </tr>
+            <tr class="danger-mid">
+                <td>--mixed（デフォルト）</td>
+                <td><code>git reset HEAD~1</code></td>
+                <td>削除</td>
+                <td>削除</td>
+                <td>保持</td>
+            </tr>
+            <tr class="danger-high">
+                <td>--hard</td>
+                <td><code>git reset --hard HEAD~1</code></td>
+                <td>削除</td>
+                <td>削除</td>
+                <td>削除</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="comparison-table">
+        <strong>📊 reset オプション比較:</strong>
+        <ul>
+            <li><code>--soft</code>: コミットだけ取り消し。変更はステージング状態で残る → 安全</li>
+            <li><code>--mixed</code>: コミット＋ステージング解除。変更は残る → やや安全</li>
+            <li><code>--hard</code>: 全て削除。変更も消える → 危険</li>
+        </ul>
+    </div>
+
+    <div class="command-block"># --soft の例（推奨）
+$ git reset --soft HEAD~1
+# コミットが取り消され、変更はステージング状態で残る
+
+$ git status
+Changes to be committed:
+  modified:   login.js
+
+# 再度コミットしたり、修正してから再コミット可能
+    </div>
+
+    <h3>方法3: revert（pushの後の安全な取り消し）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>コマンド</th>
+                <th>動作</th>
+                <th>推奨度</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td><code>git revert &lt;commitID&gt;</code></td>
+                <td>
+                    指定コミットを打ち消す<strong>新しいコミット</strong>を作成<br>
+                    履歴は残る（安全）
+                </td>
+                <td>★★★ 推奨</td>
+            </tr>
+            <tr class="danger-low">
+                <td><code>git revert HEAD</code></td>
+                <td>直前のコミットを打ち消す</td>
+                <td>★★★ 推奨</td>
+            </tr>
+            <tr class="danger-low">
+                <td><code>git revert HEAD~3</code></td>
+                <td>3つ前のコミットを打ち消す</td>
+                <td>★★☆</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># revert の実行例
+$ git log --oneline
+9c8e5d2 (HEAD -> main) feat: バグのある機能を追加
+3f2a1b4 fix: 前回の修正
+
+$ git revert 9c8e5d2
+# エディタが開くのでメッセージ確認 → 保存
+
+$ git log --oneline
+7a4b2c1 (HEAD -> main) Revert "feat: バグのある機能を追加"
+9c8e5d2 feat: バグのある機能を追加
+3f2a1b4 fix: 前回の修正
+
+# 9c8e5d2 の変更が打ち消された新しいコミット 7a4b2c1 が作成される
+    </div>
+
+    <div class="danger">
+        <strong>🚨 絶対に守るべきルール:</strong><br>
+        - <code>git reset --hard</code> は push 前のローカルのみで使用<br>
+        - push 済みのコミットは <code>git revert</code> を使う<br>
+        - <code>git push --force</code> は共有ブランチで絶対禁止<br>
+        - 重要な変更の前は必ずブランチを作成
+    </div>
+</div>
+
+<!-- セクション4: ブランチ操作 -->
+<div class="sheet-container">
+    <h2>🌿 4. ブランチ変更・操作完全ガイド</h2>
+    
+    <h3>基本的なブランチ操作</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>操作</th>
+                <th>コマンド</th>
+                <th>説明</th>
+                <th>使用場面</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ブランチ一覧表示</td>
+                <td><code>git branch</code></td>
+                <td>ローカルブランチ一覧（*が現在のブランチ）</td>
+                <td>現在位置の確認</td>
+            </tr>
+            <tr>
+                <td>全ブランチ表示</td>
+                <td><code>git branch -a</code></td>
+                <td>ローカル＋リモートの全ブランチ</td>
+                <td>リモートブランチ確認</td>
+            </tr>
+            <tr>
+                <td>新しいブランチ作成</td>
+                <td><code>git branch feature/login</code></td>
+                <td>ブランチ作成（切り替えはしない）</td>
+                <td>ブランチだけ先に作成</td>
+            </tr>
+            <tr>
+                <td>ブランチ作成＋切り替え</td>
+                <td><code>git switch -c feature/login</code></td>
+                <td>作成と同時に切り替え</td>
+                <td>新機能開発開始</td>
+            </tr>
+            <tr>
+                <td>ブランチ切り替え</td>
+                <td><code>git switch develop</code></td>
+                <td>既存ブランチに移動</td>
+                <td>ブランチ間の移動</td>
+            </tr>
+            <tr>
+                <td>直前のブランチに戻る</td>
+                <td><code>git switch -</code></td>
+                <td>1つ前にいたブランチに戻る</td>
+                <td>行ったり来たりする時</td>
+            </tr>
+            <tr>
+                <td>ブランチ削除</td>
+                <td><code>git branch -d feature/login</code></td>
+                <td>マージ済みブランチを削除</td>
+                <td>作業完了後のクリーンアップ</td>
+            </tr>
+            <tr>
+                <td>強制削除</td>
+                <td><code>git branch -D feature/login</code></td>
+                <td>マージしていなくても削除</td>
+                <td>不要なブランチ削除</td>
+            </tr>
+            <tr>
+                <td>ブランチ名変更</td>
+                <td><code>git branch -m 新しい名前</code></td>
+                <td>現在のブランチ名を変更</td>
+                <td>命名ミス修正</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>リモートブランチ操作</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>操作</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>リモートブランチ一覧</td>
+                <td><code>git branch -r</code></td>
+                <td>リモートのブランチのみ表示</td>
+            </tr>
+            <tr>
+                <td>リモートブランチを取得</td>
+                <td><code>git fetch origin</code></td>
+                <td>リモートの最新情報を取得</td>
+            </tr>
+            <tr>
+                <td>リモートブランチをチェックアウト</td>
+                <td><code>git switch -c feature/login origin/feature/login</code></td>
+                <td>リモートブランチをローカルに作成</td>
+            </tr>
+            <tr>
+                <td>リモートブランチ削除</td>
+                <td><code>git push origin --delete feature/login</code></td>
+                <td>リモートのブランチを削除</td>
+            </tr>
+            <tr>
+                <td>古いリモートブランチ情報削除</td>
+                <td><code>git fetch --prune</code></td>
+                <td>削除済みリモートブランチの参照を削除</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ブランチ切り替え時のトラブルと対処</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>エラーメッセージ</th>
+                <th>原因</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>error: Your local changes would be overwritten</td>
+                <td>未コミットの変更がある</td>
+                <td>
+                    <code>git stash</code> で退避<br>
+                    または <code>git commit</code>
+                </td>
+            </tr>
+            <tr>
+                <td>fatal: A branch named 'xxx' already exists</td>
+                <td>同名のブランチが既に存在</td>
+                <td>
+                    別の名前を使うか<br>
+                    <code>git branch -d xxx</code> で削除
+                </td>
+            </tr>
+            <tr>
+                <td>error: pathspec 'xxx' did not match</td>
+                <td>ブランチが存在しない</td>
+                <td>
+                    <code>git branch -a</code> で確認<br>
+                    または <code>git fetch</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># ブランチ操作の実行例
+$ git branch
+* develop
+  feature/login
+  main
+
+$ git switch feature/login
+Switched to branch 'feature/login'
+
+$ git branch
+  develop
+* feature/login
+  main
+
+$ git switch -
+Switched to branch 'develop'
+    </div>
+</div>
+
+<!-- セクション5: トラブル対応特化 -->
+<div class="sheet-container">
+    <h2>🚨 5. トラブル対応パターン別完全ガイド</h2>
+    
+    <h3>コミット前のトラブル</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>問題</th>
+                <th>状況</th>
+                <th>解決コマンド</th>
+                <th>詳細手順</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td>間違えて編集してしまった</td>
+                <td>まだ add していない</td>
+                <td><code>git restore &lt;ファイル&gt;</code></td>
+                <td>
+                    1. <code>git status</code> で確認<br>
+                    2. <code>git restore login.js</code><br>
+                    3. ファイルが元に戻る
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>全ファイルの変更を取り消したい</td>
+                <td>大量に編集してしまった</td>
+                <td><code>git restore .</code></td>
+                <td>
+                    1. <code>git status</code> で確認<br>
+                    2. <code>git restore .</code><br>
+                    3. 全変更が破棄される
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>間違えて add してしまった</td>
+                <td>不要なファイルを add した</td>
+                <td><code>git restore --staged &lt;ファイル&gt;</code></td>
+                <td>
+                    1. <code>git status</code> で確認<br>
+                    2. <code>git restore --staged .env</code><br>
+                    3. ステージングが解除される
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>間違ったブランチで作業してしまった</td>
+                <td>develop で作業すべきが main で作業</td>
+                <td><code>git stash</code> → 切替 → <code>git stash pop</code></td>
+                <td>
+                    1. <code>git stash</code><br>
+                    2. <code>git switch develop</code><br>
+                    3. <code>git stash pop</code><br>
+                    4. 正しいブランチで作業継続
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>コミット後・push前のトラブル</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>問題</th>
+                <th>状況</th>
+                <th>解決コマンド</th>
+                <th>詳細手順</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td>コミットメッセージを間違えた</td>
+                <td>push はまだしていない</td>
+                <td><code>git commit --amend</code></td>
+                <td>
+                    1. <code>git commit --amend -m "正しいメッセージ"</code><br>
+                    2. メッセージが修正される
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>コミットに追加し忘れたファイルがある</td>
+                <td>push はまだしていない</td>
+                <td><code>git add</code> → <code>git commit --amend --no-edit</code></td>
+                <td>
+                    1. <code>git add 忘れたファイル</code><br>
+                    2. <code>git commit --amend --no-edit</code><br>
+                    3. 直前のコミットに追加される
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>コミットをやり直したい</td>
+                <td>内容ごと修正したい</td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>
+                    1. <code>git reset --soft HEAD~1</code><br>
+                    2. ファイルを修正<br>
+                    3. <code>git add . && git commit</code>
+                </td>
+            </tr>
+            <tr class="danger-mid">
+                <td>直前のコミットを完全に削除したい</td>
+                <td>ローカルのみで試した変更</td>
+                <td><code>git reset --hard HEAD~1</code></td>
+                <td>
+                    1. <code>git reset --hard HEAD~1</code><br>
+                    2. コミットと変更が完全削除<br>
+                    ⚠️ 復元不可
+                </td>
+            </tr>
+            <tr class="danger-low">
+                <td>過去3コミットをまとめたい</td>
+                <td>WIPコミットが溜まった</td>
+                <td><code>git rebase -i HEAD~3</code></td>
+                <td>
+                    1. <code>git rebase -i HEAD~3</code><br>
+                    2. エディタで pick → squash に変更<br>
+                    3. 保存してコミット統合
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>push後のトラブル（チーム開発での重大事故）</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>問題</th>
+                <th>危険度</th>
+                <th>推奨解決策</th>
+                <th>緊急時の対応</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="danger-low">
+                <td>間違ったコミットを push してしまった</td>
+                <td>低</td>
+                <td><code>git revert &lt;commitID&gt;</code></td>
+                <td>
+                    1. <code>git revert HEAD</code><br>
+                    2. <code>git push</code><br>
+                    3. 打ち消しコミットで対応
+                </td>
+            </tr>
+            <tr class="danger-mid">
+                <td>機密情報を push してしまった</td>
+                <td>高</td>
+                <td>即座にキーを無効化 → revert</td>
+                <td>
+                    1. <strong>すぐにAPIキー等を無効化</strong><br>
+                    2. <code>git revert HEAD</code><br>
+                    3. <code>git push</code><br>
+                    4. .gitignore に追加<br>
+                    5. チームに報告
+                </td>
+            </tr>
+            <tr class="danger-high">
+                <td>main に直接 push してしまった</td>
+                <td>高</td>
+                <td>チームに確認後 revert</td>
+                <td>
+                    1. Slackで即座に報告<br>
+                    2. <code>git revert HEAD</code><br>
+                    3. <code>git push</code><br>
+                    4. 正しいブランチで再作業
+                </td>
+            </tr>
+            <tr class="danger-high">
+                <td>force push してしまった</td>
+                <td>最高</td>
+                <td>チームに謝罪 → reflog で復旧</td>
+                <td>
+                    1. <strong>すぐにチームに連絡</strong><br>
+                    2. <code>git reflog</code> で履歴確認<br>
+                    3. <code>git reset --hard &lt;元のcommitID&gt;</code><br>
+                    4. <code>git push --force</code><br>
+                    5. 全員に pull してもらう
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="danger">
+        <strong>🚨 機密情報を push してしまった場合の対応手順:</strong><br>
+        1. <strong>すぐにAPIキー・パスワード等を無効化・再発行</strong>（最優先）<br>
+        2. <code>git revert</code> でコミットを打ち消し<br>
+        3. .gitignore に該当ファイルを追加<br>
+        4. チームリーダーに報告<br>
+        5. GitHub の場合、リポジトリ設定で「履歴を完全削除」を検討<br>
+        <br>
+        <strong>※ 重要:</strong> revert だけでは履歴に残るため、本当に機密性が高い場合は<br>
+        リポジトリ管理者に相談して履歴の完全削除を依頼
+    </div>
+
+    <h3>競合（Conflict）トラブル</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>発生タイミング</th>
+                <th>原因</th>
+                <th>解決手順</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>git pull 時</td>
+                <td>同じ箇所を複数人が編集</td>
+                <td>
+                    1. <code>git status</code> で競合ファイル確認<br>
+                    2. VSCode で差分を開く<br>
+                    3. 「Accept Current」「Accept Incoming」を選択<br>
+                    4. <code>git add &lt;解決済みファイル&gt;</code><br>
+                    5. <code>git commit</code>
+                </td>
+            </tr>
+            <tr>
+                <td>git merge 時</td>
+                <td>ブランチ間で同じ箇所が変更</td>
+                <td>
+                    1. <code>git status</code> で確認<br>
+                    2. 手動で競合箇所を修正<br>
+                    3. <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> などのマーカーを削除<br>
+                    4. <code>git add .</code><br>
+                    5. <code>git commit</code>
+                </td>
+            </tr>
+            <tr>
+                <td>git stash pop 時</td>
+                <td>stash 後にファイルが変更された</td>
+                <td>
+                    1. VSCode で差分確認<br>
+                    2. 競合を手動解決<br>
+                    3. <code>git add .</code><br>
+                    4. <code>git stash drop</code>（stash を削除）
+                </td>
+            </tr>
+            <tr>
+                <td>競合解決を諦めたい</td>
+                <td>複雑すぎて解決できない</td>
+                <td>
+                    <code>git merge --abort</code>（マージ中止）<br>
+                    または<br>
+                    <code>git rebase --abort</code>（リベース中止）
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># 競合解決の例
+$ git pull origin develop
+Auto-merging login.js
+CONFLICT (content): Merge conflict in login.js
+Automatic merge failed; fix conflicts and then commit the result.
+
+$ git status
+Unmerged paths:
+  both modified:   login.js
+
+# VSCode で login.js を開いて差分を解決
+
+$ git add login.js
+$ git commit -m "Merge: 競合を解決"
+$ git push
+    </div>
+</div>
+
+<!-- セクション6: 消えたデータの復旧 -->
+<div class="sheet-container">
+    <h2>🔧 6. 消えたデータの復旧（reflog を使う）</h2>
+    
+    <div class="scenario">
+        <strong>🎬 シーン:</strong> <code>git reset --hard</code> で間違えてコミットを消してしまった！
+    </div>
+
+    <h3>reflog による復旧手順</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ステップ</th>
+                <th>コマンド</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><code>git reflog</code></td>
+                <td>全ての操作履歴を表示（消えたコミットも含む）</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>復元したいコミットIDを探す</td>
+                <td>reflog の出力から目的のコミットを特定</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><code>git reset --hard &lt;commitID&gt;</code></td>
+                <td>そのコミット時点に戻る</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><code>git log</code></td>
+                <td>復旧できたか確認</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># reflog による復旧例
+$ git reflog
+9c8e5d2 (HEAD -> main) HEAD@{0}: reset: moving to HEAD~1
+3f2a1b4 HEAD@{1}: commit: feat: ログイン機能を追加  ← これを復元したい！
+2e1f9d3 HEAD@{2}: commit: fix: バグ修正
+
+$ git reset --hard 3f2a1b4
+
+$ git log --oneline
+3f2a1b4 (HEAD -> main) feat: ログイン機能を追加
+2e1f9d3 fix: バグ修正
+
+# 無事復旧！
+    </div>
+
+    <h3>reflog で復旧できる操作</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>失敗した操作</th>
+                <th>reflog での探し方</th>
+                <th>復旧可能性</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>git reset --hard</td>
+                <td>reset 直前の HEAD を探す</td>
+                <td>高</td>
+            </tr>
+            <tr>
+                <td>git rebase</td>
+                <td>rebase 前の HEAD を探す</td>
+                <td>高</td>
+            </tr>
+            <tr>
+                <td>git merge --abort 後の後悔</td>
+                <td>merge 途中の HEAD を探す</td>
+                <td>中</td>
+            </tr>
+            <tr>
+                <td>ブランチ削除</td>
+                <td>削除前のブランチの HEAD を探す</td>
+                <td>高</td>
+            </tr>
+            <tr>
+                <td>git checkout で上書き</td>
+                <td>checkout 前の HEAD を探す</td>
+                <td>低〜中</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="tip">
+        <strong>💡 reflog の保持期間:</strong><br>
+        デフォルトで90日間保持されます。それ以降は復旧不可能になるので注意！
+    </div>
+</div>
+
+<!-- セクション7: 総合トラブルシューティングフローチャート -->
+<div class="sheet-container">
+    <h2>🗺️ 7. 総合トラブルシューティング フローチャート</h2>
+    
+    <h3>「やってしまった！」からの復旧フロー</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>質問</th>
+                <th>YES の場合</th>
+                <th>NO の場合</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>push しましたか？</td>
+                <td>→ 次の質問へ</td>
+                <td>→ <code>git reset</code> で戻せる（安全）</td>
+            </tr>
+            <tr>
+                <td>チーム開発中ですか？</td>
+                <td>→ <code>git revert</code> 必須（安全）</td>
+                <td>→ <code>git reset --hard</code> でもOK</td>
+            </tr>
+            <tr>
+                <td>機密情報を含みますか？</td>
+                <td>→ すぐにキー無効化 → 上司に報告</td>
+                <td>→ 通常の revert で対応</td>
+            </tr>
+            <tr>
+                <td>main ブランチですか？</td>
+                <td>→ 緊急対応：チームに連絡 → revert</td>
+                <td>→ feature ブランチなら revert で OK</td>
+            </tr>
+            <tr>
+                <td>既に削除されましたか？</td>
+                <td>→ <code>git reflog</code> で復旧試行</td>
+                <td>→ 該当コマンドで戻す</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>トラブル別：即座に実行すべきコマンド</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>トラブル</th>
+                <th>第一手</th>
+                <th>第二手</th>
+                <th>第三手</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>間違えた変更をした</td>
+                <td><code>git status</code></td>
+                <td><code>git restore ファイル</code></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>間違えて add した</td>
+                <td><code>git status</code></td>
+                <td><code>git restore --staged ファイル</code></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>間違えて commit した</td>
+                <td><code>git log</code></td>
+                <td><code>git reset --soft HEAD~1</code></td>
+                <td>修正して再コミット</td>
+            </tr>
+            <tr>
+                <td>間違えて push した</td>
+                <td>チームに連絡</td>
+                <td><code>git revert HEAD</code></td>
+                <td><code>git push</code></td>
+            </tr>
+            <tr>
+                <td>機密情報を push した</td>
+                <td>APIキー無効化</td>
+                <td>上司に報告</td>
+                <td><code>git revert</code> + .gitignore</td>
+            </tr>
+            <tr>
+                <td>reset で削除してしまった</td>
+                <td><code>git reflog</code></td>
+                <td>復元したいコミットID確認</td>
+                <td><code>git reset --hard commitID</code></td>
+            </tr>
+            <tr>
+                <td>競合が発生した</td>
+                <td><code>git status</code></td>
+                <td>VSCode で差分解決</td>
+                <td><code>git add . && git commit</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 参考資料 -->
+<div class="sheet-container" style="background: #f0f8ff; border-left: 4px solid #2196f3;">
+    <h2>📚 参考資料</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>カテゴリ</th>
+                <th>資料名</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>公式</td>
+                <td>Git公式ドキュメント（日本語）</td>
+                <td>https://git-scm.com/book/ja/v2</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>Git diff コマンド</td>
+                <td>https://git-scm.com/docs/git-diff</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>Git log コマンド</td>
+                <td>https://git-scm.com/docs/git-log</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>Git reset コマンド</td>
+                <td>https://git-scm.com/docs/git-reset</td>
+            </tr>
+            <tr>
+                <td>公式</td>
+                <td>Git reflog コマンド</td>
+                <td>https://git-scm.com/docs/git-reflog</td>
+            </tr>
+            <tr>
+                <td>入門</td>
+                <td>サル先生のGit入門</td>
+                <td>https://backlog.com/ja/git-tutorial/</td>
+            </tr>
+            <tr>
+                <td>トラブル</td>
+                <td>Git初心者が踏みがちな地雷 - TechRacho</td>
+                <td>https://techracho.bpsinc.jp/morimorihoge/2020_09_09/16856</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p style="margin-top: 15px; color: #666; font-size: 13px;">
+        ※ 2025年10月時点の情報です。最新情報は公式ドキュメントをご確認ください。<br>
+        ※ 重要な操作の前は必ずバックアップを取りましょう。<br>
+        ※ わからない時は、まず <code>git status</code> と <code>git log</code> で状態確認！
+    </p>
+</div>
+
+</body>
+</html>
