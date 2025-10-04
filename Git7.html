@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git 間違いやすい用語・エラー対応完全版</title>
+    <style>
+        body {
+            font-family: "Yu Gothic", "Meiryo", sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .sheet-container {
+            background: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h3 {
+            color: #34495e;
+            border-left: 4px solid #f39c12;
+            padding-left: 10px;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+        }
+        th {
+            background: #f39c12;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #e67e22;
+        }
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #fef5e7;
+        }
+        .correct { background: #d5f4e6; border-left: 4px solid #27ae60; }
+        .wrong { background: #fadbd8; border-left: 4px solid #e74c3c; }
+        .confusing { background: #fff9e6; border-left: 4px solid #f39c12; }
+        code {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #c7254e;
+            font-size: 13px;
+        }
+        .command-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: "Consolas", monospace;
+            overflow-x: auto;
+        }
+        .error-block {
+            background: #fadbd8;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: "Consolas", monospace;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            margin: 15px 0;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin-bottom: 20px;
+        }
+        .vs-table {
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instruction">
+    <strong>📋 使い方:</strong> 下の表を選択して <code>Ctrl+C</code> でコピー → Excelに <code>Ctrl+V</code> で貼り付け！<br>
+    <strong>🎯 対象:</strong> チーム開発エンジニア向け - 間違いやすい用語・エラー対応完全版
+</div>
+
+<!-- セクション1: 間違いやすい用語の違い -->
+<div class="sheet-container">
+    <h2>📚 1. 間違いやすいGit用語の違い</h2>
+    
+    <h3>基本用語の正確な理解</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>用語A</th>
+                <th>用語B</th>
+                <th>違い</th>
+                <th>使い分け</th>
+                <th>間違えやすいポイント</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="confusing">
+                <td><strong>add</strong></td>
+                <td><strong>commit</strong></td>
+                <td>
+                    <strong>add:</strong> ステージングエリアに追加<br>
+                    <strong>commit:</strong> 履歴に永続的に記録
+                </td>
+                <td>
+                    add → コミット候補<br>
+                    commit → 正式に保存
+                </td>
+                <td>
+                    ❌ addしただけでは保存されない<br>
+                    ✅ commitで初めて履歴に残る
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>pull</strong></td>
+                <td><strong>fetch</strong></td>
+                <td>
+                    <strong>pull:</strong> 取得＋自動マージ<br>
+                    <strong>fetch:</strong> 取得のみ（マージしない）
+                </td>
+                <td>
+                    pull → 即座に反映したい<br>
+                    fetch → 確認してからマージ
+                </td>
+                <td>
+                    ❌ pullは即座にマージされる<br>
+                    ✅ fetchは安全に確認できる
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>merge</strong></td>
+                <td><strong>rebase</strong></td>
+                <td>
+                    <strong>merge:</strong> 統合コミット作成<br>
+                    <strong>rebase:</strong> 履歴を付け替える
+                </td>
+                <td>
+                    merge → ブランチ統合（安全）<br>
+                    rebase → 履歴整理（上級者）
+                </td>
+                <td>
+                    ❌ rebaseはpush後に使うと危険<br>
+                    ✅ mergeはチーム開発で安全
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>reset</strong></td>
+                <td><strong>revert</strong></td>
+                <td>
+                    <strong>reset:</strong> 履歴を削除（危険）<br>
+                    <strong>revert:</strong> 打ち消すコミット作成（安全）
+                </td>
+                <td>
+                    reset → ローカルのみ<br>
+                    revert → push後も安全
+                </td>
+                <td>
+                    ❌ resetはpush後に使うと事故<br>
+                    ✅ revertはチーム開発推奨
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>checkout</strong></td>
+                <td><strong>switch</strong></td>
+                <td>
+                    <strong>checkout:</strong> 多機能（古い）<br>
+                    <strong>switch:</strong> ブランチ切替専用（新しい）
+                </td>
+                <td>
+                    checkout → 非推奨<br>
+                    switch → 推奨
+                </td>
+                <td>
+                    ❌ checkoutは混乱しやすい<br>
+                    ✅ switchは明確
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>restore</strong></td>
+                <td><strong>checkout</strong></td>
+                <td>
+                    <strong>restore:</strong> ファイル復元専用（新しい）<br>
+                    <strong>checkout:</strong> 多機能（古い）
+                </td>
+                <td>
+                    restore → ファイル復元に使う<br>
+                    checkout -- → 古い書き方
+                </td>
+                <td>
+                    ❌ checkout -- は混乱<br>
+                    ✅ restoreが明確
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>origin</strong></td>
+                <td><strong>upstream</strong></td>
+                <td>
+                    <strong>origin:</strong> 自分のリモート<br>
+                    <strong>upstream:</strong> フォーク元のリモート
+                </td>
+                <td>
+                    origin → 通常のリモート<br>
+                    upstream → OSSコントリビュート時
+                </td>
+                <td>
+                    ❌ originは固定名ではない<br>
+                    ✅ 慣習的にoriginを使う
+                </td>
+            </tr>
+            <tr class="confusing">
+                <td><strong>HEAD</strong></td>
+                <td><strong>head</strong></td>
+                <td>
+                    <strong>HEAD:</strong> 現在のコミット位置<br>
+                    <strong>head:</strong> ブランチの先頭
+                </td>
+                <td>
+                    HEAD → ポインタ<br>
+                    head → ブランチの最新
+                </td>
+                <td>
+                    ❌ HEADは常に大文字<br>
+                    ✅ HEAD~1で1つ前
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="vs-table">
+        <strong>🔀 よくある混同：pull と fetch の違い</strong>
+        <div class="command-block"># git pull の動作
+$ git pull origin develop
+# 以下の2つを同時実行:
+# 1. git fetch origin develop  (取得)
+# 2. git merge origin/develop  (マージ)
+
+# git fetch の動作
+$ git fetch origin develop
+# リモートの情報を取得するだけ
+# ローカルのファイルは変更されない
+
+# fetch後に確認してからマージ
+$ git fetch origin develop
+$ git log HEAD..origin/develop  # 差分確認
+$ git merge origin/develop      # 問題なければマージ
+        </div>
+    </div>
+</div>
+
+<!-- セクション2: 間違えやすいコマンドの使い方 -->
+<div class="sheet-container">
+    <h2>⚠️ 2. 間違えやすいコマンドの正しい使い方</h2>
+    
+    <h3>よくある誤用と正しい使い方</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>やりたいこと</th>
+                <th>❌ 間違った方法</th>
+                <th>✅ 正しい方法</th>
+                <th>説明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ブランチを切り替える</td>
+                <td class="wrong"><code>git checkout develop</code></td>
+                <td class="correct"><code>git switch develop</code></td>
+                <td>switchが新しい推奨コマンド</td>
+            </tr>
+            <tr>
+                <td>新しいブランチ作成</td>
+                <td class="wrong"><code>git checkout -b feature/xxx</code></td>
+                <td class="correct"><code>git switch -c feature/xxx</code></td>
+                <td>-c = create の意味で分かりやすい</td>
+            </tr>
+            <tr>
+                <td>ファイルの変更を取り消し</td>
+                <td class="wrong"><code>git checkout -- login.js</code></td>
+                <td class="correct"><code>git restore login.js</code></td>
+                <td>restoreが復元専用で明確</td>
+            </tr>
+            <tr>
+                <td>ステージングを取り消し</td>
+                <td class="wrong"><code>git reset HEAD login.js</code></td>
+                <td class="correct"><code>git restore --staged login.js</code></td>
+                <td>restore --stagedが推奨</td>
+            </tr>
+            <tr>
+                <td>全ファイルをadd</td>
+                <td class="wrong"><code>git add *</code></td>
+                <td class="correct"><code>git add .</code></td>
+                <td>
+                    * はシェルで展開される<br>
+                    . の方が安全
+                </td>
+            </tr>
+            <tr>
+                <td>リモートに初回プッシュ</td>
+                <td class="wrong"><code>git push</code></td>
+                <td class="correct"><code>git push -u origin feature/xxx</code></td>
+                <td>-u で上流ブランチを設定</td>
+            </tr>
+            <tr>
+                <td>コミットを修正</td>
+                <td class="wrong"><code>git reset HEAD~1</code><br>再コミット</td>
+                <td class="correct"><code>git commit --amend</code></td>
+                <td>amendが直前コミット修正専用</td>
+            </tr>
+            <tr>
+                <td>push済みコミットを取り消し</td>
+                <td class="wrong"><code>git reset --hard HEAD~1</code><br><code>git push --force</code></td>
+                <td class="correct"><code>git revert HEAD</code><br><code>git push</code></td>
+                <td>
+                    revertは安全<br>
+                    force pushは危険
+                </td>
+            </tr>
+            <tr>
+                <td>最新を取得</td>
+                <td class="wrong"><code>git pull</code></td>
+                <td class="correct"><code>git pull origin develop</code></td>
+                <td>ブランチ名を明示する方が安全</td>
+            </tr>
+            <tr>
+                <td>ローカルブランチ削除</td>
+                <td class="wrong"><code>git branch -D feature/xxx</code></td>
+                <td class="correct"><code>git branch -d feature/xxx</code></td>
+                <td>
+                    -d は安全（マージ済み確認）<br>
+                    -D は強制削除
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ 特に注意すべき危険なコマンド:</strong><br>
+        1. <code>git push --force</code> - チームメンバーの履歴を破壊<br>
+        2. <code>git reset --hard</code> - push後は絶対禁止<br>
+        3. <code>git add *</code> - 意図しないファイルを追加<br>
+        4. <code>git clean -fd</code> - 追跡外ファイルを削除（復元不可）
+    </div>
+</div>
+
+<!-- セクション3: よく出るエラーメッセージと対応 -->
+<div class="sheet-container">
+    <h2>🚨 3. よく出るエラーメッセージと対応方法</h2>
+    
+    <h3>エラー1: Your local changes would be overwritten</h3>
+    <div class="error-block">error: Your local changes to the following files would be overwritten by checkout:
+  login.js
+Please commit your changes or stash them before you switch branches.</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>解決方法1（保存する）</th>
+                <th>解決方法2（破棄する）</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>変更をコミットせずにブランチ切替</td>
+                <td>変更が上書きされる危険がある</td>
+                <td>
+                    <code>git stash</code><br>
+                    <code>git switch 別ブランチ</code><br>
+                    作業後<br>
+                    <code>git switch 元のブランチ</code><br>
+                    <code>git stash pop</code>
+                </td>
+                <td>
+                    <code>git restore .</code><br>
+                    <code>git switch 別ブランチ</code><br>
+                    ⚠️ 変更が消える
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー2: fatal: refusing to merge unrelated histories</h3>
+    <div class="error-block">fatal: refusing to merge unrelated histories</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>別々に作成されたリポジトリをマージしようとした</td>
+                <td>履歴に共通の祖先がない</td>
+                <td>
+                    <code>git pull origin main --allow-unrelated-histories</code><br>
+                    または<br>
+                    <code>git merge origin/main --allow-unrelated-histories</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー3: Updates were rejected (non-fast-forward)</h3>
+    <div class="error-block">! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'origin'
+hint: Updates were rejected because the tip of your current branch is behind</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>✅ 正しい解決方法</th>
+                <th>❌ 間違った方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>リモートが更新されている</td>
+                <td>ローカルが古い状態</td>
+                <td>
+                    1. <code>git pull origin main</code><br>
+                    2. 競合があれば解決<br>
+                    3. <code>git push origin main</code>
+                </td>
+                <td>
+                    <code>git push --force</code><br>
+                    ⚠️ 他人の変更を消す
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー4: CONFLICT (content): Merge conflict</h3>
+    <div class="error-block">Auto-merging login.js
+CONFLICT (content): Merge conflict in login.js
+Automatic merge failed; fix conflicts and then commit the result.</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>解決手順</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>同じ箇所を複数人が編集</td>
+                <td>
+                    <strong>手順:</strong><br>
+                    1. <code>git status</code> で競合ファイル確認<br>
+                    2. ファイルを開いて以下を探す:<br>
+                    　 <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code><br>
+                    　 自分の変更<br>
+                    　 <code>=======</code><br>
+                    　 相手の変更<br>
+                    　 <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch-name</code><br>
+                    3. 手動で正しい内容に修正<br>
+                    4. マーカー（&lt;&lt;&lt;, ===, &gt;&gt;&gt;）を削除<br>
+                    5. <code>git add 解決済みファイル</code><br>
+                    6. <code>git commit</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="command-block"># VSCodeでの競合解決（推奨）
+1. VSCodeでファイルを開く
+2. 「Accept Current Change」（自分の変更を採用）
+   または
+   「Accept Incoming Change」（相手の変更を採用）
+   または
+   「Accept Both Changes」（両方を残す）
+3. git add .
+4. git commit
+    </div>
+
+    <h3>エラー5: fatal: not a git repository</h3>
+    <div class="error-block">fatal: not a git repository (or any of the parent directories): .git</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Gitリポジトリではないディレクトリでコマンド実行</td>
+                <td>.gitフォルダがない</td>
+                <td>
+                    1. <code>pwd</code> または <code>cd</code> で現在位置確認<br>
+                    2. 正しいプロジェクトフォルダに移動<br>
+                    　 <code>cd /path/to/project</code><br>
+                    3. または <code>git init</code> で新規作成
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー6: Permission denied (publickey)</h3>
+    <div class="error-block">git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SSH鍵が設定されていない</td>
+                <td>GitHubにSSH接続できない</td>
+                <td>
+                    <strong>方法1: HTTPS に切り替え</strong><br>
+                    <code>git remote set-url origin https://github.com/user/repo.git</code><br>
+                    <br>
+                    <strong>方法2: SSH鍵を設定</strong><br>
+                    1. <code>ssh-keygen -t ed25519 -C "your_email@example.com"</code><br>
+                    2. <code>cat ~/.ssh/id_ed25519.pub</code><br>
+                    3. GitHub Settings → SSH Keys に登録
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー7: fatal: remote origin already exists</h3>
+    <div class="error-block">fatal: remote origin already exists.</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>解決方法1（削除して再追加）</th>
+                <th>解決方法2（URL変更）</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>originが既に登録されている</td>
+                <td>
+                    <code>git remote remove origin</code><br>
+                    <code>git remote add origin &lt;新しいURL&gt;</code>
+                </td>
+                <td>
+                    <code>git remote set-url origin &lt;新しいURL&gt;</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー8: error: pathspec did not match any file(s)</h3>
+    <div class="error-block">error: pathspec 'feature/login' did not match any file(s) known to git</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>確認方法</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>指定したブランチが存在しない</td>
+                <td>
+                    <code>git branch -a</code><br>
+                    全ブランチを確認
+                </td>
+                <td>
+                    1. ローカルにない場合:<br>
+                    　 <code>git fetch origin</code><br>
+                    　 <code>git switch feature/login</code><br>
+                    2. リモートにもない場合:<br>
+                    　 <code>git switch -c feature/login</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー9: Changes not staged for commit</h3>
+    <div class="error-block">Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   login.js</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>意味</th>
+                <th>これはエラーではない</th>
+                <th>対応</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>変更があるがステージングされていない</td>
+                <td>
+                    単なる状態表示<br>
+                    エラーではない
+                </td>
+                <td>
+                    <strong>コミットする場合:</strong><br>
+                    <code>git add login.js</code><br>
+                    <code>git commit -m "メッセージ"</code><br>
+                    <br>
+                    <strong>変更を破棄する場合:</strong><br>
+                    <code>git restore login.js</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>エラー10: You have divergent branches</h3>
+    <div class="error-block">hint: You have divergent branches and need to specify how to reconcile them.</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>原因</th>
+                <th>意味</th>
+                <th>解決方法</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ローカルとリモートが分岐している</td>
+                <td>
+                    お互いに異なるコミットがある<br>
+                    （Git 2.27以降の警告）
+                </td>
+                <td>
+                    <strong>推奨:</strong><br>
+                    <code>git pull --rebase origin main</code><br>
+                    <br>
+                    <strong>または:</strong><br>
+                    <code>git pull --no-rebase origin main</code><br>
+                    <br>
+                    <strong>デフォルト設定:</strong><br>
+                    <code>git config pull.rebase false</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- セクション4: チーム開発特有のエラーと対応 -->
+<div class="sheet-container">
+    <h2>👥 4. チーム開発特有のエラーと対応</h2>
+    
+    <h3>チームで発生しやすい問題</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>状況</th>
+                <th>エラー内容</th>
+                <th>原因</th>
+                <th>対応方法</th>
+                <th>予防策</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>mainに直接pushできない</td>
+                <td class="error-block" style="display:block">remote: error: GH006: Protected branch update failed</td>
+                <td>mainブランチが保護されている</td>
+                <td>
+                    1. featureブランチを作成<br>
+                    2. PRを作成<br>
+                    3. レビュー後マージ
+                </td>
+                <td>
+                    必ずfeatureブランチで作業<br>
+                    mainへの直接pushは禁止
+                </td>
+            </tr>
+            <tr>
+                <td>他人のブランチでpush拒否</td>
+                <td class="error-block" style="display:block">! [remote rejected] feature/xxx (permission denied)</td>
+                <td>
+                    他人が作成したブランチに<br>
+                    push権限がない
+                </td>
+                <td>
+                    1. 自分のブランチを作成<br>
+                    2. 変更をコミット<br>
+                    3. 自分のブランチでPR
+                </td>
+                <td>
+                    他人のブランチは触らない<br>
+                    必要なら相談してから
+
+</div>
+
+</body>
+</html>
