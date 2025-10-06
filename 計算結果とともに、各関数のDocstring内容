@@ -1,0 +1,145 @@
+了解です！🐰
+では、先ほどの完全版チートシートを **さらに実践的に改良** して、**関数ごとにDocstringを自動表示して確認できる版** を作ります。
+
+これにより、実行すると **計算結果とともに、各関数のDocstring内容も自動で見れる** 仕様になります。
+
+---
+
+```python
+# -*- coding: utf-8 -*-
+"""
+🐰 Python 型ヒント × 5大Docstringスタイル 消費税計算
+-------------------------------------------------------------------------------
+実践版チートシート:
+- 型ヒントとDocstringを自動表示
+- 各Docstringスタイルの消費税計算を実行
+- 関数の目的・引数・戻り値をそのまま確認可能
+"""
+
+from typing import List, Dict
+
+# --- 5大Docstring関数 ---
+def calc_tax_pep257(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+def calc_tax_google(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率（デフォルト10%）
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_numpy(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Parameters
+    ----------
+    price : float
+        商品の価格
+    tax_rate : float, optional
+        消費税率（デフォルト0.10）
+
+    Returns
+    -------
+    float
+        消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_rest(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    :param price: 商品の価格
+    :type price: float
+    :param tax_rate: 消費税率（デフォルト0.10）
+    :type tax_rate: float
+    :return: 消費税込みの合計金額
+    :rtype: float
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_epytext(price: float, tax_rate: float = 0.10) -> float:
+    """
+    @param price: 商品の価格
+    @type price: float
+    @param tax_rate: 消費税率
+    @type tax_rate: float
+    @return: 消費税込みの合計金額
+    @rtype: float
+    """
+    return price * (1 + tax_rate)
+
+# --- 型ヒント応用例 ---
+def calc_prices(prices: List[float]) -> Dict[str, float]:
+    """
+    複数商品の合計と税込合計を計算する
+
+    Parameters
+    ----------
+    prices : List[float]
+        商品価格のリスト
+
+    Returns
+    -------
+    Dict[str, float]
+        合計と税込合計の辞書
+    """
+    total = sum(prices)
+    return {"total": total, "with_tax": total * 1.1}
+
+# --- ヘルパー関数: Docstringと計算を自動表示 ---
+def display_func_info(func, *args):
+    print(f"=== {func.__name__} ===")
+    print("Docstring:")
+    print(func.__doc__)
+    result = func(*args)
+    print("計算結果:", result)
+    print()
+
+# --- 実行 ---
+if __name__ == "__main__":
+    price = 1000
+    tax = 0.10
+    prices_list = [100, 200, 300]
+
+    print("=== 型ヒント説明 ===")
+    print("price: float           -> 引数 price は float 型")
+    print("tax_rate: float = 0.10 -> 引数 tax_rate は float 型、デフォルト値 0.10")
+    print("-> float               -> 関数の戻り値は float 型")
+    print()
+
+    # 各Docstringスタイルを自動表示
+    display_func_info(calc_tax_pep257, price, tax)
+    display_func_info(calc_tax_google, price, tax)
+    display_func_info(calc_tax_numpy, price, tax)
+    display_func_info(calc_tax_rest, price, tax)
+    display_func_info(calc_tax_epytext, price, tax)
+
+    # 型ヒント応用例も表示
+    display_func_info(calc_prices, prices_list)
+```
+
+---
+
+### 💡 特徴
+
+1. **関数ごとにDocstringを自動表示** → `help()` を使わなくてもすぐ確認できる
+2. 計算結果も同時に表示 → 実行例と合わせて理解しやすい
+3. 型ヒントもまとめて表示 → Pythonの基本を復習しながら実行可能
+4. 追加の関数（List / Dict）も同様にDocstring付きで動作確認可能
+
+---
+
+🐰 これで **関数の説明と計算結果を同時に確認できる実践版チートシート** の完成です。
+
+もし希望なら、このファイルに **「複数商品の税込計算を一括で一覧表示する表形式」** も追加して、より実務向けに改良することもできます。
+作りますか？
