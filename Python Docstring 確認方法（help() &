@@ -1,0 +1,144 @@
+もちろんです！🐰
+では、新人向けに **`help()` と `.__doc__` を使ったDocstring確認方法** を、**丁寧に、対話シェルやJupyter Notebookでのやり方** も含めて解説します。
+
+---
+
+# 🐰 Python Docstring 確認方法（help() & **doc** 編）
+
+Pythonでは関数・クラス・モジュールの説明を **Docstring** に書きます。
+このDocstringは **`help()`** や **`.__doc__`** で確認できます。
+
+---
+
+## 1️⃣ `help()` の使い方
+
+### 1-1. 標準Pythonシェルで使う
+
+```bash
+$ python
+>>> def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+...     """価格から消費税を計算して合計金額を返す."""
+...     return price * (1 + tax_rate)
+...
+>>> help(calc_tax)
+```
+
+**出力例**:
+
+```
+Help on function calc_tax in module __main__:
+
+calc_tax(price: float, tax_rate: float = 0.1) -> float
+    価格から消費税を計算して合計金額を返す.
+```
+
+**ポイント**
+
+* 引数と型、デフォルト値が表示される
+* Docstringも一緒に表示される
+* 対話シェルで学習・確認すると便利
+
+---
+
+### 1-2. IPython / Jupyter Notebook での対話確認
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+```
+
+* **Docstringを見る**
+
+```python
+calc_tax?
+```
+
+* **ソースコードも確認する**
+
+```python
+calc_tax??
+```
+
+**ポイント**
+
+* Notebookでその場で確認できる
+* `?` は簡易確認、`??` はコードも確認可能
+
+---
+
+## 2️⃣ `.__doc__` 属性で確認
+
+`.__doc__` は **関数やクラスに設定されたDocstringそのものを文字列として取得** できます。
+
+```python
+print(calc_tax.__doc__)
+```
+
+**出力例**:
+
+```
+価格から消費税を計算して合計金額を返す.
+```
+
+**ポイント**
+
+* Docstringだけを表示したい場合に便利
+* ログ出力や自動テストで使用可能
+* 変数に格納して加工もできる
+
+```python
+doc_text = calc_tax.__doc__
+print("Docstring長さ:", len(doc_text))
+```
+
+---
+
+## 3️⃣ クラスやメソッドのDocstringも同様に確認
+
+```python
+class TaxCalculator:
+    """消費税計算クラス"""
+
+    def calc(self, price: float, tax_rate: float = 0.10) -> float:
+        """価格から消費税を計算して合計金額を返す."""
+        return price * (1 + tax_rate)
+
+# クラスDocstring
+print(TaxCalculator.__doc__)
+# メソッドDocstring
+print(TaxCalculator.calc.__doc__)
+```
+
+**出力例**:
+
+```
+消費税計算クラス
+価格から消費税を計算して合計金額を返す.
+```
+
+---
+
+## 4️⃣ まとめ（新人向けポイント）
+
+| 方法                     | 対象           | 利点                          | 注意点                        |
+| ---------------------- | ------------ | --------------------------- | -------------------------- |
+| `help(func)`           | 関数・クラス・モジュール | 引数・型・デフォルト・Docstringが一括で見れる | シンプルにDocstringだけ見たい場合は多すぎる |
+| `func.__doc__`         | 関数・クラス・モジュール | Docstringだけ簡単に取得可能          | 引数や型は表示されない                |
+| IPython / Jupyter `?`  | 関数・クラス・モジュール | インタラクティブにDocstring確認        | 環境が必要                      |
+| IPython / Jupyter `??` | 関数・クラス・モジュール | Docstring + ソースコード確認        | 環境が必要                      |
+
+---
+
+💡 **新人向けのおすすめ確認手順**
+
+1. まず `help(func)` で全体像を把握
+2. `.__doc__` でDocstringだけサッと確認
+3. Notebook環境なら `?` や `??` で即確認
+
+---
+
+🐰 希望であれば、この **消費税計算チートシート** にこの確認手順を組み込んで、
+「実行すると自動で各関数のDocstringを確認できる対話型チートシート」にすることもできます。
+
+作りますか？
