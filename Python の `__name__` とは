@@ -1,0 +1,291 @@
+もちろんです！🐰
+ここでは新人向けに **`__name__` の意味と使い方** を丁寧に解説します。
+
+---
+
+# 🐰 Python の `__name__` とは
+
+Pythonのスクリプトには、**どのモジュールが直接実行されたか** を示す特別な変数があります。それが `__name__` です。
+
+---
+
+## 1️⃣ 基本の意味
+
+* **直接実行したファイル** → `__name__ == "__main__"` になる
+* **他のファイルからインポートされた場合** → `__name__ == "ファイル名"` になる（モジュール名）
+
+```python
+# sample.py
+print("__name__ =", __name__)
+```
+
+* ターミナルで直接実行:
+
+```bash
+$ python sample.py
+```
+
+出力:
+
+```
+__name__ = __main__
+```
+
+* 他のファイルからインポート:
+
+```python
+# main.py
+import sample
+```
+
+出力:
+
+```
+__name__ = sample
+```
+
+---
+
+## 2️⃣ 実務でよく使うパターン
+
+```python
+def main():
+    print("スクリプトを直接実行しました")
+
+if __name__ == "__main__":
+    main()
+```
+
+* **ポイント:**
+
+  * 直接実行したときだけ `main()` を実行する
+  * 他のファイルからインポートされたときは実行されない
+  * テストやチートシートで使うと便利
+
+---
+
+## 3️⃣ Docstringチートシートとの関係
+
+先ほどの **対話型チートシート** では、
+
+```python
+if __name__ == "__main__":
+    # 実行用コード
+```
+
+と書いています。
+
+* 直接ファイルを実行したときだけ、Docstringと計算結果を表示
+* 他のPythonファイルからこのチートシートをインポートしても **自動で実行されない**
+
+---
+
+## 4️⃣ まとめ（新人向けポイント）
+
+| 用途    | **name** の値 | 実行されるか |
+| ----- | ----------- | ------ |
+| 直接実行  | "**main**"  | 実行される  |
+| インポート | モジュール名      | 実行されない |
+
+💡 **おすすめ**
+
+* スクリプトに学習用コードやテストコードを含める場合は、必ず `if __name__ == "__main__":` で囲む
+* これで **安全に実行制御** ができる
+
+---
+
+🐰 この理解があると、
+
+* 対話型チートシート
+* テストスクリプト
+* モジュール化したライブラリ
+
+すべてを安全に作れるようになります。
+
+---
+
+希望なら、この `__name__ == "__main__"` の説明を **先ほどの消費税Docstringチートシートに図解入りで組み込んだ新人向け版** にしてお見せできます。
+
+作りますか？
+
+了解です！🐰
+では、先ほどの **消費税計算 × Docstring チートシート** に **`__name__ == "__main__"` の解説と使い方** を組み込み、
+新人向けに **図解・ポイント付きで安全に実行できる対話型チートシート** にまとめます。
+
+---
+
+```python
+# -*- coding: utf-8 -*-
+"""
+🐰 Python 消費税計算 × Docstring確認チートシート（対話型・新人向け）
+-------------------------------------------------------------------------------
+- 各Docstringスタイルの関数を定義
+- 実行すると自動でDocstringと計算結果を表示
+- 型ヒントや __name__ の使い方も解説
+- 新人エンジニア向け学習用
+"""
+
+from typing import List, Dict
+
+# -----------------------------
+# 5大Docstringスタイル関数
+# -----------------------------
+def calc_tax_pep257(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+def calc_tax_google(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率（デフォルト10%）
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_numpy(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Parameters
+    ----------
+    price : float
+        商品の価格
+    tax_rate : float, optional
+        消費税率（デフォルト0.10）
+
+    Returns
+    -------
+    float
+        消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_rest(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    :param price: 商品の価格
+    :type price: float
+    :param tax_rate: 消費税率（デフォルト0.10）
+    :type tax_rate: float
+    :return: 消費税込みの合計金額
+    :rtype: float
+    """
+    return price * (1 + tax_rate)
+
+def calc_tax_epytext(price: float, tax_rate: float = 0.10) -> float:
+    """
+    @param price: 商品の価格
+    @type price: float
+    @param tax_rate: 消費税率
+    @type tax_rate: float
+    @return: 消費税込みの合計金額
+    @rtype: float
+    """
+    return price * (1 + tax_rate)
+
+# -----------------------------
+# 型ヒント応用例
+# -----------------------------
+def calc_prices(prices: List[float]) -> Dict[str, float]:
+    """
+    複数商品の合計と税込合計を計算する
+
+    Parameters
+    ----------
+    prices : List[float]
+        商品価格のリスト
+
+    Returns
+    -------
+    Dict[str, float]
+        合計と税込合計の辞書
+    """
+    total = sum(prices)
+    return {"total": total, "with_tax": total * 1.1}
+
+# -----------------------------
+# Docstring自動確認関数
+# -----------------------------
+def display_doc_and_result(func, *args):
+    print(f"=== {func.__name__} ===")
+    print("Docstring:")
+    print(func.__doc__)
+    result = func(*args)
+    print("計算結果:", result)
+    print("-" * 40)
+
+# -----------------------------
+# 新人向け解説: __name__ == "__main__"
+# -----------------------------
+def explain_name_main():
+    print("🐰 __name__ の意味")
+    print(" - Pythonスクリプトが直接実行されると __name__ は '__main__' になります")
+    print(" - 他のファイルから import された場合はモジュール名になります")
+    print(" - if __name__ == '__main__': で囲むと、")
+    print("   直接実行したときだけ処理を実行できます\n")
+    print("例:")
+    print("if __name__ == '__main__':")
+    print("    display_doc_and_result(calc_tax_pep257, 1000, 0.10)")
+    print("-" * 40)
+
+# -----------------------------
+# 実行
+# -----------------------------
+if __name__ == "__main__":
+    print("🐰 Python Docstring & 消費税計算 チートシート（対話型）\n")
+
+    # 型ヒント説明
+    print("=== 型ヒント説明 ===")
+    print("price: float           -> 引数 price は float 型")
+    print("tax_rate: float = 0.10 -> 引数 tax_rate は float 型、デフォルト値 0.10")
+    print("-> float               -> 関数の戻り値は float 型")
+    print("-" * 40)
+
+    # __name__ 解説
+    explain_name_main()
+
+    # 各Docstringスタイルを自動表示
+    price = 1000
+    tax = 0.10
+    prices_list = [100, 200, 300]
+
+    funcs = [
+        calc_tax_pep257,
+        calc_tax_google,
+        calc_tax_numpy,
+        calc_tax_rest,
+        calc_tax_epytext,
+        calc_prices
+    ]
+
+    for f in funcs:
+        if f == calc_prices:
+            display_doc_and_result(f, prices_list)
+        else:
+            display_doc_and_result(f, price, tax)
+
+    print("🐰 以上で、各関数のDocstringと計算結果を自動表示しました！")
+    print("help() や __doc__ でも同じ内容を確認できます。")
+```
+
+---
+
+### ✅ このチートシートの特徴
+
+1. 実行すると **各関数のDocstringと計算結果を自動表示**
+2. 新人向けに **型ヒントの説明** も同時に表示
+3. `__name__ == "__main__"` の意味と使い方も解説
+4. List / Dict を使った応用例も確認可能
+5. 他のファイルからインポートしても自動実行されない安全仕様
+
+---
+
+🐰 これを実行すれば、新人でも **Docstring・型ヒント・`__name__` の動作** を同時に理解できます。
+
+
