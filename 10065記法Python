@@ -1,0 +1,150 @@
+了解です！では、あなたのメモを整理して、**Pythonで消費税計算を例にしつつ、5大Docstringスタイルと型ヒントの書き方**をまとめたチートシート風に整理してみます。高卒レベルでも理解できるように簡単に書きます。
+
+---
+
+# 🐰 Python Docstring 5大記法 & 消費税計算例
+
+```python
+# Python 3.10+ 推奨：型ヒントあり
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率。デフォルトは10% (0.10)
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+```
+
+---
+
+## 📚 Python Docstring 5大記法まとめ
+
+### 1️⃣ PEP 257（公式基本）
+
+```python
+def func():
+    """何をするか。"""
+```
+
+* 最小限、1行でOK
+* 動詞で始める、ピリオドで終わる
+
+---
+
+### 2️⃣ Googleスタイル（初心者向け★推奨）
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率。デフォルトは10%
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+```
+
+* 型は `(int)` の形式
+* 読みやすさ重視
+
+---
+
+### 3️⃣ NumPyスタイル（科学技術系）
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Parameters
+    ----------
+    price : float
+        商品の価格
+    tax_rate : float, optional
+        消費税率。デフォルトは0.10
+
+    Returns
+    -------
+    float
+        消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+```
+
+* 型は `: int` の形式
+* ハイフン8個で区切る
+
+---
+
+### 4️⃣ reST / Sphinxスタイル（公式Doc）
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    :param price: 商品の価格
+    :type price: float
+    :param tax_rate: 消費税率（デフォルト0.10）
+    :type tax_rate: float
+    :return: 消費税込みの合計金額
+    :rtype: float
+    """
+    return price * (1 + tax_rate)
+```
+
+* Sphinx用
+* 各引数2行ずつ
+
+---
+
+### 5️⃣ Epytext（非推奨）
+
+```python
+def calc_tax(price, tax_rate=0.10):
+    """
+    @param price: 商品の価格
+    @type price: float
+    @param tax_rate: 消費税率
+    @type tax_rate: float
+    @return: 消費税込みの合計金額
+    @rtype: float
+    """
+    return price * (1 + tax_rate)
+```
+
+* 古い、Javadoc風
+* 基本的に使わない
+
+---
+
+## ⚡ 型ヒントまとめ
+
+* `price: float` → 引数は float
+* `tax_rate: float = 0.10` → デフォルト値付き
+* `-> float` → 戻り値の型
+
+---
+
+💡 **ポイントまとめ**
+
+1. 初心者は GoogleスタイルでOK
+2. 科学計算系なら NumPyスタイル
+3. Sphinxで自動ドキュメント生成するなら reST
+4. PEP257は最小限の説明用
+5. Epytextはレガシー対応のみ
+
+---
+
+もし希望なら、この消費税計算例を **「5大スタイルすべてを1つのコードにまとめた完全チートシート」** にして、1ページで見れる形にもできます。
+
+作ってほしいですか？
