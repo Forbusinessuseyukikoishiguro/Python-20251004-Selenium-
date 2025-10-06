@@ -1,0 +1,168 @@
+なるほど！🐰
+では、先ほどの **Qiita風チートシート** をベースにして、**「書き方のポイント」「書く前の確認」「実行方法」「Docstringの見方」** も整理してまとめます。
+Qiita記事風に読みやすくします。
+
+---
+
+# 🐰 Python 型ヒント × 5大Docstring 消費税計算チートシート（完全版）
+
+こんにちは、YUKIKOです！
+今回は **消費税計算関数** を例に、Pythonでの **型ヒント・Docstringの書き方・実行方法** をまとめた完全チートシートです。
+
+---
+
+## 1️⃣ 書き方のポイント
+
+* **型ヒントをつけると可読性がアップ**
+
+  * 引数・戻り値の型が明示される
+  * 補完・静的解析・レビューが楽になる
+* **Docstringは5種類のスタイルから用途に合わせて選ぶ**
+
+  * PEP 257：シンプル、短文向き
+  * Google：引数・戻り値が整理されて読みやすい
+  * NumPy：科学計算向けで長文でも見やすい
+  * reST / Sphinx：ドキュメント生成に便利
+  * Epytext：古いスタイル、非推奨
+* **書く順序**
+
+  1. 関数の目的を短く書く
+  2. 引数・型・デフォルト値を明示
+  3. 戻り値と型を明示
+  4. 必要に応じて補足説明を書く
+
+---
+
+## 2️⃣ 書く前に確認すること
+
+* 型ヒントが必要か？
+
+  * チーム開発・補完・静的解析の必要性がある場合は推奨
+* Docstringスタイルの統一
+
+  * プロジェクトで使用するDocstringスタイルを事前に確認
+* デフォルト値の有無
+
+  * `tax_rate: float = 0.10` のように必要なら明示
+* 関数の用途や返り値が明確か
+
+  * 他人が見てもすぐ理解できるか
+
+---
+
+## 3️⃣ 実行方法
+
+1. ファイルを保存
+
+   ```text
+   tax_calc_cheatsheet.py
+   ```
+2. コマンドラインから実行
+
+   ```bash
+   python tax_calc_cheatsheet.py
+   ```
+3. 実行すると、型ヒント説明と各Docstringスタイルの計算結果が出力される
+
+---
+
+## 4️⃣ Docstringの見方（例：Googleスタイル）
+
+```python
+def calc_tax_google(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率（デフォルト10%）
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+```
+
+* **目的**: 何をする関数か
+* **Args**: 引数の名前・型・説明・デフォルト値
+* **Returns**: 戻り値の型と説明
+
+> Docstringは `help(calc_tax_google)` でも確認可能です。
+
+```python
+>>> help(calc_tax_google)
+```
+
+---
+
+## 5️⃣ 実行用コード（全Docstringスタイル）
+
+```python
+from typing import List, Dict
+
+# --- 各Docstring関数 ---
+def calc_tax_pep257(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+def calc_tax_google(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す"""
+    return price * (1 + tax_rate)
+
+def calc_tax_numpy(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す"""
+    return price * (1 + tax_rate)
+
+def calc_tax_rest(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す"""
+    return price * (1 + tax_rate)
+
+def calc_tax_epytext(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す"""
+    return price * (1 + tax_rate)
+
+# --- 型ヒント応用例 ---
+def calc_prices(prices: List[float]) -> Dict[str, float]:
+    total = sum(prices)
+    return {"total": total, "with_tax": total * 1.1}
+
+# --- 型ヒント説明 ---
+def explain_type_hints():
+    print("=== 型ヒント説明 ===")
+    print("price: float           -> 引数 price は float 型")
+    print("tax_rate: float = 0.10 -> 引数 tax_rate は float 型、デフォルト値 0.10")
+    print("-> float               -> 関数の戻り値は float 型")
+    print()
+
+# --- 実行 ---
+if __name__ == "__main__":
+    explain_type_hints()
+    price = 1000
+    tax = 0.10
+    print("PEP257式:", calc_tax_pep257(price, tax))
+    print("Google式:", calc_tax_google(price, tax))
+    print("NumPy式:", calc_tax_numpy(price, tax))
+    print("reST式:", calc_tax_rest(price, tax))
+    print("Epytext式:", calc_tax_epytext(price, tax))
+
+    # 型ヒント応用例
+    prices_list = [100, 200, 300]
+    print("複数商品の合計・税込:", calc_prices(prices_list))
+```
+
+---
+
+💡 **まとめ**
+
+* 書く前に「型ヒントの必要性」「Docstringスタイルの統一」「デフォルト値」「関数の用途」を確認
+* 実行方法はコマンドラインで `python ファイル名.py`
+* Docstringは `help()` で確認可能
+* 型ヒントとDocstringの組み合わせで、読みやすく安全な関数が作れる
+
+---
+
+🐰 これで **Qiita風 完全版チートシート** になります。
+
+---
+
+もしよければ、このコードを **さらに「関数ごとに自動でDocstringを表示して確認できる実践版」** にすることもできます。
+作りますか？
