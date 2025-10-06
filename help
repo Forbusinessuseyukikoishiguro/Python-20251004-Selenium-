@@ -1,0 +1,345 @@
+了解です！🐰
+では、新人エンジニア向けに **Docstringの確認方法（`-doc-`）を体系的にまとめて整理** します。
+「どこでどうやってDocstringを確認できるか」をケース別に具体的に解説します。
+
+---
+
+# 🐰 新人向け Python Docstring 確認ガイド
+
+PythonのDocstringは、**関数・クラス・モジュールの説明を埋め込む文字列**です。
+正しく書く・確認することで、コードの理解やレビューが格段に楽になります。
+
+---
+
+## 1️⃣ 関数のDocstringを確認する基本方法
+
+### 1-1. `help()` を使う（推奨）
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+# 確認
+help(calc_tax)
+```
+
+**ポイント**
+
+* 引数の型、デフォルト値、Docstringの内容がまとめて見れる
+* 初心者でもわかりやすい
+* ターミナルやIDLEでも使用可能
+
+---
+
+### 1-2. `.__doc__` で直接確認（軽量）
+
+```python
+print(calc_tax.__doc__)
+```
+
+**ポイント**
+
+* Docstringだけをサッと確認したいときに便利
+* 引数や戻り値は表示されないので簡易確認向き
+
+---
+
+## 2️⃣ 複数関数やメソッドのDocstringを一覧で確認
+
+```python
+functions = [calc_tax, calc_tax_pep257, calc_tax_google]
+
+for func in functions:
+    print(f"=== {func.__name__} ===")
+    print(func.__doc__)
+    print()
+```
+
+**ポイント**
+
+* チーム開発やレビューで関数が多い場合に便利
+* Docstringの書き方や内容の統一もチェックできる
+
+---
+
+## 3️⃣ 実行しながらDocstringも確認する方法
+
+```python
+def display_info(func, *args):
+    print(f"関数名: {func.__name__}")
+    print("Docstring:", func.__doc__)
+    print("計算結果:", func(*args))
+    print()
+
+display_info(calc_tax, 1000, 0.10)
+```
+
+**ポイント**
+
+* 計算結果とDocstringを同時に確認
+* 新人研修や学習時におすすめ
+* 関数の用途を理解しながら実行できる
+
+---
+
+## 4️⃣ IPython / Jupyter Notebookでの確認
+
+* **`?`** → Docstring表示
+
+```python
+calc_tax?
+```
+
+* **`??`** → ソースコードも表示
+
+```python
+calc_tax??
+```
+
+**ポイント**
+
+* インタラクティブ環境で簡単に確認
+* その場で補完やテストも可能
+
+---
+
+## 5️⃣ クラスやモジュールのDocstring確認
+
+```python
+class TaxCalculator:
+    """消費税計算クラス"""
+
+    def calc(self, price: float, tax_rate: float = 0.10) -> float:
+        """価格から消費税を計算して合計金額を返す."""
+        return price * (1 + tax_rate)
+
+# クラスDocstring
+print(TaxCalculator.__doc__)
+# メソッドDocstring
+print(TaxCalculator.calc.__doc__)
+```
+
+**ポイント**
+
+* クラス全体の説明やメソッドごとの説明も確認可能
+* 大規模プロジェクトで役立つ
+
+---
+
+## 6️⃣ 新人向けおすすめ確認パターン
+
+| 確認方法              | 推奨度   | 用途                         |
+| ----------------- | ----- | -------------------------- |
+| `help(func)`      | ★★★★★ | 関数の引数・戻り値・Docstringをまとめて確認 |
+| `func.__doc__`    | ★★★★☆ | 簡易確認、ログや出力で利用              |
+| ループで一覧表示          | ★★★★☆ | 複数関数のDocstringをまとめて確認      |
+| 実行しながら確認          | ★★★★★ | 計算結果とDocstringを同時に確認       |
+| IPython / Jupyter | ★★★★★ | インタラクティブで学習・レビュー向け         |
+| クラス / モジュール       | ★★★★☆ | メソッドやプロジェクト全体のDocstring確認  |
+
+---
+
+## 7️⃣ 実務向けTips
+
+* Docstringスタイルを統一（Google / NumPy / reST）
+* ログやデバッグ用に `.__doc__` を出力するのも便利
+* 自動ドキュメント生成ツール（Sphinx / pdoc）で利用可能
+
+---
+
+🐰 **まとめ**
+
+* 新人エンジニアはまず `help()` と `.__doc__` を使いこなす
+* 実行しながら確認するパターンで関数の理解が早くなる
+* Notebookやループ表示も覚えると、チーム開発で役立つ
+
+---
+
+💡 希望なら、このガイドを **先ほどの消費税計算チートシートに統合して、「実行すると全関数のDocstringも自動表示される」ファイル** にまとめることもできます。
+
+作りますか？
+もちろんです！🐰
+ここでは **新人エンジニア向けに、PythonのDocstringを確認・活用する方法** を整理します。
+ただ読むだけではなく、**色んなケースで「実行してDocstringを見る・理解する」方法** をまとめました。
+
+---
+
+# 🐰 Docstringの実行・確認方法（新人向け完全ガイド）
+
+## 1️⃣ 基本：`help()` で確認
+
+最も基本でよく使う方法です。
+
+```python
+def calc_tax(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+# 確認
+help(calc_tax)
+```
+
+**出力例**:
+
+```
+Help on function calc_tax in module __main__:
+
+calc_tax(price: float, tax_rate: float = 0.1) -> float
+    価格から消費税を計算して合計金額を返す.
+```
+
+> **ポイント:**
+>
+> * 関数の説明・引数・戻り値を簡単に確認できる
+> * プロジェクトで他人の関数を見るときにも便利
+
+---
+
+## 2️⃣ `.__doc__` 属性で確認
+
+`help()` よりも軽量に確認できます。
+
+```python
+print(calc_tax.__doc__)
+```
+
+**出力例**:
+
+```
+価格から消費税を計算して合計金額を返す.
+```
+
+> **ポイント:**
+>
+> * 簡易的にDocstringだけを取り出せる
+> * ログや出力に埋め込みたいときに便利
+
+---
+
+## 3️⃣ 複数関数をループで確認（一覧表示）
+
+プロジェクトで関数が多い場合に便利です。
+
+```python
+functions = [calc_tax_pep257, calc_tax_google, calc_tax_numpy]
+
+for func in functions:
+    print(f"=== {func.__name__} ===")
+    print(func.__doc__)
+    print()
+```
+
+> **ポイント:**
+>
+> * 一覧でDocstringを確認できる
+> * 教育やレビュー用に便利
+
+---
+
+## 4️⃣ 実行しながらDocstringを確認
+
+関数の出力とDocstringを同時に確認する方法です。
+
+```python
+def display_info(func, *args):
+    print(f"関数名: {func.__name__}")
+    print("Docstring:", func.__doc__)
+    print("計算結果:", func(*args))
+    print()
+
+display_info(calc_tax, 1000, 0.10)
+```
+
+**出力例**:
+
+```
+関数名: calc_tax
+Docstring: 価格から消費税を計算して合計金額を返す.
+計算結果: 1100.0
+```
+
+> **ポイント:**
+>
+> * 実行結果と合わせて確認できる
+> * 新人研修や学習用に最適
+
+---
+
+## 5️⃣ IPython / Jupyter Notebookでの確認
+
+* 関数名のあとに `?` をつけるとDocstringを表示できます
+
+```python
+calc_tax?
+```
+
+* `??` をつけるとソースコードも表示されます
+
+```python
+calc_tax??
+```
+
+> **ポイント:**
+>
+> * インタラクティブに確認できる
+> * Notebookで学習や資料作成に便利
+
+---
+
+## 6️⃣ クラス・モジュールのDocstring確認
+
+関数だけでなく、クラスやモジュールも確認可能です。
+
+```python
+class TaxCalculator:
+    """消費税計算クラス"""
+
+    def calc(self, price: float, tax_rate: float = 0.10) -> float:
+        """価格から消費税を計算して合計金額を返す."""
+        return price * (1 + tax_rate)
+
+# クラスDocstring
+print(TaxCalculator.__doc__)
+# メソッドDocstring
+print(TaxCalculator.calc.__doc__)
+```
+
+**出力例**:
+
+```
+消費税計算クラス
+価格から消費税を計算して合計金額を返す.
+```
+
+---
+
+## 7️⃣ 実務向けTips
+
+* **関数レビュー時**：`help(func)` で内容を即確認
+* **ログ出力時**：`func.__doc__` を出力して誰が見ても理解できるようにする
+* **チーム開発時**：Docstringスタイルを統一（Google / NumPy / reST など）すると見やすい
+* **自動生成ドキュメント**：Sphinx や pdoc でDocstringを読み込むと、自動でHTMLドキュメントが作れる
+
+---
+
+💡 **新人向けまとめ**
+
+| 確認方法               | 利点                     | 注意点              |
+| ------------------ | ---------------------- | ---------------- |
+| `help(func)`       | 引数・戻り値・Docstringを一括で確認 | インタラクティブでないと見にくい |
+| `func.__doc__`     | 軽量で簡単                  | 引数・戻り値は表示されない    |
+| ループで一覧             | 複数関数をまとめて確認            | 出力が長くなることも       |
+| 実行しながら確認           | 結果とDocstringが同時に見れる    | 実行に引数が必要         |
+| IPython / Notebook | インタラクティブで便利            | 環境が必要            |
+| クラス / モジュール        | 関数以外も確認できる             | 大規模プロジェクトでは整理が必要 |
+
+---
+
+🐰 新人エンジニア向けには **`help()` + 実行しながら確認 + ループで一覧表示** の組み合わせが最も理解しやすくおすすめです。
+
+---
+
+もし希望なら、この内容を **先ほどの消費税関数チートシートに統合して、実行すると各関数のDocstringも自動表示されるファイル** にまとめることもできます。
+
+作りますか？
