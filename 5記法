@@ -1,0 +1,157 @@
+了解です！🐰
+では先ほどの **Qiita風チートシート** を、**そのまま `.py` で保存して実行できる完全版** にまとめました。コメントや説明付きで、実行すると計算結果も表示されます。
+
+---
+
+```python
+# -*- coding: utf-8 -*-
+"""
+🐰 Python 型ヒント & 5大Docstringスタイルで作る消費税計算チートシート
+-------------------------------------------------------------------------------
+Qiita風にまとめた実務向けチートシートです。
+- 型ヒントの書き方
+- PEP257 / Google / NumPy / reST / Epytext の5大Docstringスタイル
+- 消費税計算のサンプル関数
+"""
+
+# ----------------------------------------
+# 型ヒントとは
+# 引数や戻り値の型を明示する書き方
+# Pythonは動的型付けですが、型ヒントをつけると以下が向上:
+# 1. 可読性
+# 2. 補完
+# 3. 静的解析
+#
+# 基本書き方:
+# def 関数名(引数名: 型, ...) -> 戻り値の型:
+#     処理
+#     return 戻り値
+
+# ----------------------------------------
+# 1️⃣ PEP 257 スタイル（標準）
+def calc_tax_pep257(price: float, tax_rate: float = 0.10) -> float:
+    """価格から消費税を計算して合計金額を返す."""
+    return price * (1 + tax_rate)
+
+# ----------------------------------------
+# 2️⃣ Google スタイル
+def calc_tax_google(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Args:
+        price (float): 商品の価格
+        tax_rate (float, optional): 消費税率（デフォルト10%）
+
+    Returns:
+        float: 消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+# ----------------------------------------
+# 3️⃣ NumPy スタイル
+def calc_tax_numpy(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    Parameters
+    ----------
+    price : float
+        商品の価格
+    tax_rate : float, optional
+        消費税率（デフォルト0.10）
+
+    Returns
+    -------
+    float
+        消費税込みの合計金額
+    """
+    return price * (1 + tax_rate)
+
+# ----------------------------------------
+# 4️⃣ reST / Sphinx スタイル
+def calc_tax_rest(price: float, tax_rate: float = 0.10) -> float:
+    """
+    価格から消費税を計算して合計金額を返す
+
+    :param price: 商品の価格
+    :type price: float
+    :param tax_rate: 消費税率（デフォルト0.10）
+    :type tax_rate: float
+    :return: 消費税込みの合計金額
+    :rtype: float
+    """
+    return price * (1 + tax_rate)
+
+# ----------------------------------------
+# 5️⃣ Epytext スタイル（非推奨）
+def calc_tax_epytext(price: float, tax_rate: float = 0.10) -> float:
+    """
+    @param price: 商品の価格
+    @type price: float
+    @param tax_rate: 消費税率
+    @type tax_rate: float
+    @return: 消費税込みの合計金額
+    @rtype: float
+    """
+    return price * (1 + tax_rate)
+
+# ----------------------------------------
+# 型ヒントの説明
+def explain_type_hints():
+    print("=== 型ヒント説明 ===")
+    print("price: float           -> 引数 price は float 型")
+    print("tax_rate: float = 0.10 -> 引数 tax_rate は float 型、デフォルト値 0.10")
+    print("-> float               -> 関数の戻り値は float 型")
+    print()
+
+# ----------------------------------------
+# 型ヒント応用例（List / Dict）
+from typing import List, Dict
+
+def calc_prices(prices: List[float]) -> Dict[str, float]:
+    """
+    複数商品の合計と税込合計を計算する
+
+    Parameters
+    ----------
+    prices : List[float]
+        商品価格のリスト
+
+    Returns
+    -------
+    Dict[str, float]
+        合計と税込合計の辞書
+    """
+    total = sum(prices)
+    return {"total": total, "with_tax": total * 1.1}
+
+# ----------------------------------------
+# 実行用テスト
+if __name__ == "__main__":
+    explain_type_hints()
+
+    price = 1000
+    tax = 0.10
+    print("PEP257式:", calc_tax_pep257(price, tax))
+    print("Google式:", calc_tax_google(price, tax))
+    print("NumPy式:", calc_tax_numpy(price, tax))
+    print("reST式:", calc_tax_rest(price, tax))
+    print("Epytext式:", calc_tax_epytext(price, tax))
+
+    # 型ヒント応用例
+    prices_list = [100, 200, 300]
+    print("複数商品の合計・税込:", calc_prices(prices_list))
+```
+
+---
+
+💡 ポイントまとめ
+
+* Qiita記事用にコメントや見出しを多めにして理解しやすくしました
+* 実行すると型ヒントの説明と、各Docstringスタイルの消費税計算結果が表示されます
+* `typing` を使えばリスト・辞書・タプルなども型指定可能
+
+---
+
+🐰 これで **保存してすぐ動かせる Qiita風 Python チートシート** の完成です！
